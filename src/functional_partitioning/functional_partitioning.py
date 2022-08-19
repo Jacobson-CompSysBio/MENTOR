@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+'''
+[TODO] Docstring
+'''
+
 import argparse
 import os
 import sys
@@ -71,7 +75,7 @@ def cluster_hierarchical(path_or_dataframe):
     Parameters
     ----------
     path_or_dataframe : str, pd.DataFrame
-        Path to 'fullranks' file from `RWR-CV --method=singletons` or 
+        Path to 'fullranks' file from `RWR-CV --method=singletons` or
         pandas.DataFrame.
 
     Returns
@@ -102,7 +106,7 @@ def cluster_hierarchical(path_or_dataframe):
 
     # Do the hierarchical clustering.
     Z = hierarchy.linkage(dvec, method='average')
-    
+
     return Z, labels
 
 
@@ -141,9 +145,9 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', color_threshold='auto', dr
         plot_line(kwargs.get('color_threshold'), c='k', linewidth=1, linestyle='dotted')
 
     tree = hierarchy.dendrogram(
-        Z, 
+        Z,
         orientation=kwargs.pop('orientation', 'left'),
-        labels=kwargs.pop('labels', None), 
+        labels=kwargs.pop('labels', None),
         leaf_font_size=kwargs.pop('leaf_font_size', 10),
         above_threshold_color=kwargs.pop('above_threshold_color', 'gray'),
         count_sort=kwargs.pop('count_sort', True),
@@ -156,30 +160,76 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', color_threshold='auto', dr
     return tree
 
 
-def get_clusters():
+def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     '''
     Get clusters from Z at given threshold.
+
+    Parameters
+    ----------
+    Z : linkage matrix
+    labels : list
+    threshold : int, float
+    match_to_leave : None, list
+        List of ints to order the rows. Use `tree['leaves']` to visually match
+        the list of cluster labels to the leaves of the dendrogram.  See
+        example below.
+
+    Examples
+    --------
+    Z, labels = cluster_hierarchical(fullranks)
+    tree = plot_dendrogram(Z, labels)
+
+    # Genes are ordered in same order as `labels`:
+    clusters = get_clusters(Z, labels, threshold=t)
+
+    # Genes are ordered the same as `tree['leaves']`:
+    clusters = get_clusters(Z, labels, threshold=t, match_to_leaves=tree['leaves'])
     '''
-    pass
+    clusters = hierarchy.fcluster(Z, t=threshold, criterion='distance')
+    clusters = pd.DataFrame(zip(labels, clusters), columns=['label', 'cluster'])
+    if match_to_leaves is not None:
+        # The default dendrogram orientation is 'left'. Y-axis is 0 at the bottom, increasing.
+        # So numeric tree['leaves'] start at 0 at the bottom of the figure.
+        # To match the cluster labels to the dendrogram visually, reverse the
+        # order of `tree['leaves']`.
+        clusters = clusters.iloc[match_to_leaves[::-1]].reset_index(drop=True)
+
+    if out_path is not None:
+        clusters.to_csv(out_path, sep='\t', index=None)
+
+    return clusters
 
 
-def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=None, **kwargs):
+def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=None, threshold=0, **kwargs):
     Z, labels = cluster_hierarchical(path_or_dataframe)
-    if 'labels' not in kwargs:
-        kwargs['labels'] = labels
-    tree = plot_dendrogram(Z, out_path=out_dendrogram, **kwargs)
-    # [TODO] clusters = get_clusters(Z, out_path=out_clusters, **kwargs)
-    return tree
+    # if 'labels' not in kwargs:
+    #     kwargs['labels'] = labels
+    labels = kwargs.pop('labels', labels)
+    tree = plot_dendrogram(
+        Z,
+        labels=labels,
+        color_threshold=threshold,
+        out_path=out_dendrogram,
+        **kwargs
+    )
+    clusters = get_clusters(
+        Z,
+        labels=labels,
+        threshold=threshold,
+        match_to_leaves=tree['leaves'],
+        out_path=out_clusters
+    )
+    return tree, clusters
 
 
 def parse_args(test=None):
     parser = argparse.ArgumentParser(
-        description='DESCRIPTION',
+        description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     # parser.add_argument(
     #     'positional',
-    #     help='HELP'
+    #     help='The positional argument.'
     # )
     parser.add_argument(
         '--rwr-fullranks', '-f',
@@ -195,7 +245,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--threshold', '-t',
         action='store',
-        default='auto',
+        default=False,
         help='Perform functional partitioning on "seed genes" from RWR fullranks file.'
     )
     parser.add_argument(
@@ -212,7 +262,7 @@ def parse_args(test=None):
         '--verbose', '-v',
         action='count',
         default=0,
-        help='once: Info, twice: Debug, thrice: Trace'
+        help='Default: WARNING; once: INFO; twice: DEBUG'
     )
 
     if len(sys.argv)==1:
@@ -239,14 +289,13 @@ def main():
     fullranks = pd.read_table(args.rwr_fullranks)
 
     if args.partition:
-        tree = partition_fullranks(
+        tree, clusters = partition_fullranks(
             path_or_dataframe=fullranks,
-            color_threshold=args.threshold,
+            threshold=args.threshold,
             out_dendrogram=args.out_dendrogram,
             out_clusters=args.out_clusters
         )
-        
-    # # ?hierarchy.dendrogram
+
     return 0
 
 
