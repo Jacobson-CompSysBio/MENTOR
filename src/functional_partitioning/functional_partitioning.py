@@ -110,7 +110,7 @@ def cluster_hierarchical(path_or_dataframe):
     return Z, labels
 
 
-def plot_dendrogram(Z, out_path=None, figsize='auto', color_threshold='auto', draw_threshold=True, **kwargs):
+def plot_dendrogram(Z, out_path=None, figsize='auto', draw_threshold=True, **kwargs):
     # Plot the dendrogram.
     if figsize == 'auto':
         width = 5
@@ -119,15 +119,15 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', color_threshold='auto', dr
             height = 10
         figsize = (width, height)
 
-    if color_threshold == 'auto':
-        kwargs['color_threshold'] = np.mean(Z[:,2])
-    elif color_threshold is None:
-        # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])`
-        # when `color_threshold==None`. Set this explicitely to enable
-        # `draw_threshold`, below.
-        kwargs['color_threshold'] = 0.7*max(Z[:,2])
-    else:
-        kwargs['color_threshold'] = float(color_threshold)
+    # if color_threshold == 'auto':
+    #     kwargs['color_threshold'] = np.mean(Z[:,2])
+    # elif color_threshold is None:
+    #     # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])`
+    #     # when `color_threshold==None`. Set this explicitely to enable
+    #     # `draw_threshold`, below.
+    #     kwargs['color_threshold'] = 0.7*max(Z[:,2])
+    # else:
+    #     kwargs['color_threshold'] = float(color_threshold)
 
     plt.rc('figure', facecolor='white')
     plt.figure(figsize=figsize)
@@ -144,12 +144,13 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', color_threshold='auto', dr
 
         plot_line(kwargs.get('color_threshold'), c='k', linewidth=1, linestyle='dotted')
 
+    # One of the default colors for coloring the leaves is 'gray' (tab10 colors?).
     tree = hierarchy.dendrogram(
         Z,
         orientation=kwargs.pop('orientation', 'left'),
         labels=kwargs.pop('labels', None),
         leaf_font_size=kwargs.pop('leaf_font_size', 10),
-        above_threshold_color=kwargs.pop('above_threshold_color', 'gray'),
+        above_threshold_color=kwargs.pop('above_threshold_color', 'k'),
         count_sort=kwargs.pop('count_sort', True),
         **kwargs
     )
@@ -205,6 +206,17 @@ def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=Non
     # if 'labels' not in kwargs:
     #     kwargs['labels'] = labels
     labels = kwargs.pop('labels', labels)
+
+    if threshold == 'auto':
+        threshold = np.mean(Z[:,2])
+    elif threshold is None:
+        # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])` when
+        # `color_threshold==None`. Set this explicitely to enable
+        # `draw_threshold`, below.
+        threshold = 0.7*max(Z[:,2])
+    else:
+        threshold = float(threshold)
+
     tree = plot_dendrogram(
         Z,
         labels=labels,
@@ -240,7 +252,7 @@ def parse_args(test=None):
         '--partition', '-p',
         action='store_true',
         default=True,
-        help='Perform functional partitioning on "seed genes" from RWR fullranks file.'
+        help='[PLACEHOLDER] Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
     )
     parser.add_argument(
         '--threshold', '-t',
