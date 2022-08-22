@@ -112,12 +112,6 @@ def cluster_hierarchical(path_or_dataframe):
 
 def plot_dendrogram(Z, out_path=None, figsize='auto', draw_threshold=True, **kwargs):
     # Plot the dendrogram.
-    if figsize == 'auto':
-        width = 5
-        height = np.shape(Z)[0] * 0.2
-        if height < 10:
-            height = 10
-        figsize = (width, height)
 
     # if color_threshold == 'auto':
     #     kwargs['color_threshold'] = np.mean(Z[:,2])
@@ -129,10 +123,17 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', draw_threshold=True, **kwa
     # else:
     #     kwargs['color_threshold'] = float(color_threshold)
 
-    plt.rc('figure', facecolor='white')
-    plt.figure(figsize=figsize)
+    if kwargs.get('ax') is None:
+        if figsize == 'auto':
+            width = 5
+            height = np.shape(Z)[0] * 0.2
+            if height < 10:
+                height = 10
+            figsize = (width, height)
+        plt.rc('figure', facecolor='white')
+        plt.figure(figsize=figsize)
 
-    if draw_threshold and kwargs.get('color_threshold') > 0:
+    if draw_threshold and kwargs.get('color_threshold', 0) > 0:
         # You have to know the orientation: left/right > vline, top/bottom > hline.
         _orientation = kwargs.get('orientation', 'left')
         if _orientation == 'left' or _orientation == 'right':
