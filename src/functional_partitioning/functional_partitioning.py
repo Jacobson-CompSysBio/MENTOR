@@ -16,6 +16,10 @@ from sklearn import metrics
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 
+# from .version import __version__
+# Error when run as a script:
+# > ImportError: attempted relative import with no known parent package
+
 
 def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     '''
@@ -208,7 +212,7 @@ def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=Non
     #     kwargs['labels'] = labels
     labels = kwargs.pop('labels', labels)
 
-    if threshold == 'auto':
+    if threshold == 'mean':
         threshold = np.mean(Z[:,2])
     elif threshold is None:
         # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])` when
@@ -236,6 +240,16 @@ def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=Non
 
 
 def parse_args(test=None):
+
+    def _valid_threshold_values(arg):
+        try:
+            if arg == 'mean':
+                return arg
+            else:
+                return float(arg)
+        except:
+            raise argparse.ArgumentTypeError(f'Threshold must be float or "mean"; you gave "{arg}".')
+
     parser = argparse.ArgumentParser(
         description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -258,8 +272,11 @@ def parse_args(test=None):
     parser.add_argument(
         '--threshold', '-t',
         action='store',
-        default=False,
-        help='Perform functional partitioning on "seed genes" from RWR fullranks file.'
+        default=0,
+        type=_valid_threshold_values,
+        help=(
+            'Apply threshold to dendrogram. Genes in branches below this threshold will be grouped into clusters; other genes are considered isolates (separate clusters, each with a single gene). Value can be float or "mean". If the value is "mean", then use the mean branch height as the cluster threshold; this can be useful for a first pass.'
+        )
     )
     parser.add_argument(
         '--out-dendrogram', '-d',
@@ -269,7 +286,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--out-clusters', '-c',
         action='store',
-        help='[TODO] NOT IMPLEMENTED. Save clusters to path.'
+        help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
     )
     parser.add_argument(
         '--verbose', '-v',
