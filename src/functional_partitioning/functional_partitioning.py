@@ -74,7 +74,7 @@ def get_elbow(y_true, min_size=3, debug=False):
     return idx_of_elbow
 
 
-def cluster_hierarchical(path_or_dataframe):
+def cluster_hierarchical(path_or_dataframe, max_rank=None):
     '''
     Parameters
     ----------
@@ -96,9 +96,10 @@ def cluster_hierarchical(path_or_dataframe):
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
     labels = ranks.index.to_list()
 
-    # Find elbow and set max_rank.
-    mean_scores = fullranks.groupby('rank')['Score'].mean()
-    max_rank = get_elbow(mean_scores)
+    if max_rank is None:
+        # Find elbow and set max_rank.
+        mean_scores = fullranks.groupby('rank')['Score'].mean()
+        max_rank = get_elbow(mean_scores)
 
     # Filter the rank vectors.
     mask = (ranks <= max_rank).fillna(False)
