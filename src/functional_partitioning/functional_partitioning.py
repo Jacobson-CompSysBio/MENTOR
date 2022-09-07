@@ -74,7 +74,7 @@ def get_elbow(y_true, min_size=3, debug=False):
     return idx_of_elbow
 
 
-def cluster_hierarchical(path_or_dataframe, max_rank=None):
+def cluster_hierarchical(path_or_dataframe, max_rank=None, drop_missing=True):
     '''
     Parameters
     ----------
@@ -91,6 +91,10 @@ def cluster_hierarchical(path_or_dataframe, max_rank=None):
     else:
         # Load the full ranks.
         fullranks = pd.read_table(path_or_dataframe)
+
+    if drop_missing:
+        # Drop rows with seeds that were not found in the network.
+        fullranks = fullranks.query('seed!="missing"')
 
     # Pivot full ranks -> ranks matrix.
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
