@@ -119,7 +119,12 @@ def cluster_hierarchical(path_or_dataframe, max_rank=None, drop_missing=True):
     return Z, labels
 
 
-def plot_dendrogram(Z, out_path=None, figsize='auto', draw_threshold=True, **kwargs):
+def plot_dendrogram(Z, labels=None, out_path=None, figsize='auto',
+        draw_threshold=True, **kwargs):
+    '''
+    labels : None
+        Dummy (for consistency with `plot_dendrogram_polar`).
+    '''
     # Plot the dendrogram.
 
     # if color_threshold == 'auto':
@@ -171,6 +176,125 @@ def plot_dendrogram(Z, out_path=None, figsize='auto', draw_threshold=True, **kwa
     return tree
 
 
+def plot_dendrogram_polar(Z, labels=None, leaf_fontsize=10, figsize=(10,10),
+        gap=0.025, show_grid='y', title=None, out_path=None, ax=None):
+    '''
+    Z : linkage matrix
+    labels : list
+        List of labels for the leaves of the dendrogram.
+    leaf_fontsize : int
+        Font size for the labels of the leaves.
+    figsize : tuple
+        Figure size.
+    gap : float
+        Proportion of the circle to leave as a "gap" between the dendrogram.
+        This gap is placed on the right-hand side of the circle, starting at 0
+        degrees (i.e, the horizontal), and puts equal space above and below the
+        horizontal.
+    show_grid : str
+        One of ['x', 'y', True, False].
+    title : str
+        Title for the plot.
+    '''
+    def smoothsegment(seg, Nsmooth=100):
+        return np.concatenate([[seg[0]], np.linspace(seg[1], seg[2], Nsmooth), [seg[3]]])
+
+    tree = hierarchy.dendrogram(Z, no_plot=True, count_sort=True)
+
+    # 'dcoord' is the width of the branch [???].
+    dcoord = np.array(tree['dcoord'])
+    dcoord = -np.log(dcoord+1)
+
+    # Rescale icoord: [gap/2, 1-(gap/2)] -> radians; ie, distribute the leaves
+    # evenly around the plot.
+    # 'icoord' is the leaves and all of the lines parallel to the leaves.
+    icoord = np.array(tree['icoord'])
+    imax = icoord.max()
+    imin = icoord.min()
+    # print(f'imin={imin}, imax={imax}')
+    icoord = ( (((icoord - imin) / (imax - imin)) * (1-gap)) + gap/2 ) * 2 * np.pi
+
+    if figsize == 'auto':
+        figsize = (10, 10)
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': 'polar'})
+
+    # This is the part that makes the actual dendrogram.
+    for xs, ys in zip(icoord, dcoord):
+        # [TODO] Color the clusters in the dendrogram. Eg, try checking the value
+        # of xs,ys to see if it's less than 'color_threshold'. Alternatively,
+        # just color the leaves using the 'cluster ids' (don't color the dendrogram at all).
+        xs = smoothsegment(xs)
+        ys = smoothsegment(ys)
+        ax.plot(xs, ys, color="black")
+
+    # Turn off black line around outside of plot.
+    ax.spines['polar'].set_visible(False)
+
+    # Put the distance label on the horizontal (0 degrees).
+    ax.set_rlabel_position(0)
+
+    if labels:
+        n_ticks = len(labels)
+
+        # Set the xtick positions based on the range of icoord, which is in radians.
+        imin = icoord.min()
+        imax = icoord.max()
+        ticks = np.linspace(imin, imax, n_ticks)
+        ax.set_xticks(ticks)
+
+        # Match the labels to the tree.
+        labels_ = [labels[i] for i in tree['leaves']]
+        ax.set_xticklabels(labels_, fontsize=leaf_fontsize)
+
+        # Set the rotation for each label individually.
+        gap_in_radians = gap * 2 * np.pi
+        start_radians = (gap_in_radians / 2)
+        end_radians = (2 * np.pi) - (gap_in_radians / 2)
+        radians = np.linspace(start_radians, end_radians, n_ticks)
+        radians[np.cos(radians) < 0] = radians[np.cos(radians) < 0] + np.pi
+        angles = np.rad2deg(radians)
+
+        # Overwrite the existing plot labels.
+        # [TODO] There must be a cleaner way to do this without setting all
+        # of the labels first and then re-getting the labels from the figure....
+        label_padding = 0.1
+        for label, angle in zip(ax.get_xticklabels(), angles):
+            x,y = label.get_position()
+            lab = ax.text(
+                x,
+                y-label_padding,
+                label.get_text(),
+                transform=label.get_transform(),
+                ha=label.get_ha(),
+                va=label.get_va()
+            )
+            lab.set_rotation(angle)
+        ax.set_xticklabels([])
+
+    # Adjust the grid. The default is to *show* the grid, so we have to
+    # explicitly turn it off.
+    if not show_grid:
+        ax.grid(visible=False)
+    elif show_grid == 'y':
+        # Show concentric circles. This is the default for this function.
+        ax.grid(visible=False, axis='x')
+    elif show_grid == 'x':
+        ax.grid(visible=False, axis='y')
+    else:
+        # Show both grids. This is the default in matplotlib.
+        pass
+
+    if title is not None:
+        ax.set_title(f"Polar= {polar}", fontsize=15)
+
+    if out_path is not None:
+        plt.savefig(out_path, dpi=300, bbox_inches='tight')
+
+    return tree
+
+
 def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     '''
     Get clusters from Z at given threshold.
@@ -211,7 +335,11 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     return clusters
 
 
-def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=None, threshold=0, **kwargs):
+def partition_fullranks(path_or_dataframe, dendrogram_style=None,
+        out_dendrogram=None, out_clusters=None, threshold=0, **kwargs):
+    '''
+    CLI helper.
+    '''
     Z, labels = cluster_hierarchical(path_or_dataframe)
     # if 'labels' not in kwargs:
     #     kwargs['labels'] = labels
@@ -227,13 +355,26 @@ def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=Non
     else:
         threshold = float(threshold)
 
-    tree = plot_dendrogram(
-        Z,
-        labels=labels,
-        color_threshold=threshold,
-        out_path=out_dendrogram,
-        **kwargs
-    )
+    if dendrogram_style is None:
+        pass
+    elif dendrogram_style.startswith('r'):
+        tree = plot_dendrogram(
+            Z,
+            labels=labels,
+            color_threshold=threshold,
+            out_path=out_dendrogram,
+            **kwargs
+        )
+    elif dendrogram_style.startswith('p'):
+        tree = plot_dendrogram_polar(
+            Z,
+            labels=labels,
+            out_path=out_dendrogram,
+            **kwargs
+        )
+    else:
+        pass
+
     clusters = get_clusters(
         Z,
         labels=labels,
@@ -241,6 +382,7 @@ def partition_fullranks(path_or_dataframe, out_dendrogram=None, out_clusters=Non
         match_to_leaves=tree['leaves'],
         out_path=out_clusters
     )
+
     return tree, clusters
 
 
@@ -284,6 +426,18 @@ def parse_args(test=None):
         )
     )
     parser.add_argument(
+        '--dendrogram-style', '-s',
+        action='store',
+        choices=['rectangular', 'r', 'polar', 'p'],
+        default='rectangular',
+        help='Plot the dendrogram in rectangular or polar coordinates. Default is rectangular.'
+    )
+    parser.add_argument(
+        '--out-dir',
+        action='store',
+        help='Save dendrogram and clusters to path.'
+    )
+    parser.add_argument(
         '--out-dendrogram', '-d',
         action='store',
         help='Save dendrogram to path.'
@@ -320,6 +474,16 @@ def parse_args(test=None):
 def main():
     args = parse_args()
 
+    if args.out_dir is not None:
+        if args.out_dendrogram is None:
+            out_dendrogram = os.path.join(args.out_dir, 'dendrogram.png')
+        else:
+            out_dendrogram = args.out_dendrogram
+        if args.out_clusters is None:
+            out_clusters = os.path.join(args.out_dir, 'clusters.tsv')
+        else:
+            out_clusters = args.out_clusters
+
     # Load the fullranks data once.
     fullranks = pd.read_table(args.rwr_fullranks)
 
@@ -327,8 +491,9 @@ def main():
         tree, clusters = partition_fullranks(
             path_or_dataframe=fullranks,
             threshold=args.threshold,
-            out_dendrogram=args.out_dendrogram,
-            out_clusters=args.out_clusters
+            dendrogram_style=args.dendrogram_style,
+            out_dendrogram=out_dendrogram,
+            out_clusters=out_clusters
         )
 
     return 0
