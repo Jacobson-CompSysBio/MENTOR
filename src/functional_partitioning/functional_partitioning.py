@@ -119,8 +119,14 @@ def cluster_hierarchical(path_or_dataframe, max_rank=None, drop_missing=True):
     return Z, labels
 
 
-def plot_dendrogram(Z, labels=None, out_path=None, figsize='auto',
-        draw_threshold=True, **kwargs):
+def plot_dendrogram(
+    Z,
+    labels=None,
+    out_path=None,
+    figsize='auto',
+    draw_threshold=True,
+    **kwargs
+):
     '''
     labels : None
         Dummy (for consistency with `plot_dendrogram_polar`).
@@ -163,7 +169,7 @@ def plot_dendrogram(Z, labels=None, out_path=None, figsize='auto',
     tree = hierarchy.dendrogram(
         Z,
         orientation=kwargs.pop('orientation', 'left'),
-        labels=kwargs.pop('labels', None),
+        labels=labels,
         leaf_font_size=kwargs.pop('leaf_font_size', 10),
         above_threshold_color=kwargs.pop('above_threshold_color', 'k'),
         count_sort=kwargs.pop('count_sort', True),
