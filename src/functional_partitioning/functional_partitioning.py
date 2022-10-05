@@ -53,6 +53,25 @@ def _root_mean_squared_error_at_c(y_true, c, debug=False):
 def get_elbow(y_true, min_size=3, debug=False):
     '''
     RMSE_{c}={c-1\over b-1}\times RMSE(L_{c})+{b-c\over b-1}\times RMSE(R_{c}) \eqno{\hbox{[1]}}
+
+    Parameters
+    ----------
+    y_true : array-like
+        The true values.
+    min_size : int
+        Minimum size of the left and right clusters.
+    debug : bool
+        Print debug information.
+
+    Returns
+    -------
+    c : int
+        The index of the elbow.
+
+    Examples
+    --------
+    >>> y_true = scores_matrix.values
+    >>> c = get_elbow(y_true)
     '''
 
     if isinstance(y_true, pd.DataFrame):
@@ -74,17 +93,22 @@ def get_elbow(y_true, min_size=3, debug=False):
     return idx_of_elbow
 
 
-def cluster_hierarchical(path_or_dataframe, max_rank=None, drop_missing=True):
+def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True):
     '''
     Parameters
     ----------
     path_or_dataframe : str, pd.DataFrame
         Path to 'fullranks' file from `RWR-CV --method=singletons` or
         pandas.DataFrame.
+    max_rank : int, str
+        Maximum rank to use for clustering. If 'elbow', use elbow method to
+        determine max_rank.
+    drop_missing : bool
+        Drop genes that are labeled "missing" in the fullranks file.
 
     Returns
     -------
-    linkage_matrix
+    linkage_matrix, labels
     '''
     if isinstance(path_or_dataframe, pd.DataFrame):
         fullranks = path_or_dataframe
@@ -100,7 +124,7 @@ def cluster_hierarchical(path_or_dataframe, max_rank=None, drop_missing=True):
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
     labels = ranks.index.to_list()
 
-    if max_rank is None:
+    if max_rank is 'elbow':
         # Find elbow and set max_rank.
         mean_scores = fullranks.groupby('rank')['Score'].mean()
         max_rank = get_elbow(mean_scores)
