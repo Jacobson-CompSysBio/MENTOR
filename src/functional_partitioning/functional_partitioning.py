@@ -124,7 +124,7 @@ def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True)
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
     labels = ranks.index.to_list()
 
-    if max_rank is 'elbow':
+    if max_rank == 'elbow':
         # Find elbow and set max_rank.
         mean_scores = fullranks.groupby('rank')['Score'].mean()
         max_rank = get_elbow(mean_scores)
