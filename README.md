@@ -16,7 +16,7 @@ Usage
 -----
 
 ```
-usage: functional_partitioning.py
+usage: functional_partitioning
     [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--threshold THRESHOLD]
     [--dendrogram-style {rectangular,r,polar,p}] [--out-dir OUT_DIR]
     [--out-dendrogram OUT_DENDROGRAM] [--out-clusters OUT_CLUSTERS] [--verbose]
