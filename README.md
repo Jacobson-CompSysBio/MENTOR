@@ -3,6 +3,15 @@ Functional Partitioning
 
 Functional partitioning.
 
+Installation
+------------
+
+```sh
+$ git clone https://github.com/izaakm/jail-functional-partitioning
+$ cd jail-functional-partitioning
+$ pip install .
+```
+
 Usage
 -----
 
@@ -44,14 +53,6 @@ options:
         Default: WARNING; once: INFO; twice: DEBUG (default: 0)
 ```
 
-
-Project Organization
---------------------
-
-    ├── LICENSE
-    ├── README.md       <- The top-level README for developers using this project.
-    ├── setup.py        <- Install project: `pip install -e .`
-    └── src             <- Source code for use in this project.
 
 
 Acknowledgements
