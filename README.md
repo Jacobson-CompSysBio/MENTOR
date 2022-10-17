@@ -16,10 +16,11 @@ Usage
 -----
 
 ```
-usage: functional_partitioning
-    [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--threshold THRESHOLD]
-    [--dendrogram-style {rectangular,r,polar,p}] [--out-dir OUT_DIR]
-    [--out-dendrogram OUT_DENDROGRAM] [--out-clusters OUT_CLUSTERS] [--verbose]
+usage:
+    functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition]
+    [--threshold THRESHOLD] [--dendrogram-style {rectangular,r,polar,p}]
+    [--out-dir OUT_DIR] [--out-dendrogram OUT_DENDROGRAM] [--out-clusters
+    OUT_CLUSTERS] [--verbose]
 
 Partition seeds from `RWR-CV --method=singletons ...` into clusters.
 
