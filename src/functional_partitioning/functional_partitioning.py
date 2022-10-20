@@ -140,7 +140,8 @@ def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True)
     # Do the hierarchical clustering.
     Z = hierarchy.linkage(dvec, method='average')
 
-    return Z, labels
+    # return Z, labels
+    return dict(linkage=Z, labels=labels, max_rank=max_rank)
 
 
 def plot_dendrogram(
@@ -154,6 +155,12 @@ def plot_dendrogram(
     '''
     labels : None
         Dummy (for consistency with `plot_dendrogram_polar`).
+    out_path : str
+    figsize : tuple, str
+        Default is 'auto'.
+    draw_threshold : bool
+    kwargs
+        Passed to `hierarchy.dendrogram`
     '''
     # Plot the dendrogram.
 
@@ -167,7 +174,13 @@ def plot_dendrogram(
     # else:
     #     kwargs['color_threshold'] = float(color_threshold)
 
-    if kwargs.get('ax') is None:
+    if plt.get_fignums() and kwargs.get('ax') is None:
+        # A figure exists; use it.
+        # > To test whether there is currently a figure on the pyplot figure
+        # > stack, check whether `~.pyplot.get_fignums()` is empty.
+        # > ~ help(plt.gcf)
+        kwargs['ax'] = plt.gca()
+    elif kwargs.get('ax') is None:
         if figsize == 'auto':
             width = 5
             height = np.shape(Z)[0] * 0.2
@@ -369,10 +382,17 @@ def partition_fullranks(path_or_dataframe, dendrogram_style=None,
         out_dendrogram=None, out_clusters=None, threshold=0, **kwargs):
     '''
     CLI helper.
+
+    Returns
+    -------
+    tree, clusters
     '''
-    Z, labels = cluster_hierarchical(path_or_dataframe)
-    # if 'labels' not in kwargs:
-    #     kwargs['labels'] = labels
+    # Z, labels = cluster_hierarchical(path_or_dataframe)
+    partition_result = cluster_hierarchical(path_or_dataframe)
+
+    Z = partition_result['linkage']
+
+    labels = partition_result['labels']
     labels = kwargs.pop('labels', labels)
 
     if threshold == 'mean':
@@ -386,7 +406,7 @@ def partition_fullranks(path_or_dataframe, dendrogram_style=None,
         threshold = float(threshold)
 
     if dendrogram_style is None:
-        pass
+        tree = {}
     elif dendrogram_style.startswith('r'):
         tree = plot_dendrogram(
             Z,
@@ -403,17 +423,20 @@ def partition_fullranks(path_or_dataframe, dendrogram_style=None,
             **kwargs
         )
     else:
-        pass
+        tree = {}
 
     clusters = get_clusters(
         Z,
         labels=labels,
         threshold=threshold,
-        match_to_leaves=tree['leaves'],
+        match_to_leaves=tree.get('leaves'),
         out_path=out_clusters
     )
 
-    return tree, clusters
+    partition_result['tree'] = tree
+    partition_result['clusters'] = clusters
+
+    return partition_result
 
 
 def parse_args(test=None):
@@ -518,7 +541,7 @@ def main():
     fullranks = pd.read_table(args.rwr_fullranks)
 
     if args.partition:
-        tree, clusters = partition_fullranks(
+        result = partition_fullranks(
             path_or_dataframe=fullranks,
             threshold=args.threshold,
             dendrogram_style=args.dendrogram_style,
