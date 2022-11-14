@@ -524,20 +524,20 @@ def parse_args(test=None):
         action='store',
         nargs='*',
         type=str,
-        help='Label the dendrogram using columns from the nodetable. Pass columns as strings (column names).'
+        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of column names from the nodetable. Pass columns as strings (column names).'
     )
     parser.add_argument(
         '--labels-use-locs',
         action='store',
         nargs='*',
         type=int,
-        help='Label the dendrogram using columns from the nodetable. Pass columns as numeric identifiers (0-index, i.e., the first column, which contains the node names, is column 0).'
+        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of integers indicating columns from the nodetable (0-index, e.g., the first column, which contains the node names, has index 0; the second column has index 1, etc).'
     )
     parser.add_argument(
         '--labels-sep',
         action='store',
         default=' | ',
-        help='This is the separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
+        help='The separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
     )
     parser.add_argument(
         '--out-dir',
