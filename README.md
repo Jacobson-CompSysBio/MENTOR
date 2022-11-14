@@ -78,6 +78,52 @@ options:
                         0)
 ```
 
+Examples
+--------
+
+You can change the labels on the leaves of the dendrogram. This requires that
+you have a nodetable file. The nodetable is a TSV file with the first column as
+the seed genes use for RWR-CV (singletons), e.g., something like this:
+
+    gene_id          gene_info
+    Potri.001G377800 This is gene 001G377800.
+    Potri.001G429430 This is gene 001G429430.
+    Potri.003G099600 This is gene 003G099600.
+    ...
+
+Then, provide the `--nodetable` and `--labels-use-{locs,names}` parameters to
+tell this script which columns to use as labels on the dendrogram. E.g., to use
+the column "gene_info" as the labels, you can either provide the column by name:
+
+```sh
+functional_partitioning \
+    --rwr-fullranks <path to fullranks file> \
+    --partition \
+    --nodetable <path to nodetable.tsv file> \
+    --labels-use-names "gene_info"
+```
+
+Or provide the column by number:
+
+```sh
+functional_partitioning \
+    --rwr-fullranks <path to fullranks file> \
+    --partition \
+    --nodetable <path to nodetable.tsv file> \
+    --labels-use-locs 1
+```
+
+If you want to keep the node ID in the label, provide that column as one of the
+labels in addition to any others:
+
+```sh
+functional_partitioning \
+    --rwr-fullranks <path to fullranks file> \
+    --partition \
+    --nodetable <path to nodetable.tsv file> \
+    --labels-use-names "gene_id" "gene_info"
+```
+
 
 Acknowledgements
 ----------------
