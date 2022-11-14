@@ -378,14 +378,27 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     return clusters
 
 
-def partition_fullranks(path_or_dataframe, dendrogram_style=None,
-        out_dendrogram=None, out_clusters=None, threshold=0, **kwargs):
+def partition_fullranks(
+    path_or_dataframe,
+    dendrogram_style=None,
+    label_mapper=None,
+    out_dendrogram=None,
+    out_clusters=None,
+    threshold=0,
+    **kwargs
+):
     '''
     CLI helper.
 
+    Parameters
+    ----------
+    label_mapper : dict
+        Use these labels on the dendrogram. Dict of `{seed: dendrogram_label,
+        ... }`.
+
     Returns
     -------
-    tree, clusters
+    dict
     '''
     # Z, labels = cluster_hierarchical(path_or_dataframe)
     partition_result = cluster_hierarchical(path_or_dataframe)
@@ -393,7 +406,12 @@ def partition_fullranks(path_or_dataframe, dendrogram_style=None,
     Z = partition_result['linkage']
 
     labels = partition_result['labels']
-    labels = kwargs.pop('labels', labels)
+    if label_mapper is not None:
+        labels = [label_mapper[l] for l in labels]
+    elif 'labels' in kwargs:
+        labels = kwargs.pop('labels', labels)
+    else:
+        pass
 
     if threshold == 'mean':
         threshold = np.mean(Z[:,2])
@@ -464,6 +482,11 @@ def parse_args(test=None):
         help='Path to "fullranks" file from `RWR-CV --method=singletons ...`'
     )
     parser.add_argument(
+        '--nodetable',
+        action='store',
+        help='Path to "nodetable" file. This is a TSV file where the first column is the node name (i.e., the seed genes from RWR-fullranks).'
+    )
+    parser.add_argument(
         '--partition', '-p',
         action='store_true',
         default=True,
@@ -484,6 +507,26 @@ def parse_args(test=None):
         choices=['rectangular', 'r', 'polar', 'p'],
         default='rectangular',
         help='Plot the dendrogram in rectangular or polar coordinates. Default is rectangular.'
+    )
+    parser.add_argument(
+        '--labels-use-names',
+        action='store',
+        nargs='*',
+        type=str,
+        help='Label the dendrogram using columns from the nodetable. Pass columns as strings (column names).'
+    )
+    parser.add_argument(
+        '--labels-use-locs',
+        action='store',
+        nargs='*',
+        type=int,
+        help='Label the dendrogram using columns from the nodetable. Pass columns as numeric identifiers (0-index, i.e., the first column, which contains the node names, is column 0).'
+    )
+    parser.add_argument(
+        '--labels-sep',
+        action='store',
+        default=' | ',
+        help='This is the separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
     )
     parser.add_argument(
         '--out-dir',
@@ -537,6 +580,22 @@ def main():
         else:
             out_clusters = args.out_clusters
 
+    if args.labels_use_names or args.labels_use_locs:
+        nodetable = pd.read_table(args.nodetable)
+        columns = nodetable.columns.to_list()
+        idx_col = columns[0]
+
+        if args.labels_use_locs:
+            col_names = [columns[i] for i in args.labels_use_locs]
+        else:
+            col_names = args.labels_use_names
+
+        label_mapper = nodetable.set_index(idx_col, drop=False)[col_names].agg(args.labels_sep.join, axis=1).to_dict()
+    else:
+        label_mapper = None
+
+    # print(label_mapper)  # Debug.
+
     # Load the fullranks data once.
     fullranks = pd.read_table(args.rwr_fullranks)
 
@@ -545,6 +604,7 @@ def main():
             path_or_dataframe=fullranks,
             threshold=args.threshold,
             dendrogram_style=args.dendrogram_style,
+            label_mapper=label_mapper,
             out_dendrogram=out_dendrogram,
             out_clusters=out_clusters
         )
