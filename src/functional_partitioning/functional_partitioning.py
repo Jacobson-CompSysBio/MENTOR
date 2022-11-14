@@ -150,6 +150,7 @@ def plot_dendrogram(
     out_path=None,
     figsize='auto',
     draw_threshold=True,
+    verbose=0,
     **kwargs
 ):
     '''
@@ -215,6 +216,8 @@ def plot_dendrogram(
 
     if out_path is not None:
         plt.savefig(out_path, dpi=300, bbox_inches='tight')
+        if verbose:
+            print(f'Saved dendrogram: {out_path}')
 
     return tree
 
@@ -334,11 +337,13 @@ def plot_dendrogram_polar(Z, labels=None, leaf_fontsize=10, figsize=(10,10),
 
     if out_path is not None:
         plt.savefig(out_path, dpi=300, bbox_inches='tight')
+        if verbose:
+            print(f'Saved dendrogram: {out_path}')
 
     return tree
 
 
-def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
+def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None, verbose=0):
     '''
     Get clusters from Z at given threshold.
 
@@ -374,6 +379,8 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
 
     if out_path is not None:
         clusters.to_csv(out_path, sep='\t', index=None)
+        if verbose:
+            print(f'Saved clusters: {out_path}')
 
     return clusters
 
@@ -385,6 +392,7 @@ def partition_fullranks(
     out_dendrogram=None,
     out_clusters=None,
     threshold=0,
+    verbose=0,
     **kwargs
 ):
     '''
@@ -431,6 +439,7 @@ def partition_fullranks(
             labels=labels,
             color_threshold=threshold,
             out_path=out_dendrogram,
+            verbose=verbose,
             **kwargs
         )
     elif dendrogram_style.startswith('p'):
@@ -438,6 +447,7 @@ def partition_fullranks(
             Z,
             labels=labels,
             out_path=out_dendrogram,
+            verbose=verbose,
             **kwargs
         )
     else:
@@ -448,7 +458,8 @@ def partition_fullranks(
         labels=labels,
         threshold=threshold,
         match_to_leaves=tree.get('leaves'),
-        out_path=out_clusters
+        out_path=out_clusters,
+        verbose=verbose
     )
 
     partition_result['tree'] = tree
@@ -606,7 +617,8 @@ def main():
             dendrogram_style=args.dendrogram_style,
             label_mapper=label_mapper,
             out_dendrogram=out_dendrogram,
-            out_clusters=out_clusters
+            out_clusters=out_clusters,
+            verbose=args.verbose
         )
 
     return 0
