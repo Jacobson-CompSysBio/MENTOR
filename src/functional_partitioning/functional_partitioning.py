@@ -582,14 +582,22 @@ def main():
     args = parse_args()
 
     if args.out_dir is not None:
+        # Use --out-dir with default names, unless another path is explicitely specified.
+
         if args.out_dendrogram is None:
+            # Set the default path for the dendrogram.
             out_dendrogram = os.path.join(args.out_dir, 'dendrogram.png')
         else:
             out_dendrogram = args.out_dendrogram
+
         if args.out_clusters is None:
+            # Set the default path for the clusters.
             out_clusters = os.path.join(args.out_dir, 'clusters.tsv')
         else:
             out_clusters = args.out_clusters
+    else:
+        out_dendrogram = args.out_dendrogram
+        out_clusters = args.out_clusters
 
     if args.labels_use_names or args.labels_use_locs:
         nodetable = pd.read_table(args.nodetable)
