@@ -26,7 +26,8 @@ Usage
 usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
                                [--nodetable NODETABLE] [--partition]
                                [--threshold THRESHOLD]
-                               [--dendrogram-style {rectangular,r,polar,p}]
+                               [--dendrogram-style {rectangular,r,polar,p,none,n}]
+                               [--no-plot]
                                [--labels-use-names [LABELS_USE_NAMES ...]]
                                [--labels-use-locs [LABELS_USE_LOCS ...]]
                                [--labels-sep LABELS_SEP] [--out-dir OUT_DIR]
@@ -55,23 +56,26 @@ options:
                         the value is "mean", then use the mean branch height
                         as the cluster threshold; this can be useful for a
                         first pass. (default: 0)
-  --dendrogram-style {rectangular,r,polar,p}, -s {rectangular,r,polar,p}
+  --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
                         Plot the dendrogram in rectangular or polar
                         coordinates. Default is rectangular. (default:
                         rectangular)
+  --no-plot             Do not plot the dendrogram. (default: False)
   --labels-use-names [LABELS_USE_NAMES ...]
                         Label the dendrogram using columns from the nodetable.
-                        Pass columns as strings (column names). (default:
-                        None)
+                        This is a space-separated list of column names from
+                        the nodetable. Pass columns as strings (column names).
+                        (default: None)
   --labels-use-locs [LABELS_USE_LOCS ...]
                         Label the dendrogram using columns from the nodetable.
-                        Pass columns as numeric identifiers (0-index, i.e.,
-                        the first column, which contains the node names, is
-                        column 0). (default: None)
+                        This is a space-separated list of integers indicating
+                        columns from the nodetable (0-index, e.g., the first
+                        column, which contains the node names, has index 0;
+                        the second column has index 1, etc). (default: None)
   --labels-sep LABELS_SEP
-                        This is the separator that will be used if multiple
-                        columns from nodetable are used to label the
-                        dendrogram. (default: | )
+                        The separator that will be used if multiple columns
+                        from nodetable are used to label the dendrogram.
+                        (default: | )
   --out-dir OUT_DIR     Save dendrogram and clusters to path. (default: None)
   --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
                         Save dendrogram to path. (default: None)
