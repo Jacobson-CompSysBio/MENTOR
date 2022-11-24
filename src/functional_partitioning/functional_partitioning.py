@@ -24,12 +24,6 @@ from scipy.cluster import hierarchy
 DPI = 300
 LOGGER = logging.getLogger(__name__)
 
-# LOGGER.debug('This is a debug')
-# LOGGER.info('This is a info')
-# LOGGER.warning('This is a warning')
-# LOGGER.error('This is a error')
-# LOGGER.critical('This is a critical')
-
 def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     '''
     y_true, y_pred, *, sample_weight=None, multioutput='uniform_average', squared=True
@@ -51,10 +45,6 @@ def _root_mean_squared_error_at_c(y_true, c, debug=False):
     r_stop = b+1
     Lc = y_true[l_start:l_stop]
     Rc = y_true[r_start:r_stop]
-    # if debug:
-    #     # print(l_start, l_stop, c, r_start, r_stop)
-    #     # print(len(Lc), len(Rc))
-    #     print(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
     LOGGER.debug(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
     rmse_c = ( ((c-1)/(b-1)) * _root_mean_squared_error(Lc) ) +              ( ((b-c)/(b-1)) * _root_mean_squared_error(Rc) )
     return rmse_c
@@ -167,11 +157,9 @@ def savefig(out_path=None, **kwargs):
 
 def plot_dendrogram(
     Z,
-    labels=None,
     out_path=None,
     figsize='auto',
     draw_threshold=True,
-    verbose=0,
     **kwargs
 ):
     '''
@@ -184,19 +172,9 @@ def plot_dendrogram(
     kwargs
         Passed to `hierarchy.dendrogram`
     '''
-    # Plot the dendrogram.
-
-    # if color_threshold == 'auto':
-    #     kwargs['color_threshold'] = np.mean(Z[:,2])
-    # elif color_threshold is None:
-    #     # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])`
-    #     # when `color_threshold==None`. Set this explicitely to enable
-    #     # `draw_threshold`, below.
-    #     kwargs['color_threshold'] = 0.7*max(Z[:,2])
-    # else:
-    #     kwargs['color_threshold'] = float(color_threshold)
-
-    if plt.get_fignums() and kwargs.get('ax') is None:
+    if kwargs.get('no_plot'):
+        pass
+    elif plt.get_fignums() and kwargs.get('ax') is None:
         # A figure exists; use it.
         # > To test whether there is currently a figure on the pyplot figure
         # > stack, check whether `~.pyplot.get_fignums()` is empty.
@@ -213,7 +191,9 @@ def plot_dendrogram(
         plt.rc('figure', facecolor='white')
         plt.figure(figsize=figsize)
 
-    if draw_threshold and kwargs.get('color_threshold', 0) > 0:
+    if kwargs.get('no_plot'):
+        pass
+    elif draw_threshold and kwargs.get('color_threshold', 0) > 0:
         # You have to know the orientation: left/right > vline, top/bottom > hline.
         _orientation = kwargs.get('orientation', 'left')
         if _orientation == 'left' or _orientation == 'right':
@@ -222,25 +202,35 @@ def plot_dendrogram(
             plot_line = plt.axhline
         else:
             raise ValueError(f'`orientation` must be one of ["top", "bottom", "left", "right"]: {_orientation}')
-
         plot_line(kwargs.get('color_threshold'), c='k', linewidth=1, linestyle='dotted')
 
     # One of the default colors for coloring the leaves is 'gray' (tab10 colors?).
     tree = hierarchy.dendrogram(
         Z,
-        orientation=kwargs.pop('orientation', 'left'),
-        labels=labels,
-        leaf_font_size=kwargs.pop('leaf_font_size', 10),
-        above_threshold_color=kwargs.pop('above_threshold_color', 'k'),
-        count_sort=kwargs.pop('count_sort', True),
-        **kwargs
+        p=kwargs.get('p', 30),
+        truncate_mode=kwargs.get('truncate_mode', None),
+        color_threshold=kwargs.get('color_threshold', None),
+        get_leaves=kwargs.get('get_leaves', True),
+        orientation=kwargs.get('orientation', 'left'),
+        labels=kwargs.get('labels', None),
+        count_sort=kwargs.get('count_sort', True),
+        distance_sort=kwargs.get('distance_sort', False),
+        show_leaf_counts=kwargs.get('show_leaf_counts', True),
+        no_plot=kwargs.get('no_plot', False),
+        no_labels=kwargs.get('no_labels', False),
+        leaf_font_size=kwargs.get('leaf_font_size', 10),
+        leaf_rotation=kwargs.get('leaf_rotation', None),
+        leaf_label_func=kwargs.get('leaf_label_func', None),
+        show_contracted=kwargs.get('show_contracted', False),
+        link_color_func=kwargs.get('link_color_func', None),
+        ax=kwargs.get('ax', None),
+        above_threshold_color=kwargs.get('above_threshold_color', 'k')
     )
 
-    # if out_path is not None:
-    #     plt.savefig(out_path, dpi=DPI, bbox_inches='tight')
-    #     if verbose:
-    #         print(f'Saved dendrogram: {out_path}')
-    savefig(out_path=out_path)
+    if kwargs.get('no_plot'):
+        pass
+    else:
+        savefig(out_path=out_path)
 
     return tree
 
@@ -249,13 +239,12 @@ def plot_dendrogram_polar(
     Z,
     labels=None,
     leaf_fontsize=10,
-    figsize=(10,10),
+    figsize='auto',
     gap=0.025,
     show_grid='y',
     title=None,
     out_path=None,
     ax=None,
-    verbose=0,
     **kwargs
 ):
     '''
@@ -281,104 +270,103 @@ def plot_dendrogram_polar(
 
     tree = hierarchy.dendrogram(Z, no_plot=True, count_sort=True)
 
-    # 'dcoord' is the width of the branch [???].
-    dcoord = np.array(tree['dcoord'])
-    dcoord = -np.log(dcoord+1)
-
-    # Rescale icoord: [gap/2, 1-(gap/2)] -> radians; ie, distribute the leaves
-    # evenly around the plot.
-    # 'icoord' is the leaves and all of the lines parallel to the leaves.
-    icoord = np.array(tree['icoord'])
-    imax = icoord.max()
-    imin = icoord.min()
-    # print(f'imin={imin}, imax={imax}')
-    icoord = ( (((icoord - imin) / (imax - imin)) * (1-gap)) + gap/2 ) * 2 * np.pi
-
-    if figsize == 'auto':
-        figsize = (10, 10)
-
-    if ax is None:
-        fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': 'polar'})
-
-    # This is the part that makes the actual dendrogram.
-    for xs, ys in zip(icoord, dcoord):
-        # [TODO] Color the clusters in the dendrogram. Eg, try checking the value
-        # of xs,ys to see if it's less than 'color_threshold'. Alternatively,
-        # just color the leaves using the 'cluster ids' (don't color the dendrogram at all).
-        xs = smoothsegment(xs)
-        ys = smoothsegment(ys)
-        ax.plot(xs, ys, color="black")
-
-    # Turn off black line around outside of plot.
-    ax.spines['polar'].set_visible(False)
-
-    # Put the distance label on the horizontal (0 degrees).
-    ax.set_rlabel_position(0)
-
-    if labels:
-        n_ticks = len(labels)
-
-        # Set the xtick positions based on the range of icoord, which is in radians.
-        imin = icoord.min()
-        imax = icoord.max()
-        ticks = np.linspace(imin, imax, n_ticks)
-        ax.set_xticks(ticks)
-
-        # Match the labels to the tree.
-        labels_ = [labels[i] for i in tree['leaves']]
-        ax.set_xticklabels(labels_, fontsize=leaf_fontsize)
-
-        # Set the rotation for each label individually.
-        gap_in_radians = gap * 2 * np.pi
-        start_radians = (gap_in_radians / 2)
-        end_radians = (2 * np.pi) - (gap_in_radians / 2)
-        radians = np.linspace(start_radians, end_radians, n_ticks)
-        radians[np.cos(radians) < 0] = radians[np.cos(radians) < 0] + np.pi
-        angles = np.rad2deg(radians)
-
-        # Overwrite the existing plot labels.
-        # [TODO] There must be a cleaner way to do this without setting all
-        # of the labels first and then re-getting the labels from the figure....
-        label_padding = 0.1
-        for label, angle in zip(ax.get_xticklabels(), angles):
-            x,y = label.get_position()
-            lab = ax.text(
-                x,
-                y-label_padding,
-                label.get_text(),
-                transform=label.get_transform(),
-                ha=label.get_ha(),
-                va=label.get_va()
-            )
-            lab.set_rotation(angle)
-        ax.set_xticklabels([])
-
-    # Adjust the grid. The default is to *show* the grid, so we have to
-    # explicitly turn it off.
-    if not show_grid:
-        ax.grid(visible=False)
-    elif show_grid == 'y':
-        # Show concentric circles. This is the default for this function.
-        ax.grid(visible=False, axis='x')
-    elif show_grid == 'x':
-        ax.grid(visible=False, axis='y')
-    else:
-        # Show both grids. This is the default in matplotlib.
+    if kwargs.get('no_plot'):
         pass
+    else:
+        # 'dcoord' is the width of the branch [???].
+        dcoord = np.array(tree['dcoord'])
+        dcoord = -np.log(dcoord+1)
 
-    if title is not None:
-        ax.set_title(f"Polar= {polar}", fontsize=15)
+        # Rescale icoord: [gap/2, 1-(gap/2)] -> radians; ie, distribute the leaves
+        # evenly around the plot.
+        # 'icoord' is the leaves and all of the lines parallel to the leaves.
+        icoord = np.array(tree['icoord'])
+        imax = icoord.max()
+        imin = icoord.min()
+        # print(f'imin={imin}, imax={imax}')
+        icoord = ( (((icoord - imin) / (imax - imin)) * (1-gap)) + gap/2 ) * 2 * np.pi
 
-    # if out_path is not None:
-    #     plt.savefig(out_path, dpi=DPI, bbox_inches='tight')
-    #     if verbose:
-    #         print(f'Saved dendrogram: {out_path}')
-    savefig(out_path=out_path)
+        if figsize == 'auto':
+            figsize = (10, 10)
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': 'polar'})
+
+        # This is the part that makes the actual dendrogram.
+        for xs, ys in zip(icoord, dcoord):
+            # [TODO] Color the clusters in the dendrogram. Eg, try checking the value
+            # of xs,ys to see if it's less than 'color_threshold'. Alternatively,
+            # just color the leaves using the 'cluster ids' (don't color the dendrogram at all).
+            xs = smoothsegment(xs)
+            ys = smoothsegment(ys)
+            ax.plot(xs, ys, color="black")
+
+        # Turn off black line around outside of plot.
+        ax.spines['polar'].set_visible(False)
+
+        # Put the distance label on the horizontal (0 degrees).
+        ax.set_rlabel_position(0)
+
+        if labels:
+            n_ticks = len(labels)
+
+            # Set the xtick positions based on the range of icoord, which is in radians.
+            imin = icoord.min()
+            imax = icoord.max()
+            ticks = np.linspace(imin, imax, n_ticks)
+            ax.set_xticks(ticks)
+
+            # Match the labels to the tree.
+            labels_ = [labels[i] for i in tree['leaves']]
+            ax.set_xticklabels(labels_, fontsize=leaf_fontsize)
+
+            # Set the rotation for each label individually.
+            gap_in_radians = gap * 2 * np.pi
+            start_radians = (gap_in_radians / 2)
+            end_radians = (2 * np.pi) - (gap_in_radians / 2)
+            radians = np.linspace(start_radians, end_radians, n_ticks)
+            radians[np.cos(radians) < 0] = radians[np.cos(radians) < 0] + np.pi
+            angles = np.rad2deg(radians)
+
+            # Overwrite the existing plot labels.
+            # [TODO] There must be a cleaner way to do this without setting all
+            # of the labels first and then re-getting the labels from the figure....
+            label_padding = 0.1
+            for label, angle in zip(ax.get_xticklabels(), angles):
+                x,y = label.get_position()
+                lab = ax.text(
+                    x,
+                    y-label_padding,
+                    label.get_text(),
+                    transform=label.get_transform(),
+                    ha=label.get_ha(),
+                    va=label.get_va()
+                )
+                lab.set_rotation(angle)
+            ax.set_xticklabels([])
+
+        # Adjust the grid. The default is to *show* the grid, so we have to
+        # explicitly turn it off.
+        if not show_grid:
+            ax.grid(visible=False)
+        elif show_grid == 'y':
+            # Show concentric circles. This is the default for this function.
+            ax.grid(visible=False, axis='x')
+        elif show_grid == 'x':
+            ax.grid(visible=False, axis='y')
+        else:
+            # Show both grids. This is the default in matplotlib.
+            pass
+
+        if title is not None:
+            ax.set_title(f"Polar= {polar}", fontsize=15)
+
+        savefig(out_path=out_path)
 
     return tree
 
 
-def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None, verbose=0):
+def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     '''
     Get clusters from Z at given threshold.
 
@@ -414,8 +402,6 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None, ve
 
     if out_path is not None:
         clusters.to_csv(out_path, sep='\t', index=None)
-        # if verbose:
-        #     print(f'Saved clusters: {out_path}')
         LOGGER.info(f'Saved clusters: {out_path}')
 
     return clusters
@@ -428,7 +414,6 @@ def partition_fullranks(
     out_dendrogram=None,
     out_clusters=None,
     threshold=0,
-    verbose=0,
     **kwargs
 ):
     '''
@@ -478,7 +463,6 @@ def partition_fullranks(
                 labels=labels,
                 color_threshold=threshold,
                 out_path=out_dendrogram,
-                verbose=verbose,
                 **kwargs
             )
         except Exception as e:
@@ -490,7 +474,6 @@ def partition_fullranks(
                 Z,
                 labels=labels,
                 out_path=out_dendrogram,
-                verbose=verbose,
                 **kwargs
             )
         except Exception as e:
@@ -505,7 +488,6 @@ def partition_fullranks(
         threshold=threshold,
         match_to_leaves=tree.get('leaves'),
         out_path=out_clusters,
-        verbose=verbose
     )
 
     partition_result['tree'] = tree
@@ -566,6 +548,12 @@ def parse_args(test=None):
         help='Plot the dendrogram in rectangular or polar coordinates. Default is rectangular.'
     )
     parser.add_argument(
+        '--no-plot',
+        action='store_true',
+        default=False,
+        help='Do not plot the dendrogram.'
+    )
+    parser.add_argument(
         '--labels-use-names',
         action='store',
         nargs='*',
@@ -616,23 +604,16 @@ def parse_args(test=None):
     else:
         args = parser.parse_args(test)
 
-    # if args.verbose>0:
-    #     # print(f"Arguments count: {len(args)}")
-    #     for name, value in args.__dict__.items():
-    #         print(f"{name}: {value}")
-
     return args
 
 
 def main():
     args = parse_args()
-    # print('args:', args)
 
     # Logging:
     # - Using `LOGGER.setLevel` isn't working, use `logging.basicConfig`
     #   instead.
-    # - `logging.basicConfig` should be called *once*; if called multiple times
-    #   it will overwrite previous calls with defaults.
+    # - `logging.basicConfig` should be called *once*.
     # - `logging.basicConfig` also affects settings for imported modules, eg,
     #   matplotlib.
     logger_config = dict(format='[%(asctime)s|%(levelname)s] %(message)s', datefmt='%FT%T')
@@ -690,7 +671,6 @@ def main():
     else:
         label_mapper = None
 
-    # print(label_mapper)  # Debug.
 
     # Load the fullranks data once.
     fullranks = pd.read_table(args.rwr_fullranks)
@@ -704,7 +684,7 @@ def main():
             label_mapper=label_mapper,
             out_dendrogram=out_dendrogram,
             out_clusters=out_clusters,
-            verbose=args.verbose
+            no_plot=args.no_plot
         )
 
     return 0
