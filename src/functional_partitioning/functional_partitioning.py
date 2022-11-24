@@ -58,7 +58,7 @@ def _root_mean_squared_error_at_c(y_true, c, **kwargs):
     return rmse_c
 
 
-def get_elbow(y_true, min_size=3, debug=False):
+def get_elbow(y_true, min_size=3, **kwargs):
     r'''
     RMSE_{c}={c-1\over b-1}\times RMSE(L_{c})+{b-c\over b-1}\times RMSE(R_{c}) \eqno{\hbox{[1]}}
 
@@ -68,8 +68,6 @@ def get_elbow(y_true, min_size=3, debug=False):
         The true values.
     min_size : int
         Minimum size of the left and right clusters.
-    debug : bool
-        Print debug information.
 
     Returns
     -------
@@ -94,7 +92,7 @@ def get_elbow(y_true, min_size=3, debug=False):
     rmse_over_c = []
 
     for c in range(min_size, b-(min_size+1)):
-        rmse_at_c = _root_mean_squared_error_at_c(y_true, c, debug=debug)
+        rmse_at_c = _root_mean_squared_error_at_c(y_true, c, **kwargs)
         rmse_over_c.append(rmse_at_c)
     # Adjust index by min_size.
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
@@ -660,10 +658,10 @@ def main():
         out_dendrogram = args.out_dendrogram
         out_clusters = args.out_clusters
 
-    if args.dendrogram_style.startswith('n'):
-        dendrogram_style = None
-    else:
+    if args.dendrogram_style.startswith(('r', 'p')):
         dendrogram_style = args.dendrogram_style
+    else:
+        dendrogram_style = None
 
     if args.labels_use_names or args.labels_use_locs:
         nodetable = pd.read_table(args.nodetable)
