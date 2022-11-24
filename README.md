@@ -1,3 +1,10 @@
+**THIS SOFWARE IS IN THE PRE-ALPHA STAGE. PRE-ALPHA REFERS TO ALL ACTIVITIES
+PERFORMED DURING DEVELOPMENT BEFORE FORMAL TESTING. THIS SOFTWARE PACKAGE
+INTENDS TO DO SOMETHING PARTICULAR, MOSTLY DOES SO, BUT ISN'T GUARANTEED TO DO
+SO. IT MAY CONTAIN SERIOUS ERRORS, CAUSE CRASHES OR DATA LOSS, OR RETURN
+INCORRECT RESULTS. [READ MORE][software_release_life_cycle].**
+
+
 Functional Partitioning
 ==============================
 
@@ -134,5 +141,6 @@ Derived from the [cookiecutter data science][] project template.
 <!-- LINKS -->
 
 [cookiecutter data science]: https://drivendata.github.io/cookiecutter-data-science/
+[software_release_life_cycle]: https://en.wikipedia.org/wiki/Software_release_life_cycle
 
 <!-- END -->
