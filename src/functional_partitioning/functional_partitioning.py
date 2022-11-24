@@ -37,7 +37,10 @@ def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     return rmse
 
 
-def _root_mean_squared_error_at_c(y_true, c, debug=False):
+def _root_mean_squared_error_at_c(y_true, c, **kwargs):
+    '''
+    Root mean squared error at c
+    '''
     b = len(y_true)
     l_start = 0
     l_stop = c+1
@@ -45,13 +48,18 @@ def _root_mean_squared_error_at_c(y_true, c, debug=False):
     r_stop = b+1
     Lc = y_true[l_start:l_stop]
     Rc = y_true[r_start:r_stop]
-    LOGGER.debug(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
-    rmse_c = ( ((c-1)/(b-1)) * _root_mean_squared_error(Lc) ) +              ( ((b-c)/(b-1)) * _root_mean_squared_error(Rc) )
+    LOGGER.debug(rf'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
+    # RMSE at c is the sum of RMSE to the left and RMSE to the right.
+    rmse_c = (
+        ( (c-1)/(b-1) ) * _root_mean_squared_error(Lc, **kwargs)
+    ) + (
+        ( (b-c)/(b-1) ) * _root_mean_squared_error(Rc, **kwargs)
+    )
     return rmse_c
 
 
 def get_elbow(y_true, min_size=3, debug=False):
-    '''
+    r'''
     RMSE_{c}={c-1\over b-1}\times RMSE(L_{c})+{b-c\over b-1}\times RMSE(R_{c}) \eqno{\hbox{[1]}}
 
     Parameters
