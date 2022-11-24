@@ -11,6 +11,7 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
 
 from sklearn import metrics
 from scipy.spatial import distance
@@ -20,6 +21,14 @@ from scipy.cluster import hierarchy
 # Error when run as a script:
 # > ImportError: attempted relative import with no known parent package
 
+DPI = 300
+LOGGER = logging.getLogger(__name__)
+
+# LOGGER.debug('This is a debug')
+# LOGGER.info('This is a info')
+# LOGGER.warning('This is a warning')
+# LOGGER.error('This is a error')
+# LOGGER.critical('This is a critical')
 
 def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     '''
@@ -42,10 +51,11 @@ def _root_mean_squared_error_at_c(y_true, c, debug=False):
     r_stop = b+1
     Lc = y_true[l_start:l_stop]
     Rc = y_true[r_start:r_stop]
-    if debug:
-        # print(l_start, l_stop, c, r_start, r_stop)
-        # print(len(Lc), len(Rc))
-        print(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
+    # if debug:
+    #     # print(l_start, l_stop, c, r_start, r_stop)
+    #     # print(len(Lc), len(Rc))
+    #     print(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
+    LOGGER.debug(f'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
     rmse_c = ( ((c-1)/(b-1)) * _root_mean_squared_error(Lc) ) +              ( ((b-c)/(b-1)) * _root_mean_squared_error(Rc) )
     return rmse_c
 
@@ -144,6 +154,17 @@ def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True)
     return dict(linkage=Z, labels=labels, max_rank=max_rank)
 
 
+def savefig(out_path=None, **kwargs):
+    kwargs.setdefault('dpi', DPI)
+    kwargs.setdefault('bbox_inches', 'tight')
+    if out_path is not None:
+        try:
+            plt.savefig(out_path, **kwargs)
+            LOGGER.info('Saved figure: %s', out_path)
+        except Exception as e:
+            LOGGER.error('Failed to save figure: %s', str(e))
+
+
 def plot_dendrogram(
     Z,
     labels=None,
@@ -188,6 +209,7 @@ def plot_dendrogram(
             if height < 10:
                 height = 10
             figsize = (width, height)
+        # Initialize the figure.
         plt.rc('figure', facecolor='white')
         plt.figure(figsize=figsize)
 
@@ -214,16 +236,28 @@ def plot_dendrogram(
         **kwargs
     )
 
-    if out_path is not None:
-        plt.savefig(out_path, dpi=300, bbox_inches='tight')
-        if verbose:
-            print(f'Saved dendrogram: {out_path}')
+    # if out_path is not None:
+    #     plt.savefig(out_path, dpi=DPI, bbox_inches='tight')
+    #     if verbose:
+    #         print(f'Saved dendrogram: {out_path}')
+    savefig(out_path=out_path)
 
     return tree
 
 
-def plot_dendrogram_polar(Z, labels=None, leaf_fontsize=10, figsize=(10,10),
-        gap=0.025, show_grid='y', title=None, out_path=None, ax=None):
+def plot_dendrogram_polar(
+    Z,
+    labels=None,
+    leaf_fontsize=10,
+    figsize=(10,10),
+    gap=0.025,
+    show_grid='y',
+    title=None,
+    out_path=None,
+    ax=None,
+    verbose=0,
+    **kwargs
+):
     '''
     Z : linkage matrix
     labels : list
@@ -335,10 +369,11 @@ def plot_dendrogram_polar(Z, labels=None, leaf_fontsize=10, figsize=(10,10),
     if title is not None:
         ax.set_title(f"Polar= {polar}", fontsize=15)
 
-    if out_path is not None:
-        plt.savefig(out_path, dpi=300, bbox_inches='tight')
-        if verbose:
-            print(f'Saved dendrogram: {out_path}')
+    # if out_path is not None:
+    #     plt.savefig(out_path, dpi=DPI, bbox_inches='tight')
+    #     if verbose:
+    #         print(f'Saved dendrogram: {out_path}')
+    savefig(out_path=out_path)
 
     return tree
 
@@ -379,15 +414,16 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None, ve
 
     if out_path is not None:
         clusters.to_csv(out_path, sep='\t', index=None)
-        if verbose:
-            print(f'Saved clusters: {out_path}')
+        # if verbose:
+        #     print(f'Saved clusters: {out_path}')
+        LOGGER.info(f'Saved clusters: {out_path}')
 
     return clusters
 
 
 def partition_fullranks(
     path_or_dataframe,
-    dendrogram_style=None,
+    dendrogram_style='rectangular',
     label_mapper=None,
     out_dendrogram=None,
     out_clusters=None,
@@ -408,6 +444,7 @@ def partition_fullranks(
     -------
     dict
     '''
+    LOGGER.info('Partitioning....')
     # Z, labels = cluster_hierarchical(path_or_dataframe)
     partition_result = cluster_hierarchical(path_or_dataframe)
 
@@ -432,24 +469,33 @@ def partition_fullranks(
         threshold = float(threshold)
 
     if dendrogram_style is None:
+        # Catch None, bc `None.startswith` raises error.
         tree = {}
     elif dendrogram_style.startswith('r'):
-        tree = plot_dendrogram(
-            Z,
-            labels=labels,
-            color_threshold=threshold,
-            out_path=out_dendrogram,
-            verbose=verbose,
-            **kwargs
-        )
+        try:
+            tree = plot_dendrogram(
+                Z,
+                labels=labels,
+                color_threshold=threshold,
+                out_path=out_dendrogram,
+                verbose=verbose,
+                **kwargs
+            )
+        except Exception as e:
+            LOGGER.error('Plotting failed: %s', str(e))
+            tree = {}
     elif dendrogram_style.startswith('p'):
-        tree = plot_dendrogram_polar(
-            Z,
-            labels=labels,
-            out_path=out_dendrogram,
-            verbose=verbose,
-            **kwargs
-        )
+        try:
+            tree = plot_dendrogram_polar(
+                Z,
+                labels=labels,
+                out_path=out_dendrogram,
+                verbose=verbose,
+                **kwargs
+            )
+        except Exception as e:
+            LOGGER.error('Plotting failed: %s', str(e))
+            tree = {}
     else:
         tree = {}
 
@@ -515,7 +561,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--dendrogram-style', '-s',
         action='store',
-        choices=['rectangular', 'r', 'polar', 'p'],
+        choices=['rectangular', 'r', 'polar', 'p', 'none', 'n'],
         default='rectangular',
         help='Plot the dendrogram in rectangular or polar coordinates. Default is rectangular.'
     )
@@ -570,16 +616,42 @@ def parse_args(test=None):
     else:
         args = parser.parse_args(test)
 
-    if args.verbose>0:
-        # print(f"Arguments count: {len(args)}")
-        for name, value in args.__dict__.items():
-            print(f"{name}: {value}")
+    # if args.verbose>0:
+    #     # print(f"Arguments count: {len(args)}")
+    #     for name, value in args.__dict__.items():
+    #         print(f"{name}: {value}")
 
     return args
 
 
 def main():
     args = parse_args()
+    # print('args:', args)
+
+    # Logging:
+    # - Using `LOGGER.setLevel` isn't working, use `logging.basicConfig`
+    #   instead.
+    # - `logging.basicConfig` should be called *once*; if called multiple times
+    #   it will overwrite previous calls with defaults.
+    # - `logging.basicConfig` also affects settings for imported modules, eg,
+    #   matplotlib.
+    logger_config = dict(format='[%(asctime)s|%(levelname)s] %(message)s', datefmt='%FT%T')
+    if args.verbose == 0:
+        # LOGGER.setLevel(logging.WARNING)
+        logger_config['level'] = logging.WARNING
+    elif args.verbose == 1:
+        # LOGGER.setLevel(logging.INFO)
+        logger_config['level'] = logging.INFO
+    elif args.verbose >= 2:
+        # LOGGER.setLevel(logging.DEBUG)
+        logger_config['level'] = logging.DEBUG
+    logging.basicConfig(**logger_config)
+
+    # LOGGER.debug('debug message')
+    # LOGGER.info('info message')
+    # LOGGER.warning('warn message')
+    # LOGGER.error('error message')
+    # LOGGER.critical('critical message')
 
     if args.out_dir is not None:
         # Use --out-dir with default names, unless another path is explicitely specified.
@@ -598,6 +670,11 @@ def main():
     else:
         out_dendrogram = args.out_dendrogram
         out_clusters = args.out_clusters
+
+    if args.dendrogram_style.startswith('n'):
+        dendrogram_style = None
+    else:
+        dendrogram_style = args.dendrogram_style
 
     if args.labels_use_names or args.labels_use_locs:
         nodetable = pd.read_table(args.nodetable)
@@ -619,10 +696,11 @@ def main():
     fullranks = pd.read_table(args.rwr_fullranks)
 
     if args.partition:
+
         result = partition_fullranks(
             path_or_dataframe=fullranks,
             threshold=args.threshold,
-            dendrogram_style=args.dendrogram_style,
+            dendrogram_style=dendrogram_style,
             label_mapper=label_mapper,
             out_dendrogram=out_dendrogram,
             out_clusters=out_clusters,
