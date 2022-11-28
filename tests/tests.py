@@ -105,6 +105,11 @@ def test_hierarchicalclustering_linkage_matrix_ranks():
 
 # Test metrics functions.
 def test_spearman_distance_function_equal_pandas_scores():
+    '''
+    Using the `metrics._spearman_distance` fxn is much slower than
+    `pandas.DataFrame.corr`, so I want to check to make sure that the two
+    methods are giving (approximately) the same output.
+    '''
     scores = datasets.make_scores_matrix()
     scores = scores.fillna(scores.max(axis=1))
 
@@ -117,6 +122,11 @@ def test_spearman_distance_function_equal_pandas_scores():
 
 
 def test_spearman_distance_function_equal_pandas_ranks():
+    '''
+    Using the `metrics._spearman_distance` fxn is much slower than
+    `pandas.DataFrame.corr`, so I want to check to make sure that the two
+    methods are giving (approximately) the same output.
+    '''
     ranks = datasets.make_ranks_matrix()
     ranks = ranks.fillna(0)
 
