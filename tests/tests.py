@@ -21,7 +21,9 @@ CHECKSUMS = {
     'ranks_matrix': '946e98267a27f4d837bdf0cbb4d1a529',
     'fullranks': 'e8646ece5873b493e38a71f877372e66',
     'linkage_matrix_scores_euclidean_average': 'b1dd3e10cc1029f1a57202f4be3c9cfa',
-    'linkage_matrix_ranks_euclidean_average': '477efbcf8ed2e66e4e2ea29d77d57abc'
+    'linkage_matrix_ranks_euclidean_average': '477efbcf8ed2e66e4e2ea29d77d57abc',
+    'spearman_distance_matrix_scores': '181f9b182d74532fdeba6ce50051c324',
+    'spearman_distance_matrix_ranks': '17ec19ed3ff1dde6a6f0dfdd210e40ca'
 }
 
 
@@ -101,6 +103,7 @@ def test_hierarchicalclustering_linkage_matrix_ranks():
     assert joblib.hash(mod.linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_euclidean_average']
 
 
+# Test metrics functions.
 def test_spearman_distance_function_equal_pandas_scores():
     scores = datasets.make_scores_matrix()
     scores = scores.fillna(scores.max(axis=1))
@@ -123,6 +126,24 @@ def test_spearman_distance_function_equal_pandas_ranks():
     pandas_dmat = 1 - ranks.T.corr(method='spearman')
 
     np.testing.assert_array_almost_equal(scipy_dmat, pandas_dmat.values)
+
+def test_spearman_distance_matrix_scores():
+    scores = datasets.make_scores_matrix()
+    scores = scores.fillna(scores.max(axis=1))
+
+    dmat = metrics.spearman_d(scores)
+
+    assert joblib.hash(dmat) == CHECKSUMS['spearman_distance_matrix_scores']
+
+
+def test_spearman_distance_matrix_ranks():
+    ranks = datasets.make_scores_matrix()
+    ranks = ranks.fillna(0)
+
+    dmat = metrics.spearman_d(ranks)
+
+    assert joblib.hash(dmat) == CHECKSUMS['spearman_distance_matrix_ranks']
+
 
 
 # END.
