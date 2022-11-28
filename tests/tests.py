@@ -2,12 +2,17 @@
 # coding: utf-8
 
 import joblib
+import itertools
+import numpy as np
 
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
 from functional_partitioning import functional_partitioning as fp
-from functional_partitioning import datasets, cluster
+from functional_partitioning import datasets, cluster, metrics
+
+from scipy.spatial import distance
+from scipy.cluster import hierarchy
 
 
 CHECKSUMS = {
@@ -45,9 +50,6 @@ def test_make_fullranks_table(random_state=RANDOM_STATE):
 
 # Linkage matrices.
 def test_scipy_linkage_matrix_scores():
-    from scipy.spatial import distance
-    from scipy.cluster import hierarchy
-
     metric = 'euclidean'
     method = 'average'
 
@@ -61,9 +63,6 @@ def test_scipy_linkage_matrix_scores():
 
 
 def test_scipy_linkage_matrix_ranks():
-    from scipy.spatial import distance
-    from scipy.cluster import hierarchy
-
     metric = 'euclidean'
     method = 'average'
 
@@ -77,9 +76,6 @@ def test_scipy_linkage_matrix_ranks():
 
 
 def test_hierarchicalclustering_linkage_matrix_scores():
-    from scipy.spatial import distance
-    from scipy.cluster import hierarchy
-
     metric = 'euclidean'
     method = 'average'
 
@@ -93,9 +89,6 @@ def test_hierarchicalclustering_linkage_matrix_scores():
 
 
 def test_hierarchicalclustering_linkage_matrix_ranks():
-    from scipy.spatial import distance
-    from scipy.cluster import hierarchy
-
     metric = 'euclidean'
     method = 'average'
 
@@ -106,6 +99,30 @@ def test_hierarchicalclustering_linkage_matrix_ranks():
     mod.fit(ranks)
 
     assert joblib.hash(mod.linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_euclidean_average']
+
+
+def test_spearman_distance_function_equal_pandas_scores():
+    scores = datasets.make_scores_matrix()
+    scores = scores.fillna(scores.max(axis=1))
+
+    dvec = [metrics._spearman_distance(u, v) for u,v in itertools.combinations(scores.to_numpy(), 2)]
+    scipy_dmat = distance.squareform(dvec)
+
+    pandas_dmat = 1 - scores.T.corr(method='spearman')
+
+    np.testing.assert_array_almost_equal(scipy_dmat, pandas_dmat.values)
+
+
+def test_spearman_distance_function_equal_pandas_ranks():
+    ranks = datasets.make_ranks_matrix()
+    ranks = ranks.fillna(0)
+
+    dvec = [metrics._spearman_distance(u, v) for u,v in itertools.combinations(ranks.to_numpy(), 2)]
+    scipy_dmat = distance.squareform(dvec)
+
+    pandas_dmat = 1 - ranks.T.corr(method='spearman')
+
+    np.testing.assert_array_almost_equal(scipy_dmat, pandas_dmat.values)
 
 
 # END.
