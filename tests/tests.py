@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import joblib
 import itertools
 import numpy as np
@@ -23,11 +20,14 @@ CHECKSUMS = {
     'linkage_matrix_scores_euclidean_average': 'b1dd3e10cc1029f1a57202f4be3c9cfa',
     'linkage_matrix_ranks_euclidean_average': '477efbcf8ed2e66e4e2ea29d77d57abc',
     'spearman_distance_matrix_scores': '181f9b182d74532fdeba6ce50051c324',
-    'spearman_distance_matrix_ranks': '17ec19ed3ff1dde6a6f0dfdd210e40ca'
+    'spearman_distance_matrix_ranks': '17ec19ed3ff1dde6a6f0dfdd210e40ca',
+    # Clusters based on Spearman distances from the `scores` and `ranks` matrices should be the same.
+    'spearman_distance_clusters': 'c35db22b2b15458dfe3817f7781dd4ce',
 }
 
 
 RANDOM_STATE = 42
+
 
 # Data sets.
 def test_make_features(random_state=RANDOM_STATE):
@@ -83,7 +83,7 @@ def test_hierarchicalclustering_linkage_matrix_scores():
 
     scores = datasets.make_scores_matrix()
     scores = scores.fillna(scores.max(axis=1))
-    
+
     mod = cluster.HierarchicalClustering(affinity='euclidean')
     mod.fit(scores)
 
@@ -96,11 +96,35 @@ def test_hierarchicalclustering_linkage_matrix_ranks():
 
     ranks = datasets.make_ranks_matrix()
     ranks = ranks.fillna(0)
-    
+
     mod = cluster.HierarchicalClustering(affinity='euclidean')
     mod.fit(ranks)
 
     assert joblib.hash(mod.linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_euclidean_average']
+
+
+def test_hierarchicalclustering_clusters_scores():
+    scores = datasets.make_scores_matrix()
+    scores = scores.fillna(scores.max(axis=1))
+
+    mod = cluster.HierarchicalClustering(affinity=metrics.spearman_d)
+    mod.fit(scores)
+
+    clusters = hierarchy.cut_tree(mod.linkage_matrix)
+
+    assert joblib.hash(clusters) == CHECKSUMS['spearman_distance_clusters']
+
+
+def test_hierarchicalclustering_clusters_ranks():
+    ranks = datasets.make_scores_matrix()
+    ranks = ranks.fillna(ranks.max(axis=1))
+
+    mod = cluster.HierarchicalClustering(affinity=metrics.spearman_d)
+    mod.fit(ranks)
+
+    clusters = hierarchy.cut_tree(mod.linkage_matrix)
+
+    assert joblib.hash(clusters) == CHECKSUMS['spearman_distance_clusters']
 
 
 # Test metrics functions.
@@ -137,6 +161,7 @@ def test_spearman_distance_function_equal_pandas_ranks():
 
     np.testing.assert_array_almost_equal(scipy_dmat, pandas_dmat.values)
 
+
 def test_spearman_distance_matrix_scores():
     scores = datasets.make_scores_matrix()
     scores = scores.fillna(scores.max(axis=1))
@@ -153,7 +178,6 @@ def test_spearman_distance_matrix_ranks():
     dmat = metrics.spearman_d(ranks)
 
     assert joblib.hash(dmat) == CHECKSUMS['spearman_distance_matrix_ranks']
-
 
 
 # END.
