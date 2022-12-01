@@ -11,12 +11,16 @@ input and return a scalar distance between them.
 
 import numpy as np
 
+from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.utils.validation import check_memory
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import (
+    AgglomerativeClustering,
+    KMeans
+)
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
 from scipy.cluster import hierarchy
 
-class HierarchicalClustering(AgglomerativeClustering):
+class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimator):
     # Notes:
     # - `affinity` is passed to `pdist` as `metric`
     # - `affinity` can be a callable, but it takes a single matrix `X` as
@@ -171,6 +175,8 @@ class HierarchicalClustering(AgglomerativeClustering):
         # Compute the dendrogram (**NEW**).
         if self.compute_dendrogram:
             self.dendrogram = hierarchy.dendrogram(self.linkage_matrix, no_plot=True)
+        else:
+            self.dendrogram = None
     
         return self
 
