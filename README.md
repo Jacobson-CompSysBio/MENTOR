@@ -1,3 +1,5 @@
+% Functional Partitioning (JAIL)
+
 **THIS SOFWARE IS IN THE PRE-ALPHA STAGE. PRE-ALPHA REFERS TO ALL ACTIVITIES
 PERFORMED DURING DEVELOPMENT BEFORE FORMAL TESTING. THIS SOFTWARE PACKAGE
 INTENDS TO DO SOMETHING PARTICULAR, MOSTLY DOES SO, BUT ISN'T GUARANTEED TO DO
@@ -5,13 +7,8 @@ SO. IT MAY CONTAIN SERIOUS ERRORS, CAUSE CRASHES OR DATA LOSS, OR RETURN
 INCORRECT RESULTS. [READ MORE][software_release_life_cycle].**
 
 
-Functional Partitioning
-==============================
-
-Functional partitioning.
-
 Installation
-------------
+============
 
 ```sh
 $ git clone https://github.com/izaakm/jail-functional-partitioning
@@ -20,7 +17,7 @@ $ pip install .
 ```
 
 Usage
------
+=====
 
 ```
 usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
@@ -90,7 +87,7 @@ options:
 ```
 
 Examples
---------
+========
 
 You can change the labels on the leaves of the dendrogram. This requires that
 you have a nodetable file. The nodetable is a TSV file with the first column as
@@ -137,7 +134,7 @@ functional_partitioning \
 
 
 Acknowledgements
-----------------
+================
 
 Derived from the [cookiecutter data science][] project template.
 
