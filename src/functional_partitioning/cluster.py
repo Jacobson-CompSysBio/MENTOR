@@ -19,6 +19,8 @@ from sklearn.cluster import (
 )
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
 from scipy.cluster import hierarchy
+from sklearn.utils.validation import check_is_fitted
+
 
 class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimator):
     # Notes:
@@ -178,6 +180,7 @@ class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimato
         else:
             self.dendrogram = None
     
+
         return self
 
 
