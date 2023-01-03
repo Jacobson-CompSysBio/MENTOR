@@ -103,6 +103,54 @@ def get_elbow(y_true, min_size=3, **kwargs):
     return idx_of_elbow
 
 
+def calc_chi(X_true, clusters):
+    if isinstance(clusters, (pd.DataFrame, pd.Series)):
+        clusters = clusters.to_numpy()
+    # CHI is only valid for clusterings with n-clusters between 2 and n samples-1.
+    # Filling with NaN is more accurate, but plotting the values is misleading if the user
+    # is unaware that the missing values are not plotted.
+    n_samples = X_true.shape[0]
+    n_cuts = clusters.shape[-1]
+    chi_scores = []
+    for i in range(n_cuts):
+        labels_pred = clusters[:, i]
+        n_clusters = len(set(labels_pred))
+        if n_clusters < 2:
+            chi_scores.append(np.nan)
+            # chi_scores.append(0)
+            continue
+        elif n_clusters > (n_samples - 1):
+            chi_scores.append(np.nan)
+            # chi_scores.append(0)
+            continue
+        chi = metrics.calinski_harabasz_score(X_true, labels_pred)
+
+        chi_scores.append(chi)
+    chi_scores = np.array(chi_scores)
+    return chi_scores
+
+
+def calc_threshold(Z, threshold, scores=None):
+    if threshold == 'mean':
+        threshold = np.mean(Z[:,2])
+    elif threshold == 'best_chi':
+        # Do NOT match to leaves yet, bc `scores` is NOT aligned to leaves.
+        # clusterings = get_clusters(Z, labels=labels)
+        clusterings = hierarchy.cut_tree(Z, n_clusters=None, height=None)
+        chi_scores = calc_chi(scores, clusterings)
+        best_at = np.nan_to_num(chi_scores).argmax()
+
+        # # The absolute number of clusters changes from n-samples to 1; ie, the number of clusters uniquely corresponds to a specific branch/agglomeration step.
+        # n_clusters = clusterings.iloc[:, best_at].nunique()
+        # clusters = get_clusters(Z, labels=labels, n_clusters=n_clusters, match_to_leaves=partition['tree']['leaves'])
+
+        # Calculate the threshold from the linkage matrix.
+        h1 = Z[best_at, 2]
+        h0 = Z[best_at-1, 2]
+        threshold = np.mean((h0, h1))
+    else:
+        pass
+    return threshold
 
 
 def partition_fullranks(
@@ -195,7 +243,7 @@ def partition_fullranks(
 
 
 ########################################################################
-# Plot
+# Plot {{{
 ########################################################################
 
 
@@ -414,14 +462,14 @@ def plot_dendrogram_polar(
             pass
 
         if title is not None:
-            ax.set_title(f"Polar= {polar}", fontsize=15)
+            ax.set_title(f"{title}", fontsize=15)
 
         savefig(out_path=out_path)
 
     return tree
-
+# }}}
 ########################################################################
-# Parse args
+# Parse args {{{
 ########################################################################
 
 def parse_args(test=None):
@@ -534,9 +582,9 @@ def parse_args(test=None):
 
     return args
 
-
+# }}}
 ########################################################################
-# Main.
+# Main. {{{
 ########################################################################
 
 
@@ -621,3 +669,6 @@ def main():
         )
 
     return 0
+
+# }}}
+########################################################################
