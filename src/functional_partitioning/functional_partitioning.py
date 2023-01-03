@@ -1,8 +1,12 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 '''
-[TODO] Docstring
+Functional partitioning
+
+This module contains functions for functional partitioning of a network.
+
+References
+----------
+[1] https://en.wikipedia.org/wiki/Elbow_method_(clustering)
+[2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
 '''
 
 import argparse
@@ -694,7 +698,3 @@ def main():
         )
 
     return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main())
