@@ -230,9 +230,9 @@ def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True)
     return dict(linkage=Z, labels=labels, max_rank=max_rank)
 
 
-def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
+def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leaves=None, out_path=None):
     '''
-    Get clusters from Z at given threshold.
+    Get clusters from linkage matrix `Z` at given threshold.
 
     Parameters
     ----------
@@ -255,17 +255,46 @@ def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
     # Genes are ordered the same as `tree['leaves']`:
     clusters = get_clusters(Z, labels, threshold=t, match_to_leaves=tree['leaves'])
     '''
-    clusters = hierarchy.fcluster(Z, t=threshold, criterion='distance')
-    clusters = pd.DataFrame(zip(labels, clusters), columns=['label', 'cluster'])
+    # clusters = hierarchy.fcluster(Z, t=threshold, criterion='distance')
+    # clusters = pd.DataFrame(zip(labels, clusters), columns=['label', 'cluster'])
+    
+    # There is a discrepancy bn `fcluster` and `cut_tree`, when the cut is on the branch,
+    # one returns the clustering *above* the branch but the other returns the clustering *below*
+    # the branch (don't recall off hand which is which).
+    # The two methods (`fcluster` vs `cut_tree`) differ in implementation:
+    # >>> threshold = 0.3
+    # >>> hierarchy.fcluster(Z, t=threshold, criterion='distance')
+    # array([2, 2, 1, 2, 1, 1, 1, 3, 1], dtype=int32)
+    # >>> hierarchy.cut_tree(Z, height=threshold, n_clusters=None)
+    # array([[0],
+    #        [0],
+    #        [1],
+    #        [0],
+    #        [1],
+    #        [1],
+    #        [1],
+    #        [2],
+    #        [1]])
+
+    if threshold is None and n_clusters is None:
+        # Get a matrix of clusterings, one for each agglomeration step.
+        clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold)
+    else:
+        # Get a vector of a single clustering.
+        clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold).flatten()
+    clusters = pd.DataFrame(clusters, index=labels)
+    clusters.index.name = 'node_label'
+
     if match_to_leaves is not None:
         # The default dendrogram orientation is 'left'. Y-axis is 0 at the bottom, increasing.
         # So numeric tree['leaves'] start at 0 at the bottom of the figure.
         # To match the cluster labels to the dendrogram visually, reverse the
         # order of `tree['leaves']`.
-        clusters = clusters.iloc[match_to_leaves[::-1]].reset_index(drop=True)
+        # clusters = clusters.iloc[match_to_leaves[::-1]].reset_index(drop=True)
+        clusters = clusters.iloc[match_to_leaves[::-1]]
 
     if out_path is not None:
-        clusters.to_csv(out_path, sep='\t', index=None)
+        clusters.to_csv(out_path, sep='\t')
         LOGGER.info(f'Saved clusters: {out_path}')
 
     return clusters
