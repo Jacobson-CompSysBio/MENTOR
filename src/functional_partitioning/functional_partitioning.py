@@ -103,57 +103,6 @@ def get_elbow(y_true, min_size=3, **kwargs):
     return idx_of_elbow
 
 
-# def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True):
-#     '''
-#     Parameters
-#     ----------
-#     path_or_dataframe : str, pd.DataFrame
-#         Path to 'fullranks' file from `RWR-CV --method=singletons` or
-#         pandas.DataFrame.
-#     max_rank : int, str
-#         Maximum rank to use for clustering. If 'elbow', use elbow method to
-#         determine max_rank.
-#     drop_missing : bool
-#         Drop genes that are labeled "missing" in the fullranks file.
-
-#     Returns
-#     -------
-#     linkage_matrix, labels
-#     '''
-#     if isinstance(path_or_dataframe, pd.DataFrame):
-#         fullranks = path_or_dataframe
-#     else:
-#         # Load the full ranks.
-#         fullranks = pd.read_table(path_or_dataframe)
-
-#     if drop_missing:
-#         # Drop rows with seeds that were not found in the network.
-#         fullranks = fullranks.query('seed!="missing"')
-
-#     # Pivot full ranks -> ranks matrix.
-#     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
-#     labels = ranks.index.to_list()
-
-#     if max_rank == 'elbow':
-#         # Find elbow and set max_rank.
-#         mean_scores = fullranks.groupby('rank')['Score'].mean()
-#         max_rank = get_elbow(mean_scores)
-
-#     # Filter the rank vectors.
-#     mask = (ranks <= max_rank).fillna(False)
-#     col_mask = mask.any()
-
-#     # Get pairwise distances.
-#     dmat = 1 - ranks.loc[:, col_mask].T.corr(method='spearman')
-#     dvec = distance.squareform(dmat)
-
-#     # Do the hierarchical clustering.
-#     Z = hierarchy.linkage(dvec, method='average')
-
-#     # return Z, labels
-#     return dict(linkage=Z, labels=labels, max_rank=max_rank)
-
-
 def savefig(out_path=None, **kwargs):
     kwargs.setdefault('dpi', DPI)
     kwargs.setdefault('bbox_inches', 'tight')
@@ -374,47 +323,6 @@ def plot_dendrogram_polar(
         savefig(out_path=out_path)
 
     return tree
-
-
-# def get_clusters(Z, labels, threshold=0, match_to_leaves=None, out_path=None):
-#     '''
-#     Get clusters from Z at given threshold.
-
-#     Parameters
-#     ----------
-#     Z : linkage matrix
-#     labels : list
-#     threshold : int, float
-#     match_to_leave : None, list
-#         List of ints to order the rows. Use `tree['leaves']` to visually match
-#         the list of cluster labels to the leaves of the dendrogram.  See
-#         example below.
-
-#     Examples
-#     --------
-#     Z, labels = cluster_hierarchical(fullranks)
-#     tree = plot_dendrogram(Z, labels)
-
-#     # Genes are ordered in same order as `labels`:
-#     clusters = get_clusters(Z, labels, threshold=t)
-
-#     # Genes are ordered the same as `tree['leaves']`:
-#     clusters = get_clusters(Z, labels, threshold=t, match_to_leaves=tree['leaves'])
-#     '''
-#     clusters = hierarchy.fcluster(Z, t=threshold, criterion='distance')
-#     clusters = pd.DataFrame(zip(labels, clusters), columns=['label', 'cluster'])
-#     if match_to_leaves is not None:
-#         # The default dendrogram orientation is 'left'. Y-axis is 0 at the bottom, increasing.
-#         # So numeric tree['leaves'] start at 0 at the bottom of the figure.
-#         # To match the cluster labels to the dendrogram visually, reverse the
-#         # order of `tree['leaves']`.
-#         clusters = clusters.iloc[match_to_leaves[::-1]].reset_index(drop=True)
-
-#     if out_path is not None:
-#         clusters.to_csv(out_path, sep='\t', index=None)
-#         LOGGER.info(f'Saved clusters: {out_path}')
-
-#     return clusters
 
 
 def partition_fullranks(
