@@ -3,6 +3,12 @@ Functional partitioning
 
 This module contains functions for functional partitioning of a network.
 
+[TODO] Refactor:
+
+    1. Make `X` from 'fullranks'.
+    2. Apply clustering method to `X`.
+    3. Optional: plot dendrogram (only for HC).
+
 References
 ----------
 [1] https://en.wikipedia.org/wiki/Elbow_method_(clustering)
@@ -263,6 +269,7 @@ def plot_dendrogram(
     out_path=None,
     figsize='auto',
     draw_threshold=True,
+    title=None,
     **kwargs
 ):
     '''
@@ -333,6 +340,8 @@ def plot_dendrogram(
     if kwargs.get('no_plot'):
         pass
     else:
+        if title is not None:
+            plt.gca().set_title(f"{title}", fontsize=15)
         savefig(out_path=out_path)
 
     return tree
