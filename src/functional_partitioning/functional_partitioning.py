@@ -103,6 +103,102 @@ def get_elbow(y_true, min_size=3, **kwargs):
     return idx_of_elbow
 
 
+
+
+def partition_fullranks(
+    path_or_dataframe,
+    dendrogram_style='rectangular',
+    label_mapper=None,
+    out_dendrogram=None,
+    out_clusters=None,
+    threshold=0,
+    **kwargs
+):
+    '''
+    CLI helper.
+
+    Parameters
+    ----------
+    label_mapper : dict
+        Use these labels on the dendrogram. Dict of `{seed: dendrogram_label,
+        ... }`.
+
+    Returns
+    -------
+    dict
+    '''
+    LOGGER.info('Partitioning....')
+    # Z, labels = cluster_hierarchical(path_or_dataframe)
+    partition_result = cluster.cluster_hierarchical(path_or_dataframe)
+
+    Z = partition_result['linkage']
+
+    labels = partition_result['labels']
+    if label_mapper is not None:
+        labels = [label_mapper[l] for l in labels]
+    elif 'labels' in kwargs:
+        labels = kwargs.pop('labels', labels)
+    else:
+        pass
+
+    if threshold == 'mean':
+        threshold = np.mean(Z[:,2])
+    elif threshold is None:
+        # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])` when
+        # `color_threshold==None`. Set this explicitely to enable
+        # `draw_threshold`, below.
+        threshold = 0.7*max(Z[:,2])
+    else:
+        threshold = float(threshold)
+
+    if dendrogram_style is None:
+        # Catch None, bc `None.startswith` raises error.
+        tree = {}
+    elif dendrogram_style.startswith('r'):
+        try:
+            tree = plot_dendrogram(
+                Z,
+                labels=labels,
+                color_threshold=threshold,
+                out_path=out_dendrogram,
+                **kwargs
+            )
+        except Exception as e:
+            LOGGER.error('Plotting failed: %s', str(e))
+            tree = {}
+    elif dendrogram_style.startswith('p'):
+        try:
+            tree = plot_dendrogram_polar(
+                Z,
+                labels=labels,
+                out_path=out_dendrogram,
+                **kwargs
+            )
+        except Exception as e:
+            LOGGER.error('Plotting failed: %s', str(e))
+            tree = {}
+    else:
+        tree = {}
+
+    clusters = cluster.get_clusters(
+        Z,
+        labels=labels,
+        threshold=threshold,
+        match_to_leaves=tree.get('leaves'),
+        out_path=out_clusters,
+    )
+
+    partition_result['tree'] = tree
+    partition_result['clusters'] = clusters
+
+    return partition_result
+
+
+########################################################################
+# Plot
+########################################################################
+
+
 def savefig(out_path=None, **kwargs):
     kwargs.setdefault('dpi', DPI)
     kwargs.setdefault('bbox_inches', 'tight')
@@ -324,95 +420,9 @@ def plot_dendrogram_polar(
 
     return tree
 
-
-def partition_fullranks(
-    path_or_dataframe,
-    dendrogram_style='rectangular',
-    label_mapper=None,
-    out_dendrogram=None,
-    out_clusters=None,
-    threshold=0,
-    **kwargs
-):
-    '''
-    CLI helper.
-
-    Parameters
-    ----------
-    label_mapper : dict
-        Use these labels on the dendrogram. Dict of `{seed: dendrogram_label,
-        ... }`.
-
-    Returns
-    -------
-    dict
-    '''
-    LOGGER.info('Partitioning....')
-    # Z, labels = cluster_hierarchical(path_or_dataframe)
-    partition_result = cluster.cluster_hierarchical(path_or_dataframe)
-
-    Z = partition_result['linkage']
-
-    labels = partition_result['labels']
-    if label_mapper is not None:
-        labels = [label_mapper[l] for l in labels]
-    elif 'labels' in kwargs:
-        labels = kwargs.pop('labels', labels)
-    else:
-        pass
-
-    if threshold == 'mean':
-        threshold = np.mean(Z[:,2])
-    elif threshold is None:
-        # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])` when
-        # `color_threshold==None`. Set this explicitely to enable
-        # `draw_threshold`, below.
-        threshold = 0.7*max(Z[:,2])
-    else:
-        threshold = float(threshold)
-
-    if dendrogram_style is None:
-        # Catch None, bc `None.startswith` raises error.
-        tree = {}
-    elif dendrogram_style.startswith('r'):
-        try:
-            tree = plot_dendrogram(
-                Z,
-                labels=labels,
-                color_threshold=threshold,
-                out_path=out_dendrogram,
-                **kwargs
-            )
-        except Exception as e:
-            LOGGER.error('Plotting failed: %s', str(e))
-            tree = {}
-    elif dendrogram_style.startswith('p'):
-        try:
-            tree = plot_dendrogram_polar(
-                Z,
-                labels=labels,
-                out_path=out_dendrogram,
-                **kwargs
-            )
-        except Exception as e:
-            LOGGER.error('Plotting failed: %s', str(e))
-            tree = {}
-    else:
-        tree = {}
-
-    clusters = cluster.get_clusters(
-        Z,
-        labels=labels,
-        threshold=threshold,
-        match_to_leaves=tree.get('leaves'),
-        out_path=out_clusters,
-    )
-
-    partition_result['tree'] = tree
-    partition_result['clusters'] = clusters
-
-    return partition_result
-
+########################################################################
+# Parse args
+########################################################################
 
 def parse_args(test=None):
 
@@ -523,6 +533,11 @@ def parse_args(test=None):
         args = parser.parse_args(test)
 
     return args
+
+
+########################################################################
+# Main.
+########################################################################
 
 
 def main():
