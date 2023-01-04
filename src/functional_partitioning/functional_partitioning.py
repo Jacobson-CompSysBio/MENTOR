@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import logging
 import warnings
 
-from sklearn import metrics
+# from sklearn import metrics
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 from functional_partitioning import cluster, metrics

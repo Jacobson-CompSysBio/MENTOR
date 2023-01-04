@@ -4,6 +4,9 @@ import pandas as pd
 
 from scipy import stats
 from scipy.spatial import distance
+# from sklearn.metrics import *
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import calinski_harabasz_score
 
 
 def _spearman_distance(u, v):
