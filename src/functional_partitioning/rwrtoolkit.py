@@ -24,7 +24,7 @@ else:
     PATH_TO_CONDA_ENV = None
 
 
-def activate_env(
+def _activate_env(
     path_to_conda_env=PATH_TO_CONDA_ENV
 ):
     '''
@@ -56,6 +56,7 @@ def activate_env(
     return command
 
 def rwr_singletons(
+    path_to_conda_env=None,
     path_to_rwrtoolkit=PATH_TO_RWRTOOLKIT,
     data=None,
     geneset=None,
@@ -133,8 +134,10 @@ def rwr_singletons(
         List of values will be converted to string for RWR_KFOLD.R
     '''
     # }}}
-    # cmd_list = ['Rscript']
-    command = 'Rscript'
+    if path_to_conda_env is not None:
+        command = _activate_env(path_to_conda_env) + ' && Rscript'
+    else:
+        command = 'Rscript'
 
     if path_to_rwrtoolkit is not None:
         # Scripts are located at `$PATH_TO_RWRTOOLKIT/inst/scripts/run_*.R`.
@@ -296,6 +299,9 @@ def fullranks_to_matrix(path_or_dataframe, max_rank='elbow', drop_missing=True):
 
     # Pivot full ranks -> ranks matrix.
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
+    scores = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
+    assert ranks.shape == scores.shape
+    assert ranks.index.equals(scores.index)
     labels = ranks.index.to_list()
 
     if max_rank == 'elbow':
@@ -309,9 +315,10 @@ def fullranks_to_matrix(path_or_dataframe, max_rank='elbow', drop_missing=True):
 
     # Get pairwise distances.
     # dmat = 1 - ranks.loc[:, col_mask].T.corr(method='spearman')
-    X = ranks.loc[:, col_mask]
+    X_ranks = ranks.loc[:, col_mask]
+    X_scores = scores.loc[:, col_mask]
 
-    return X, labels, max_rank
+    return X_ranks, X_scores, labels, max_rank
 
 
 # END

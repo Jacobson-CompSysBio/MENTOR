@@ -10,6 +10,8 @@ input and return a scalar distance between them.
 '''
 
 import numpy as np
+import pandas as pd
+import logging
 
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.utils.validation import check_memory
@@ -18,9 +20,11 @@ from sklearn.cluster import (
     KMeans
 )
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-from scipy.cluster import hierarchy
 from sklearn.utils.validation import check_is_fitted
+from scipy.cluster import hierarchy
+from scipy.spatial import distance
 
+LOGGER = logging.getLogger(__name__)
 
 class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimator):
     # Notes:
@@ -188,55 +192,20 @@ class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimato
 # DEPRECATED: The functions below will be removed in a future version.
 ########################################################################
 
-def cluster_hierarchical(path_or_dataframe, max_rank='elbow', drop_missing=True):
-    '''
-    Parameters
-    ----------
-    path_or_dataframe : str, pd.DataFrame
-        Path to 'fullranks' file from `RWR-CV --method=singletons` or
-        pandas.DataFrame.
-    max_rank : int, str
-        Maximum rank to use for clustering. If 'elbow', use elbow method to
-        determine max_rank.
-    drop_missing : bool
-        Drop genes that are labeled "missing" in the fullranks file.
 
-    Returns
-    -------
-    linkage_matrix, labels
-    '''
-    if isinstance(path_or_dataframe, pd.DataFrame):
-        fullranks = path_or_dataframe
-    else:
-        # Load the full ranks.
-        fullranks = pd.read_table(path_or_dataframe)
-
-    if drop_missing:
-        # Drop rows with seeds that were not found in the network.
-        fullranks = fullranks.query('seed!="missing"')
-
-    # Pivot full ranks -> ranks matrix.
-    ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
-    labels = ranks.index.to_list()
-
-    if max_rank == 'elbow':
-        # Find elbow and set max_rank.
-        mean_scores = fullranks.groupby('rank')['Score'].mean()
-        max_rank = get_elbow(mean_scores)
-
-    # Filter the rank vectors.
-    mask = (ranks <= max_rank).fillna(False)
-    col_mask = mask.any()
+def cluster_hierarchical(X, corr_method='spearman', linkage_method='average'):
+    if not isinstance(X, pd.DataFrame):
+        X = pd.DataFrame(X)
 
     # Get pairwise distances.
-    dmat = 1 - ranks.loc[:, col_mask].T.corr(method='spearman')
+    dmat = 1 - X.T.corr(method=corr_method)
     dvec = distance.squareform(dmat)
 
     # Do the hierarchical clustering.
-    Z = hierarchy.linkage(dvec, method='average')
+    Z = hierarchy.linkage(dvec, method=linkage_method)
 
     # return Z, labels
-    return dict(linkage=Z, labels=labels, max_rank=max_rank)
+    return Z
 
 
 def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leaves=None, out_path=None):
@@ -307,3 +276,5 @@ def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leave
         LOGGER.info(f'Saved clusters: {out_path}')
 
     return clusters
+
+# END

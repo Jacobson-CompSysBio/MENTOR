@@ -23,11 +23,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import logging
 import warnings
+import pathlib
 
 # from sklearn import metrics
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
-from functional_partitioning import cluster, metrics
+from functional_partitioning import cluster, metrics, rwrtoolkit
 
 # from .version import __version__
 # Error when run as a script:
@@ -161,93 +162,37 @@ def calc_threshold(Z, threshold, scores=None):
     return threshold
 
 
-def partition_fullranks(
-    path_or_dataframe,
-    dendrogram_style='rectangular',
-    label_mapper=None,
-    out_dendrogram=None,
-    out_clusters=None,
-    threshold=0,
-    **kwargs
-):
+def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '):
     '''
-    CLI helper.
-
-    Parameters
-    ----------
-    label_mapper : dict
-        Use these labels on the dendrogram. Dict of `{seed: dendrogram_label,
-        ... }`.
-
-    Returns
-    -------
-    dict
+    Create a label mapper.
     '''
-    LOGGER.info('Partitioning....')
-    # Z, labels = cluster_hierarchical(path_or_dataframe)
-    partition_result = cluster.cluster_hierarchical(path_or_dataframe)
+    def join(x, sep=sep):
+        return sep.join([str(i) for i in x])
 
-    Z = partition_result['linkage']
-
-    labels = partition_result['labels']
-    if label_mapper is not None:
-        labels = [label_mapper[l] for l in labels]
-    elif 'labels' in kwargs:
-        labels = kwargs.pop('labels', labels)
+    if isinstance(nodetable, str):
+        # The default for `read_table` is to set a numeric index, ie, all of
+        # the data will appear in columns and will not be used as the index.
+        nodetable = pd.read_table(nodetable, index_col=0)
     else:
-        pass
+        nodetable = nodetable.copy()
 
-    if threshold == 'mean':
-        threshold = np.mean(Z[:,2])
-    elif threshold is None:
-        # Default for hierarchy.dendrogram is to use `0.7*max(Z[:,2])` when
-        # `color_threshold==None`. Set this explicitely to enable
-        # `draw_threshold`, below.
-        threshold = 0.7*max(Z[:,2])
+    # Move the index to a column, preserving the 'name' of the index.
+    # nodetable.insert(0, '__index__', nodetable.index)
+    idx = nodetable.index
+    nodetable = nodetable.reset_index()
+    nodetable.index = idx
+
+    if use_names or use_locs:
+        columns = nodetable.columns.to_list()
+        if use_locs:
+            col_names = [columns[i] for i in use_locs]
+        else:
+            col_names = use_names
+        label_mapper = nodetable[col_names].agg(join, axis=1).to_dict()
     else:
-        threshold = float(threshold)
+        label_mapper = {}
 
-    if dendrogram_style is None:
-        # Catch None, bc `None.startswith` raises error.
-        tree = {}
-    elif dendrogram_style.startswith('r'):
-        try:
-            tree = plot_dendrogram(
-                Z,
-                labels=labels,
-                color_threshold=threshold,
-                out_path=out_dendrogram,
-                **kwargs
-            )
-        except Exception as e:
-            LOGGER.error('Plotting failed: %s', str(e))
-            tree = {}
-    elif dendrogram_style.startswith('p'):
-        try:
-            tree = plot_dendrogram_polar(
-                Z,
-                labels=labels,
-                out_path=out_dendrogram,
-                **kwargs
-            )
-        except Exception as e:
-            LOGGER.error('Plotting failed: %s', str(e))
-            tree = {}
-    else:
-        tree = {}
-
-    clusters = cluster.get_clusters(
-        Z,
-        labels=labels,
-        threshold=threshold,
-        match_to_leaves=tree.get('leaves'),
-        out_path=out_clusters,
-    )
-
-    partition_result['tree'] = tree
-    partition_result['clusters'] = clusters
-
-    return partition_result
+    return label_mapper
 
 
 ########################################################################
@@ -478,6 +423,8 @@ def plot_dendrogram_polar(
         savefig(out_path=out_path)
 
     return tree
+
+
 # }}}
 ########################################################################
 # Parse args {{{
@@ -489,10 +436,12 @@ def parse_args(test=None):
         try:
             if arg == 'mean':
                 return arg
+            elif arg == 'best_chi':
+                return arg
             else:
                 return float(arg)
         except:
-            raise argparse.ArgumentTypeError(f'Threshold must be float or "mean"; you gave "{arg}".')
+            raise argparse.ArgumentTypeError(f'Threshold must be one of "mean", "best_chi", or <float>; you gave "{arg}".')
 
     parser = argparse.ArgumentParser(
         description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
@@ -541,6 +490,12 @@ def parse_args(test=None):
         help='Do not plot the dendrogram.'
     )
     parser.add_argument(
+        '--labels-use-clusters',
+        action='store_true',
+        default=False,
+        help=''
+    )
+    parser.add_argument(
         '--labels-use-names',
         action='store',
         nargs='*',
@@ -561,8 +516,9 @@ def parse_args(test=None):
         help='The separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
     )
     parser.add_argument(
-        '--out-dir',
+        '--outdir',
         action='store',
+        type=pathlib.Path,
         help='Save dendrogram and clusters to path.'
     )
     parser.add_argument(
@@ -574,6 +530,67 @@ def parse_args(test=None):
         '--out-clusters', '-c',
         action='store',
         help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
+    )
+    parser.add_argument(
+        '--path-to-conda-env',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--path-to-rwrtoolkit',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--multiplex',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--geneset',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--method',
+        action='store',
+        default='singletons',
+        help=''
+    )
+    parser.add_argument(
+        '--folds',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--restart',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--tau',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--numranked',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--modname',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--plot',
+        action='store',
+        help=''
+    )
+    parser.add_argument(
+        '--threads',
+        action='store',
+        help=''
     )
     parser.add_argument(
         '--verbose', '-v',
@@ -620,64 +637,156 @@ def main():
         logger_config['level'] = logging.DEBUG
     logging.basicConfig(**logger_config)
 
+
     # LOGGER.debug('debug message')
     # LOGGER.info('info message')
     # LOGGER.warning('warn message')
     # LOGGER.error('error message')
     # LOGGER.critical('critical message')
 
-    if args.out_dir is not None:
+
+    if args.outdir is not None:
         # Use --out-dir with default names, unless another path is explicitely specified.
 
         if args.out_dendrogram is None:
             # Set the default path for the dendrogram.
-            out_dendrogram = os.path.join(args.out_dir, 'dendrogram.png')
+            out_dendrogram = os.path.join(args.outdir, 'dendrogram.png')
         else:
             out_dendrogram = args.out_dendrogram
 
         if args.out_clusters is None:
             # Set the default path for the clusters.
-            out_clusters = os.path.join(args.out_dir, 'clusters.tsv')
+            out_clusters = os.path.join(args.outdir, 'clusters.tsv')
         else:
             out_clusters = args.out_clusters
     else:
         out_dendrogram = args.out_dendrogram
         out_clusters = args.out_clusters
 
+
     if args.dendrogram_style.startswith(('r', 'p')):
         dendrogram_style = args.dendrogram_style
     else:
         dendrogram_style = None
 
-    if args.labels_use_names or args.labels_use_locs:
-        nodetable = pd.read_table(args.nodetable)
-        columns = nodetable.columns.to_list()
-        idx_col = columns[0]
 
-        if args.labels_use_locs:
-            col_names = [columns[i] for i in args.labels_use_locs]
-        else:
-            col_names = args.labels_use_names
+    if args.multiplex and args.geneset:
+        # Run RWR-singletons.
+        command = rwrtoolkit.rwr_singletons(
+            path_to_conda_env=args.path_to_conda_env,
+            path_to_rwrtoolkit=args.path_to_rwrtoolkit,
+            data=args.multiplex,
+            geneset=args.geneset,
+            method=args.method,
+            folds=args.folds,
+            restart=args.restart,
+            tau=args.tau,
+            numranked=args.numranked,
+            outdir=args.outdir,
+            modname=args.modname,
+            plot=args.plot,
+            threads=args.threads,
+            verbose=args.verbose
+        )
+        # print(command)
+        res = rwrtoolkit.run(command)
+        if res['returncode'] != 0:
+            LOGGER.error('RWR-singletons failed.')
+            LOGGER.error(command)
+            LOGGER.error(res.stderr)
+            sys.exit(1)
+        # print(res)
 
-        label_mapper = nodetable.set_index(idx_col, drop=False)[col_names].agg(args.labels_sep.join, axis=1).to_dict()
+        rwrtoolkit.compress_results(args.outdir)
+
+        try:
+            path_to_fullranks = next(args.outdir.glob('RWR*fullranks*'))
+            # print(path_to_fullranks)
+        except StopIteration:
+            LOGGER.error('Cannot find fullranks file.')
+            sys.exit(1)
+
+        X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(
+            path_to_fullranks,
+            max_rank='elbow',
+            drop_missing=True
+        )
     else:
-        label_mapper = None
+        X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(
+            args.rwr_fullranks,
+            max_rank='elbow',
+            drop_missing=True
+        )
 
-
-    # Load the fullranks data once.
-    fullranks = pd.read_table(args.rwr_fullranks)
 
     if args.partition:
 
-        result = partition_fullranks(
-            path_or_dataframe=fullranks,
-            threshold=args.threshold,
-            dendrogram_style=dendrogram_style,
-            label_mapper=label_mapper,
-            out_dendrogram=out_dendrogram,
-            out_clusters=out_clusters,
-            no_plot=args.no_plot
+        linkage_matrix = cluster.cluster_hierarchical(X_ranks)
+        threshold = calc_threshold(
+            linkage_matrix,
+            args.threshold,
+            scores=X_scores.fillna(X_scores.max(axis=1))
         )
+        # print('threshold', threshold)
+
+        clusters = cluster.get_clusters(
+            linkage_matrix,
+            labels=labels,
+            threshold=threshold,
+            n_clusters=None,
+            match_to_leaves=None,
+            out_path=out_clusters
+        )
+        # print(clusters)
+
+        if args.labels_use_clusters:
+            label_mapper = make_label_mapper(
+                nodetable=clusters,
+                use_locs=[0, 1], # List.
+                sep=args.labels_sep
+            )
+            labels = [label_mapper.get(l, l) for l in labels]
+        elif args.labels_use_names or args.labels_use_locs:
+            label_mapper = make_label_mapper(
+                nodetable=args.nodetable,
+                use_names=args.labels_use_names,
+                use_locs=args.labels_use_locs,
+                sep=args.labels_sep
+            )
+            labels = [label_mapper.get(l, l) for l in labels]
+        else:
+            label_mapper = None
+        # print(label_mapper)
+        # print(labels)
+
+        if dendrogram_style is None:
+            # Catch None, bc `None.startswith` raises error.
+            tree = {}
+        elif dendrogram_style.startswith('r'):
+            try:
+                tree = plot_dendrogram(
+                    linkage_matrix,
+                    labels=labels,
+                    color_threshold=threshold,
+                    out_path=out_dendrogram,
+                    no_plot=args.no_plot
+                )
+            except Exception as e:
+                LOGGER.error('Plotting failed: %s', str(e))
+                tree = {}
+        elif dendrogram_style.startswith('p'):
+            try:
+                tree = plot_dendrogram_polar(
+                    linkage_matrix,
+                    labels=labels,
+                    out_path=out_dendrogram,
+                    no_plot=args.no_plot
+                )
+            except Exception as e:
+                LOGGER.error('Plotting failed: %s', str(e))
+                tree = {}
+        else:
+            tree = {}
 
     return 0
 
