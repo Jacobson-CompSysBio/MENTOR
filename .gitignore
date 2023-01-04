@@ -15,43 +15,35 @@ purgatory
 reference
 results
 tmp
+.ipynb_checkpoints
 
-# Misc files
+# Files
 *.bak
+*.bam
+*.csv
 *.html
-*.tmp
-
-# Image files.
 *.jpeg
 *.jpg
 *.pdf
+*.pkl
 *.png
+*.sam
 *.svg
 *.tiff
-
-# Data Files
-*.bam
-*.csv
-*.pkl
-*.sam
+*.tmp
 *.tsv
-
-# Jupyter notebook checkpoint files
-.ipynb_checkpoints
+*.swp
+tags
 
 # Microsoft (eg, Excel, Word)
 ~$*.xls*
 ~$*.doc*
 ~$*.ppt*
 
-# Vim files
-*.swp
-
 # R crap
 *.rds
 *.Rdata
 *.RData
-
 
 # Batch output
 *slurm*
