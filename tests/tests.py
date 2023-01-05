@@ -19,6 +19,8 @@ CHECKSUMS = {
     'fullranks': 'e8646ece5873b493e38a71f877372e66',
     'linkage_matrix_scores_euclidean_average': 'b1dd3e10cc1029f1a57202f4be3c9cfa',
     'linkage_matrix_ranks_euclidean_average': '477efbcf8ed2e66e4e2ea29d77d57abc',
+    'linkage_matrix_scores_spearman_average' : 'cc82aa17649c4ff0e7faa8c4288b8185',
+    'linkage_matrix_ranks_spearman_average' : 'b7c48b5580dae5f4fc066d229f098873',
     'spearman_distance_matrix_scores': '181f9b182d74532fdeba6ce50051c324',
     'spearman_distance_matrix_ranks': '17ec19ed3ff1dde6a6f0dfdd210e40ca',
     # Clusters based on Spearman distances from the `scores` and `ranks` matrices should be the same.
@@ -27,7 +29,13 @@ CHECKSUMS = {
     'fullranks_to_matrix_X_ranks': '9101f73917fc9678808ce47d720ec411',
     'fullranks_to_matrix_X_scores' : '3c6d835ec34107f53bd13f9f1e1a16ce',
     'fullranks_to_matrix_labels' : 'bdcc8bd8b0edc2e52b82d39b282493b7',
-    'fullranks_to_matrix_max_rank' : 'c763ff8f88aacdbe4b423f930ff3afeb'
+    'fullranks_to_matrix_max_rank' : 'c763ff8f88aacdbe4b423f930ff3afeb',
+    # Helper functions.
+    'calc_threshold_mean' : '6b88a48bc7f8bcf7ec27d6e8592fae6a',
+    'calc_threshold_best_chi' : 'fb42bd8c5d5c3bec691d6c7c1d37bede',
+    'get_clusters_labels_none_threshold_05' : 'a86b536ff791b21ab57fe612a93021df',
+    'get_clusters_labels_default_threshold_05' : 'cee8925663a74cb41bd759e6291b8e6d',
+    'label_mapper_labels_default' : '38fe01a29198ab24055b1faf53d68cc5'
 }
 
 
@@ -57,7 +65,8 @@ def test_make_fullranks_table(random_state=RANDOM_STATE):
     assert joblib.hash(fullranks) == CHECKSUMS['fullranks']
 
 
-# Test linkage matrices.
+# Test linkage matrices. The linkage matrices returned from
+# `scipy.hierarchy.linkage` and `HierarchicalClustering` should be the same.
 
 
 def test_scipy_linkage_matrix_scores():
@@ -134,6 +143,33 @@ def test_hierarchicalclustering_clusters_ranks():
     clusters = hierarchy.cut_tree(mod.linkage_matrix)
 
     assert joblib.hash(clusters) == CHECKSUMS['spearman_distance_clusters']
+
+
+
+def test_cluster_hierarchical_scores_spearman_average():
+    scores = datasets.make_scores_matrix()
+    scores = scores.fillna(scores.max(axis=1))
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        scores,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    assert joblib.hash(linkage_matrix) == CHECKSUMS['linkage_matrix_scores_spearman_average']
+
+
+def test_cluster_hierarchical_ranks_spearman_average():
+    ranks = datasets.make_ranks_matrix()
+    ranks = ranks.fillna(0)
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    assert joblib.hash(linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_spearman_average']
 
 
 # Test metrics functions.
@@ -217,6 +253,127 @@ def test_rwrtoolkit_fullranks_to_matrix_max_rank():
     fullranks = datasets.make_fullranks_table()
     X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
     assert joblib.hash(max_rank) == CHECKSUMS['fullranks_to_matrix_max_rank']
+
+
+# Test helper functions.
+
+
+def test_calc_threshold_mean():
+    ranks = datasets.make_ranks_matrix()
+    ranks = ranks.fillna(0)
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    threshold = fp.calc_threshold(
+        linkage_matrix,
+        threshold='mean',
+        scores=None
+    )
+
+    assert joblib.hash(threshold) == CHECKSUMS['calc_threshold_mean']
+
+
+def test_calc_threshold_best_chi():
+    # Ranks => linkage matrix.
+    ranks = datasets.make_ranks_matrix()
+    ranks = ranks.fillna(0)
+
+    # Scores => threshold w/ CHI.
+    scores = datasets.make_scores_matrix()
+    scores = scores.fillna(scores.max(axis=1))
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    threshold = fp.calc_threshold(
+        linkage_matrix,
+        threshold='best_chi',
+        scores=scores
+    )
+
+    assert joblib.hash(threshold) == CHECKSUMS['calc_threshold_best_chi']
+
+
+def test_get_clusters_labels_none_threshold_05():
+    ranks = datasets.make_ranks_matrix()
+    ranks = ranks.fillna(0)
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    clusters = cluster.get_clusters(
+        linkage_matrix,
+        labels=None,
+        threshold=0.5,
+        n_clusters=None,
+        match_to_leaves=None,
+        out_path=None
+    )
+
+    assert joblib.hash(clusters) == CHECKSUMS['get_clusters_labels_none_threshold_05']
+
+
+def test_get_clusters_labels_default_threshold_05():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+
+    X_ranks = X_ranks.fillna(0)
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        X_ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    clusters = cluster.get_clusters(
+        linkage_matrix,
+        labels=labels,
+        threshold=0.5,
+        n_clusters=None,
+        match_to_leaves=None,
+        out_path=None
+    )
+
+    assert joblib.hash(clusters) == CHECKSUMS['get_clusters_labels_default_threshold_05']
+
+
+def test_make_label_mapper_labels_default():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+
+    X_ranks = X_ranks.fillna(0)
+
+    linkage_matrix = cluster.cluster_hierarchical(
+        X_ranks,
+        corr_method='spearman',
+        linkage_method='average'
+    )
+
+    clusters = cluster.get_clusters(
+        linkage_matrix,
+        labels=labels,
+        threshold=0.5,
+        n_clusters=None,
+        match_to_leaves=None,
+        out_path=None
+    )
+
+    label_mapper = fp.make_label_mapper(
+        nodetable=clusters,
+        use_locs=[0, 1], # List.
+    )
+
+    assert joblib.hash(label_mapper) == CHECKSUMS['label_mapper_labels_default']
 
 
 # END.
