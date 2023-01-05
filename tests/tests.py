@@ -5,8 +5,8 @@ import numpy as np
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
+from functional_partitioning import datasets, cluster, metrics, rwrtoolkit
 from functional_partitioning import functional_partitioning as fp
-from functional_partitioning import datasets, cluster, metrics
 
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
@@ -23,13 +23,20 @@ CHECKSUMS = {
     'spearman_distance_matrix_ranks': '17ec19ed3ff1dde6a6f0dfdd210e40ca',
     # Clusters based on Spearman distances from the `scores` and `ranks` matrices should be the same.
     'spearman_distance_clusters': 'c35db22b2b15458dfe3817f7781dd4ce',
+    # RWRtoolkit wrapper.
+    'fullranks_to_matrix_X_ranks': '9101f73917fc9678808ce47d720ec411',
+    'fullranks_to_matrix_X_scores' : '3c6d835ec34107f53bd13f9f1e1a16ce',
+    'fullranks_to_matrix_labels' : 'bdcc8bd8b0edc2e52b82d39b282493b7',
+    'fullranks_to_matrix_max_rank' : 'c763ff8f88aacdbe4b423f930ff3afeb'
 }
 
 
 RANDOM_STATE = 42
 
 
-# Data sets.
+# Test data sets.
+
+
 def test_make_features(random_state=RANDOM_STATE):
     X, y = datasets.make_features()
     assert joblib.hash(X) == CHECKSUMS['features']
@@ -50,7 +57,9 @@ def test_make_fullranks_table(random_state=RANDOM_STATE):
     assert joblib.hash(fullranks) == CHECKSUMS['fullranks']
 
 
-# Linkage matrices.
+# Test linkage matrices.
+
+
 def test_scipy_linkage_matrix_scores():
     metric = 'euclidean'
     method = 'average'
@@ -128,6 +137,8 @@ def test_hierarchicalclustering_clusters_ranks():
 
 
 # Test metrics functions.
+
+
 def test_spearman_distance_function_equal_pandas_scores():
     '''
     Using the `metrics._spearman_distance` fxn is much slower than
@@ -178,6 +189,34 @@ def test_spearman_distance_matrix_ranks():
     dmat = metrics.spearman_d(ranks)
 
     assert joblib.hash(dmat) == CHECKSUMS['spearman_distance_matrix_ranks']
+
+
+# Test RWRtoolkit wrapper functions. Minimal testing here; just make sure the
+# fullranks table is properly converted.
+
+
+def test_rwrtoolkit_fullranks_to_matrix_X_ranks():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    assert joblib.hash(X_ranks) == CHECKSUMS['fullranks_to_matrix_X_ranks']
+
+
+def test_rwrtoolkit_fullranks_to_matrix_X_scores():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    assert joblib.hash(X_scores) == CHECKSUMS['fullranks_to_matrix_X_scores']
+
+
+def test_rwrtoolkit_fullranks_to_matrix_labels():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    assert joblib.hash(labels) == CHECKSUMS['fullranks_to_matrix_labels']
+
+
+def test_rwrtoolkit_fullranks_to_matrix_max_rank():
+    fullranks = datasets.make_fullranks_table()
+    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    assert joblib.hash(max_rank) == CHECKSUMS['fullranks_to_matrix_max_rank']
 
 
 # END.
