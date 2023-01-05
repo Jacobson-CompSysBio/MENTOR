@@ -721,7 +721,11 @@ def main():
 
     if args.partition:
 
-        linkage_matrix = cluster.cluster_hierarchical(X_ranks)
+        linkage_matrix = cluster.cluster_hierarchical(
+            X_ranks.fillna(0),
+            corr_method='spearman',
+            linkage_method='average'
+        )
         threshold = calc_threshold(
             linkage_matrix,
             args.threshold,
