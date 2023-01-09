@@ -33,10 +33,7 @@ Initial release.
 - Split loading 'fullranks' and converting it to 'X' matrix into separate
   functions
 
-## Deprecated
-## Removed
-## Fixed
-## Security
+---
 
 See also:
 
