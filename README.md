@@ -24,66 +24,82 @@ usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
                                [--nodetable NODETABLE] [--partition]
                                [--threshold THRESHOLD]
                                [--dendrogram-style {rectangular,r,polar,p,none,n}]
-                               [--no-plot]
+                               [--no-plot] [--labels-use-clusters]
                                [--labels-use-names [LABELS_USE_NAMES ...]]
                                [--labels-use-locs [LABELS_USE_LOCS ...]]
-                               [--labels-sep LABELS_SEP] [--out-dir OUT_DIR]
+                               [--labels-sep LABELS_SEP] [--outdir OUTDIR]
                                [--out-dendrogram OUT_DENDROGRAM]
-                               [--out-clusters OUT_CLUSTERS] [--verbose]
+                               [--out-clusters OUT_CLUSTERS]
+                               [--path-to-conda-env PATH_TO_CONDA_ENV]
+                               [--path-to-rwrtoolkit PATH_TO_RWRTOOLKIT]
+                               [--multiplex MULTIPLEX] [--geneset GENESET]
+                               [--method METHOD] [--folds FOLDS]
+                               [--restart RESTART] [--tau TAU]
+                               [--numranked NUMRANKED] [--modname MODNAME]
+                               [--plot PLOT] [--threads THREADS] [--verbose]
 
 Partition seeds from `RWR-CV --method=singletons ...` into clusters.
 
 options:
-  -h, --help            show this help message and exit
-  --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
-                        Path to "fullranks" file from `RWR-CV
-                        --method=singletons ...` (default: None)
-  --nodetable NODETABLE
-                        Path to "nodetable" file. This is a TSV file where the
-                        first column is the node name (i.e., the seed genes
-                        from RWR-fullranks). (default: None)
-  --partition, -p       [PLACEHOLDER] Perform functional partitioning on "seed
-                        genes" from RWR fullranks file. This is the default.
-                        (default: True)
-  --threshold THRESHOLD, -t THRESHOLD
-                        Apply threshold to dendrogram. Genes in branches below
-                        this threshold will be grouped into clusters; other
-                        genes are considered isolates (separate clusters, each
-                        with a single gene). Value can be float or "mean". If
-                        the value is "mean", then use the mean branch height
-                        as the cluster threshold; this can be useful for a
-                        first pass. (default: 0)
-  --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
-                        Plot the dendrogram in rectangular or polar
-                        coordinates. Default is rectangular. (default:
-                        rectangular)
-  --no-plot             Do not plot the dendrogram. (default: False)
-  --labels-use-names [LABELS_USE_NAMES ...]
-                        Label the dendrogram using columns from the nodetable.
-                        This is a space-separated list of column names from
-                        the nodetable. Pass columns as strings (column names).
-                        (default: None)
-  --labels-use-locs [LABELS_USE_LOCS ...]
-                        Label the dendrogram using columns from the nodetable.
-                        This is a space-separated list of integers indicating
-                        columns from the nodetable (0-index, e.g., the first
-                        column, which contains the node names, has index 0;
-                        the second column has index 1, etc). (default: None)
-  --labels-sep LABELS_SEP
-                        The separator that will be used if multiple columns
-                        from nodetable are used to label the dendrogram.
-                        (default: | )
-  --out-dir OUT_DIR     Save dendrogram and clusters to path. (default: None)
-  --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
-                        Save dendrogram to path. (default: None)
-  --out-clusters OUT_CLUSTERS, -c OUT_CLUSTERS
-                        Save clusters to path as tsv file with columns
-                        "label", "cluster". When --threshold is 0 (the
-                        default) each gene is put into a separate cluster
-                        (i.e., every cluster has only a single gene).
-                        (default: None)
-  --verbose, -v         Default: WARNING; once: INFO; twice: DEBUG (default:
-                        0)
+    -h, --help           
+        show this help message and exit
+    --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
+        Path to "fullranks" file from `RWR-CV --method=singletons ...`
+        (default: None)
+    --nodetable NODETABLE
+        Path to "nodetable" file. This is a TSV file where the first column is
+        the node name (i.e., the seed genes from RWR-fullranks). (default:
+        None)
+    --partition, -p      
+        [PLACEHOLDER] Perform functional partitioning on "seed genes" from RWR
+        fullranks file. This is the default. (default: True)
+    --threshold THRESHOLD, -t THRESHOLD
+        Apply threshold to dendrogram. Genes in branches below this threshold
+        will be grouped into clusters; other genes are considered isolates
+        (separate clusters, each with a single gene). Value can be float or
+        "mean". If the value is "mean", then use the mean branch height as the
+        cluster threshold; this can be useful for a first pass. (default: 0)
+    --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
+        Plot the dendrogram in rectangular or polar coordinates. Default is
+        rectangular. (default: rectangular)
+    --no-plot            
+        Do not plot the dendrogram. (default: False)
+    --labels-use-clusters
+    --labels-use-names [LABELS_USE_NAMES ...]
+        Label the dendrogram using columns from the nodetable. This is
+        a space-separated list of column names from the nodetable. Pass columns
+        as strings (column names). (default: None)
+    --labels-use-locs [LABELS_USE_LOCS ...]
+        Label the dendrogram using columns from the nodetable. This is
+        a space-separated list of integers indicating columns from the
+        nodetable (0-index, e.g., the first column, which contains the node
+        names, has index 0; the second column has index 1, etc). (default:
+        None)
+    --labels-sep LABELS_SEP
+        The separator that will be used if multiple columns from nodetable are
+        used to label the dendrogram. (default: | )
+    --outdir OUTDIR      
+        Save dendrogram and clusters to path. (default: None)
+    --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
+        Save dendrogram to path. (default: None)
+    --out-clusters OUT_CLUSTERS, -c OUT_CLUSTERS
+        Save clusters to path as tsv file with columns "label", "cluster". When
+        --threshold is 0 (the default) each gene is put into a separate cluster
+        (i.e., every cluster has only a single gene). (default: None)
+    --path-to-conda-env PATH_TO_CONDA_ENV
+    --path-to-rwrtoolkit PATH_TO_RWRTOOLKIT
+    --multiplex MULTIPLEX
+    --geneset GENESET
+    --method METHOD
+    --folds FOLDS
+    --restart RESTART
+    --tau TAU
+    --numranked NUMRANKED
+    --modname MODNAME
+    --plot PLOT
+    --threads THREADS
+    --verbose, -v        
+        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
 ```
 
 Examples
@@ -93,11 +109,13 @@ You can change the labels on the leaves of the dendrogram. This requires that
 you have a nodetable file. The nodetable is a TSV file with the first column as
 the seed genes use for RWR-CV (singletons), e.g., something like this:
 
-    gene_id          gene_info
-    Potri.001G377800 This is gene 001G377800.
-    Potri.001G429430 This is gene 001G429430.
-    Potri.003G099600 This is gene 003G099600.
-    ...
+```
+gene_id          gene_info
+Potri.001G377800 This is gene 001G377800.
+Potri.001G429430 This is gene 001G429430.
+Potri.003G099600 This is gene 003G099600.
+...
+```
 
 Then, provide the `--nodetable` and `--labels-use-{locs,names}` parameters to
 tell this script which columns to use as labels on the dendrogram. E.g., to use
