@@ -452,10 +452,17 @@ def parse_args(test=None):
 
     def _valid_threshold_values(arg):
         try:
-            if arg == 'mean':
+            if isinstance(arg, str):
+                arg = arg.lower()
+
+            if arg is None:
+                return None
+            elif arg == 'mean':
                 return arg
             elif arg == 'best_chi':
                 return arg
+            elif arg == 'none':
+                return None
             else:
                 return float(arg)
         except:
@@ -488,7 +495,6 @@ def parse_args(test=None):
     parser.add_argument(
         '--threshold', '-t',
         action='store',
-        default=0,
         type=_valid_threshold_values,
         help=(
             'Apply threshold to dendrogram. Genes in branches below this threshold will be grouped into clusters; other genes are considered isolates (separate clusters, each with a single gene). Value can be float or "mean". If the value is "mean", then use the mean branch height as the cluster threshold; this can be useful for a first pass.'
@@ -641,7 +647,7 @@ def parse_args(test=None):
 
 def main():
     args = parse_args()
-    print(args)
+    # print(args)
 
     # Logging:
     # - Using `LOGGER.setLevel` isn't working, use `logging.basicConfig`
