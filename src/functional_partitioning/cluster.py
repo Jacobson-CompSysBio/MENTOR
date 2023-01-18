@@ -254,9 +254,9 @@ def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leave
     #        [2],
     #        [1]])
 
-    if threshold is None and n_clusters is None:
-        # Get a matrix of clusterings, one for each agglomeration step.
-        clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold)
+    if not threshold and not n_clusters:
+        # Get a matrix of all clusterings, one for each agglomeration step.
+        clusters = hierarchy.cut_tree(Z, n_clusters=None, height=None)
     else:
         # Get a vector of a single clustering.
         clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold).flatten()

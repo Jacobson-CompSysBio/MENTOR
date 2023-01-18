@@ -165,7 +165,28 @@ def calc_threshold(Z, threshold, scores=None):
 def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '):
     '''
     Create a label mapper.
+
+    Parameters
+    ----------
+    nodetable : {pandas.DataFrame, str}
+        A pandas DataFrame or path to a tsv file. The index should match the
+        node labels from the input data.
+    use_names : list
+        List of column names in `nodetable` to use as labels.
+    use_locs : list
+        List of ints corresponding to column locations in `nodetable` to use as
+        labels.
+    sep : str
+        Separator to use when joining multiple columns.
+
+    Returns
+    -------
+    dict
+        {<node name> : <label> , ...}
     '''
+    if not use_names and not use_locs:
+        raise ValueError('You must provide at least one of `use_names` or `use_locs`.')
+
     def join(x, sep=sep):
         return sep.join([str(i) for i in x])
 
@@ -182,15 +203,12 @@ def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '
     nodetable = nodetable.reset_index()
     nodetable.index = idx
 
-    if use_names or use_locs:
-        columns = nodetable.columns.to_list()
-        if use_locs:
-            col_names = [columns[i] for i in use_locs]
-        else:
-            col_names = use_names
-        label_mapper = nodetable[col_names].agg(join, axis=1).to_dict()
-    else:
-        label_mapper = {}
+    columns = nodetable.columns.to_list()
+    if use_locs:
+        col_names = [columns[i] for i in use_locs]
+    elif use_cols:
+        col_names = use_names
+    label_mapper = nodetable[col_names].agg(join, axis=1).to_dict()
 
     return label_mapper
 
@@ -593,6 +611,11 @@ def parse_args(test=None):
         help=''
     )
     parser.add_argument(
+        '--init-test-fullranks',
+        action='store',
+        help='Create fullranks file for testing at the given path.'
+    )
+    parser.add_argument(
         '--verbose', '-v',
         action='count',
         default=0,
@@ -618,6 +641,7 @@ def parse_args(test=None):
 
 def main():
     args = parse_args()
+    print(args)
 
     # Logging:
     # - Using `LOGGER.setLevel` isn't working, use `logging.basicConfig`
@@ -644,6 +668,12 @@ def main():
     # LOGGER.error('error message')
     # LOGGER.critical('critical message')
 
+    if args.init_test_fullranks:
+        from functional_partitioning import datasets
+        fullranks = datasets.make_fullranks_table()
+        # print('fullranks:')
+        # print(fullranks)
+        fullranks.to_csv(args.init_test_fullranks, sep='\t', index=False)
 
     if args.outdir is not None:
         # Use --out-dir with default names, unless another path is explicitely specified.
@@ -731,8 +761,10 @@ def main():
             args.threshold,
             scores=X_scores.fillna(X_scores.max(axis=1))
         )
-        # print('threshold', threshold)
+        # print('threshold:', threshold)
 
+        # print('linkage matrix:')
+        # print(linkage_matrix)
         clusters = cluster.get_clusters(
             linkage_matrix,
             labels=labels,
@@ -741,6 +773,7 @@ def main():
             match_to_leaves=None,
             out_path=out_clusters
         )
+        # print('clusters:')
         # print(clusters)
 
         if args.labels_use_clusters:
