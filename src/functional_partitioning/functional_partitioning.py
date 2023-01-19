@@ -247,6 +247,12 @@ def plot_dendrogram(
     kwargs
         Passed to `hierarchy.dendrogram`
     '''
+    if kwargs.get('color_threshold') is None:
+        # Do not allow 'color_threshold' to be None.
+        # - Set it to 0 to prevent dendrogram from using default color_threshold.
+        # - Protect against error: '>' not supported between instances of 'NoneType' and 'int'
+        kwargs['color_threshold'] = 0
+
     if kwargs.get('no_plot'):
         pass
     elif plt.get_fignums() and kwargs.get('ax') is None:
