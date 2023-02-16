@@ -28,18 +28,52 @@ LOGGER = logging.getLogger(__name__)
 
 class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimator):
     # Notes:
+    # - `affinity` is deprecated in sklearn v1.2 and will be removed in v1.4.
     # - `affinity` is passed to `pdist` as `metric`
     # - `affinity` can be a callable, but it takes a single matrix `X` as
     #   input, whereas `pdist` requires a callable takes two vectors `u` and
     #   `v` as arguments.
 
-    def __init__(self, compute_linkage_matrix=True, compute_dendrogram=True, **kwargs):
-        kwargs.setdefault('distance_threshold', 0)
-        kwargs.setdefault('n_clusters', None)
-        kwargs.setdefault('linkage', 'average')
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        n_clusters=None, # Changed default.
+        *,
+        affinity=None,
+        metric=None,
+        memory=None,
+        connectivity=None,
+        compute_full_tree="auto",
+        linkage="average", # Changed default.
+        distance_threshold=None, # Changed default.
+        compute_distances=False,
+        compute_linkage_matrix=True, # New.
+        compute_dendrogram=True # New.
+    ):
+        # Handle 'affinity', which will be removed in v1.4. Sklearn passes
+        # 'affinity' to 'pdist' as 'metric' (eg, in the `_average` method).
+        # After v1.4, I assume this will change so that 'metric' will passed
+        # instead of 'affinity'.
+        if metric is None:
+            if affinity is None or affinity == 'deprecated':
+                metric = 'euclidean'
+            else:
+                metric = affinity
+        init_kwargs = dict(
+            affinity = metric,
+            metric = metric,
+            n_clusters = n_clusters,
+            distance_threshold = distance_threshold,
+            memory = memory,
+            connectivity = connectivity,
+            compute_full_tree = compute_full_tree,
+            linkage = linkage,
+            compute_distances = compute_distances,
+        )
+        super().__init__(**init_kwargs)
         self.compute_linkage_matrix = compute_linkage_matrix
         self.compute_dendrogram = compute_dendrogram
+        self.labels_ = None  # Not sure if this is needed.
+        self.method = linkage # [TODO] Use method instead of linkage.
 
     def _fit(self, X):
         """
@@ -60,24 +94,23 @@ class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimato
         # Copied from AgglomerativeClustering._fit >>>
         memory = check_memory(self.memory)
 
+        # Changed: Only one of n_clusters or distance_threshold can be passed to hierarchy.cut_tree.
+        if self.n_clusters and self.distance_threshold:
+            raise ValueError("Provide n_clusters OR distance_threshold, not both.")
+
         if self.n_clusters is not None and self.n_clusters <= 0:
             raise ValueError(
                 "n_clusters should be an integer greater than 0. %s was provided."
                 % str(self.n_clusters)
             )
 
-        if not ((self.n_clusters is None) ^ (self.distance_threshold is None)):
-            raise ValueError(
-                "Exactly one of n_clusters and "
-                "distance_threshold has to be set, and the other "
-                "needs to be None."
-            )
+        # Changed: Consider removing compute_full_tree.
+        # if self.distance_threshold is not None and not self.compute_full_tree:
+        #     raise ValueError(
+        #         "compute_full_tree must be True if distance_threshold is set."
+        #     )
 
-        if self.distance_threshold is not None and not self.compute_full_tree:
-            raise ValueError(
-                "compute_full_tree must be True if distance_threshold is set."
-            )
-
+        # [TODO] Use self.metric instead of self.affinity.
         if self.linkage == "ward" and self.affinity != "euclidean":
             raise ValueError(
                 "%s was provided as affinity. Ward can only "
@@ -143,48 +176,72 @@ class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimato
             self.n_clusters_ = (
                 np.count_nonzero(self.distances_ >= distance_threshold) + 1
             )
-        else:  # n_clusters is used
+        else:
+            # n_clusters is used
             self.n_clusters_ = self.n_clusters
 
-        # Cut the tree
-        if compute_full_tree:
-            self.labels_ = _hc_cut(self.n_clusters_, self.children_, self.n_leaves_)
-        else:
-            labels = _hierarchical.hc_get_heads(parents, copy=False)
-            # copy to avoid holding a reference on the original array
-            labels = np.copy(labels[:n_samples])
-            # Reassign cluster numbers
-            self.labels_ = np.searchsorted(np.unique(labels), labels)
+        # Change: use hierarchy.linkage and hierarchy.cut_tree (below) instead of this.
+        # # Cut the tree
+        # if compute_full_tree:
+        #     self.labels_ = _hc_cut(self.n_clusters_, self.children_, self.n_leaves_)
+        # else:
+        #     labels = _hierarchical.hc_get_heads(parents, copy=False)
+        #     # copy to avoid holding a reference on the original array
+        #     labels = np.copy(labels[:n_samples])
+        #     # Reassign cluster numbers
+        #     self.labels_ = np.searchsorted(np.unique(labels), labels)
         # End of AgglomerativeClustering._fit <<<
-            
-        # Compute the linkage matrix (**NEW**).
-        if self.compute_linkage_matrix or self.compute_dendrogram:
-            # Create the counts of samples under each node.
-            # https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html#sphx-glr-auto-examples-cluster-plot-agglomerative-dendrogram-py
-            counts = np.zeros(self.children_.shape[0])
-            n_samples = len(self.labels_)
-            for i, merge in enumerate(self.children_):
-                current_count = 0
-                for child_idx in merge:
-                    if child_idx < n_samples:
-                        current_count += 1  # leaf node
-                    else:
-                        current_count += counts[child_idx - n_samples]
-                counts[i] = current_count
 
-            self.linkage_matrix = np.column_stack(
-                [self.children_, self.distances_, counts]
-            ).astype(float)
+        # New code >>>
+        # Compute the linkage matrix
+        # An example of building a linkage matrix is available here:
+        # https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html#sphx-glr-auto-examples-cluster-plot-agglomerative-dendrogram-py
+        # Use scipy.hierarchy.link instead:
+        # > The input may be either a 1-D condensed distance matrix or a 2-D
+        # array of observation vectors.
+        if self.metric == 'precomputed':
+            if X.ndim == 1:
+                self.linkage_matrix = hierarchy.linkage(
+                    X,
+                    method=self.linkage,
+                    metric=None,
+                    optimal_ordering=False
+                )
+            else:
+                self.linkage_matrix = hierarchy.linkage(
+                    distance.squareform(X),
+                    method=self.linkage,
+                    metric=None,
+                    optimal_ordering=False
+                )
         else:
-            self.linkage_matrx = None
+            if X.ndim == 1:
+                raise ValueError('X must be a 2D array of observations if metric is not precomputed.')
+            self.linkage_matrix = hierarchy.linkage(
+                X,
+                method=self.linkage,
+                metric=self.metric,
+                optimal_ordering=False
+            )
             
-        # Compute the dendrogram (**NEW**).
+        # Get the clusters.
+        self.labels_ = hierarchy.cut_tree(
+            self.linkage_matrix,
+            n_clusters=self.n_clusters,
+            height=self.distance_threshold
+        )
+
+        # The array from cut_tree is 2D; if there's only one column, flatten it.
+        if self.labels_.shape[1] == 1:
+            self.labels_ = self.labels_.flatten()
+
+        # Compute the dendrogram.
         if self.compute_dendrogram:
             self.dendrogram = hierarchy.dendrogram(self.linkage_matrix, no_plot=True)
         else:
+            # [TODO] Change: declare self.dendrogram in __init__
             self.dendrogram = None
     
-
         return self
 
 
