@@ -11,9 +11,19 @@
 
 # [Unreleased]
 
-<!-- ## Added for new features. -->
-<!-- ## Changed for changes in existing functionality. -->
-<!-- ## Deprecated for soon-to-be removed features. -->
+## Added for new features.
+
+- `metric` parameter was added in sklearn `AgglomerativeClustering` (upstream).
+
+## Changed for changes in existing functionality.
+
+- Use `scipy.cluster.hierarchy.{linkage,cut_tree}` to create `labels_` in
+  `HierarchicalClustering`.
+
+## Deprecated for soon-to-be removed features.
+
+- `affinity` parameter was decrepated in sklearn `AgglomerativeClustering` (upstream).
+
 <!-- ## Removed for now removed features. -->
 <!-- ## Fixed for any bug fixes. -->
 <!-- ## Security in case of vulnerabilities. -->
