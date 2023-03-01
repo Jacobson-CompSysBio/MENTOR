@@ -13,20 +13,17 @@ import numpy as np
 import pandas as pd
 import logging
 
-from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.utils.validation import check_memory
-from sklearn.cluster import (
-    AgglomerativeClustering,
-    KMeans
-)
-from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-from sklearn.utils.validation import check_is_fitted
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
+from sklearn import metrics
+from sklearn.base import BaseEstimator, ClusterMixin
+from sklearn.cluster import ( AgglomerativeClustering, KMeans )
+from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
+from sklearn.utils.validation import check_is_fitted, check_memory
 
 LOGGER = logging.getLogger(__name__)
 
-class HierarchicalClustering(AgglomerativeClustering, ClusterMixin, BaseEstimator):
+class HierarchicalClustering(AgglomerativeClustering):
     # Notes:
     # - `affinity` is deprecated in sklearn v1.2 and will be removed in v1.4.
     # - `affinity` is passed to `pdist` as `metric`
