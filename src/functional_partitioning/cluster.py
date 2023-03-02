@@ -13,6 +13,7 @@ import dynamicTreeCut
 import logging
 import numpy as np
 import pandas as pd
+import warnings
 
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
@@ -38,8 +39,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         self,
         n_clusters=None, # Changed default.
         *,
-        affinity=None,
-        metric=None,
+        metric='euclidean',
         memory=None,
         connectivity=None,
         compute_full_tree="auto",
@@ -49,18 +49,18 @@ class HierarchicalClustering(AgglomerativeClustering):
         compute_linkage_matrix=True,
         compute_dendrogram=True,
         cut_threshold=None,
-        cut_method=None,
+        cut_method='cutreeHybrid',
     ):
-        # Handle 'affinity', which will be removed in v1.4. Sklearn passes
-        # 'affinity' to 'pdist' as 'metric' (eg, in the `_average` method).
-        # After v1.4, I assume this will change so that 'metric' will passed
-        # instead of 'affinity'.
-        if metric is None:
-            if affinity is None or affinity == 'deprecated':
-                metric = 'euclidean'
-            else:
-                metric = affinity
-        init_kwargs = dict(
+        # # Handle 'affinity', which will be removed in v1.4. Sklearn passes
+        # # 'affinity' to 'pdist' as 'metric' (eg, in the `_average` method).
+        # # After v1.4, I assume this will change so that 'metric' will passed
+        # # instead of 'affinity'.
+        # if metric is None:
+        #     if affinity is None or affinity == 'deprecated':
+        #         metric = 'euclidean'
+        #     else:
+        #         metric = affinity
+        super_kwargs = dict(
             affinity = metric,
             metric = metric,
             n_clusters = n_clusters,
@@ -71,16 +71,27 @@ class HierarchicalClustering(AgglomerativeClustering):
             linkage = linkage,
             compute_distances = compute_distances,
         )
-        super().__init__(**init_kwargs)
-        self.compute_linkage_matrix = compute_linkage_matrix
+        super().__init__(**super_kwargs)
+        # [IN_PROGRESS] Init all the attributes ... 
+        self._cutreeHybrid = None
+        self._n_samples = None
         self.compute_dendrogram = compute_dendrogram
-        self.labels_ = None  # Not sure if this is needed.
-        self.method = linkage # [TODO] Use method instead of linkage.
+        self.compute_linkage_matrix = compute_linkage_matrix
         self.cut_method = cut_method
         self.cut_threshold = cut_threshold
-        # [TODO] Make linkage args explicit: linkaae_method, linkage_metric.
+        self.dendrogram = None
+        self.distances_ = 'deprecated'
+        self.labels_ = None  # Not sure if this is needed.
+        self.method = linkage # [TODO] Use method instead of linkage.
+        self.min_cluster_size_ = None
+        # [TODO] Change 'linkage' to 'linkage_method'
+        self.linkage_method = None
+        # [TODO] Change 'metric' to 'linkage_metric'
+        self.linkage_metric = None
 
-    def _fit(self, X):
+    # [TODO] Add fit method
+    # [TODO] Add fit_predict method
+    def _fit(self, X, **kwargs):
         """
         Fit without validation
         
@@ -96,134 +107,37 @@ class HierarchicalClustering(AgglomerativeClustering):
             
         https://github.com/scikit-learn/scikit-learn/blob/f3f51f9b6/sklearn/cluster/_agglomerative.py#L917
         """
-        # COPIED FROM AgglomerativeClustering._fit >>>>>>>>>
+        # [TODO] What does `check_memory` do?
         memory = check_memory(self.memory)
 
-        # Changed: Only one of n_clusters or distance_threshold can be passed to hierarchy.cut_tree.
-        if self.n_clusters and self.distance_threshold:
-            raise ValueError("Provide n_clusters OR distance_threshold, not both.")
+        if self.cut_method != 'cutreeHybrid':
+            # Only one of n_clusters or distance_threshold can be passed to hierarchy.cut_tree.
+            if self.n_clusters is not None and self.distance_threshold is not None:
+                raise ValueError("Provide n_clusters OR distance_threshold, not both.")
+            if self.n_clusters is not None and self.n_clusters <= 0:
+                raise ValueError(
+                    "n_clusters should be an integer greater than 0. %s was provided."
+                    % str(self.n_clusters)
+                )
 
-        if self.n_clusters is not None and self.n_clusters <= 0:
-            raise ValueError(
-                "n_clusters should be an integer greater than 0. %s was provided."
-                % str(self.n_clusters)
-            )
-
-        # Changed: Consider removing compute_full_tree.
-        # if self.distance_threshold is not None and not self.compute_full_tree:
-        #     raise ValueError(
-        #         "compute_full_tree must be True if distance_threshold is set."
-        #     )
-
-        # BEGIN NEW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         # Check for consistency between shape of X and the distance metric.
         if X.ndim == 1 and self.metric != "precomputed":
-            raise ValueError("X should be a 2D array if metric \"%s\"." % self.metric)
+            raise ValueError("X should be a 2D array if metric is \"%s\"." % self.metric)
         elif X.ndim != 1 and self.metric == "precomputed":
             raise ValueError("X should be a 1D condensed distance matrix if metric is \"precomputed\"." % self.metric)
-        # END NEW <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-        # # [DONE] Use self.metric instead of self.affinity.
-        # if self.linkage == "ward" and self.affinity != "euclidean":
-        #     raise ValueError(
-        #         "%s was provided as affinity. Ward can only "
-        #         "work with euclidean distances." % (self.affinity,)
-        #     )
-        if self.linkage == "ward" and self.metric != "euclidean":
+        if self.linkage == 'ward' and self.metric == 'precomputed':
+            warnings.warn(
+                    'The Ward linkage algorithm is only valid for Euclidean distances; you gave `precomputed`'
+                    ' Be sure that your distance metric is Euclidean.'
+            )
+        elif self.linkage == "ward" and self.metric != "euclidean":
             raise ValueError(
-                "%s was provided as metric. Ward can only "
-                "work with euclidean distances." % (self.metric,)
+                'The Ward linkage algorithm is only valid for Euclidean distances; you gave `%s`.'
+                % self.metric
             )
 
-        # if self.linkage not in _TREE_BUILDERS:
-        #     raise ValueError(
-        #         "Unknown linkage type %s. Valid options are %s"
-        #         % (self.linkage, _TREE_BUILDERS.keys())
-        #     )
-        # tree_builder = _TREE_BUILDERS[self.linkage]
-
-        # connectivity = self.connectivity
-        # if self.connectivity is not None:
-        #     if callable(self.connectivity):
-        #         connectivity = self.connectivity(X)
-        #     connectivity = check_array(
-        #         connectivity, accept_sparse=["csr", "coo", "lil"]
-        #     )
-
-        # REMOVED >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # n_samples = len(X)
-        # compute_full_tree = self.compute_full_tree
-        # if self.connectivity is None:
-        #     compute_full_tree = True
-        # if compute_full_tree == "auto":
-        #     if self.distance_threshold is not None:
-        #         compute_full_tree = True
-        #     else:
-        #         # Early stopping is likely to give a speed up only for
-        #         # a large number of clusters. The actual threshold
-        #         # implemented here is heuristic
-        #         compute_full_tree = self.n_clusters < max(100, 0.02 * n_samples)
-        # n_clusters = self.n_clusters
-        # if compute_full_tree:
-        #     n_clusters = None
-        # END REMOVED <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        # REMOVED >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # # Construct the tree
-        # kwargs = {}
-        # if self.linkage != "ward":
-        #     kwargs["linkage"] = self.linkage
-        #     kwargs["affinity"] = self.affinity
-        #
-        # distance_threshold = self.distance_threshold
-        #
-        # return_distance = (distance_threshold is not None) or self.compute_distances
-        #
-        # out = memory.cache(tree_builder)(
-        #     X,
-        #     connectivity=connectivity,
-        #     n_clusters=n_clusters,
-        #     return_distance=return_distance,
-        #     **kwargs,
-        # )
-        # (self.children_, self.n_connected_components_, self.n_leaves_, parents) = out[
-        #     :4
-        # ]
-        # END REMOVED <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        # BEGIN CHANGE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # The `distances_` attribute is ambiguous. It refers to the distances
-        # between the *clusters* but the user may actually want the (pairwise)
-        # distances between the *samples*.
-        # if return_distance:
-        #     self.distances_ = out[-1]
-        #
-        # if self.distance_threshold is not None:  # distance_threshold is used
-        #     self.n_clusters_ = (
-        #         np.count_nonzero(self.distances_ >= distance_threshold) + 1
-        #     )
-        # else:
-        #     # n_clusters is used
-        #     self.n_clusters_ = self.n_clusters
-        self.distances_ = 'deprecated'
-        # END CHANGE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        # BEGIN CHANGE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # Change: use hierarchy.linkage and hierarchy.cut_tree (below) instead of this.
-        # # Cut the tree
-        # if compute_full_tree:
-        #     self.labels_ = _hc_cut(self.n_clusters_, self.children_, self.n_leaves_)
-        # else:
-        #     labels = _hierarchical.hc_get_heads(parents, copy=False)
-        #     # copy to avoid holding a reference on the original array
-        #     labels = np.copy(labels[:n_samples])
-        #     # Reassign cluster numbers
-        #     self.labels_ = np.searchsorted(np.unique(labels), labels)
-        # END CHANGE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        # END AgglomerativeClustering._fit <<<<<<<<<<<<<<<<<<<<
-
-        # BEGIN NEW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # Compute the pairwise distances between the samples.
+        # Compute pairwise distances between samples.
         if X.ndim == 1 and self.metric == 'precomputed':
             # It's a condensed distance matrix (ie, vector), but scikit-learn
             # pairwise_distances function wants it as a square, uncondensed
@@ -231,50 +145,48 @@ class HierarchicalClustering(AgglomerativeClustering):
             features = distance.squareform(X, checks=False)
         else:
             features = X
-        dmat = metrics.pairwise_distances(features, metric=self.metric)
+
+        self._n_samples = features.shape[0]
+
+        pairwise_distances_kwargs = dict(
+            Y=kwargs.get('Y', None),
+            metric=self.metric,
+            n_jobs=kwargs.get('n_jobs', None),
+            force_all_finite=kwargs.get('force_all_finite', True)
+        )
+        dmat = metrics.pairwise_distances(features, **pairwise_distances_kwargs)
+
+        # Manually check the distance matrix for symmetry with absolute value tolerance.
+        atol = 1e-6
+        assert dmat.shape[0] == dmat.shape[1], f'The distance matrix is not square: {dmat.shape}'
+        np.testing.assert_allclose(
+            np.diag(dmat),
+            0,
+            atol=atol,
+            err_msg=f'The diagonal values are not within tolerance to 0 (`diag - 0 > {atol}`)'
+        )
+        np.testing.assert_allclose(
+            dmat - dmat.T,
+            0,
+            atol=atol,
+            err_msg=f'The distance matrix is not symmetric (`d - d.T >{atol}`)'
+        )
         self.pairwise_distances = distance.squareform(dmat, checks=False)
+
+        # Compute the linkage matrix.
         self.linkage_matrix = hierarchy.linkage(
             self.pairwise_distances,
-            metric='precomputed'
+            metric='precomputed',
+            method=self.linkage,
         )
         
-        # # Compute the linkage matrix
-        # # An example of building a linkage matrix is available here:
-        # # https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html#sphx-glr-auto-examples-cluster-plot-agglomerative-dendrogram-py
-        # # Use scipy.hierarchy.link instead:
-        # # > The input may be either a 1-D condensed distance matrix or a 2-D
-        # # array of observation vectors.
-        # if self.metric == 'precomputed':
-        #     if X.ndim == 1:
-        #         self.linkage_matrix = hierarchy.linkage(
-        #             X,
-        #             method=self.linkage,
-        #             metric=None,
-        #             optimal_ordering=False
-        #         )
-        #     else:
-        #         self.linkage_matrix = hierarchy.linkage(
-        #             distance.squareform(X),
-        #             method=self.linkage,
-        #             metric=None,
-        #             optimal_ordering=False
-        #         )
-        # else:
-        #     if X.ndim == 1:
-        #         raise ValueError('X must be a 2D array of observations if metric is not precomputed.')
-        #     self.linkage_matrix = hierarchy.linkage(
-        #         X,
-        #         method=self.linkage,
-        #         metric=self.metric,
-        #         optimal_ordering=False
-        #     )
-            
         # Get the clusters.
         if self.cut_method == 'cutreeHybrid':
+            self.min_cluster_size_ = int(np.sqrt(self._n_samples))
             self._cutreeHybrid = dynamicTreeCut.cutreeHybrid(
                 self.linkage_matrix,
                 self.pairwise_distances,
-                minClusterSize=3
+                minClusterSize=self.min_cluster_size_
             )
             self.labels_ = self._cutreeHybrid['labels']
         else:
@@ -284,24 +196,19 @@ class HierarchicalClustering(AgglomerativeClustering):
                 height=self.distance_threshold
             )
 
-        # # The array from cut_tree is 2D; if there's only one column, flatten it.
-        # if self.labels_.shape[1] == 1:
-        #     self.labels_ = self.labels_.flatten()
         if self.labels_.ndim == 1:
+            # This really only applies to cutreeHybrid.
             self.labels_ = self.labels_.reshape(-1, 1)
 
         # Compute the dendrogram.
         if self.compute_dendrogram:
             self.dendrogram = hierarchy.dendrogram(self.linkage_matrix, no_plot=True)
-        else:
-            # [TODO] Change: declare self.dendrogram in __init__
-            self.dendrogram = None
     
         return self
 
 
 ########################################################################
-# DEPRECATED: The functions below will be removed in a future version.
+# DEPRECATED: The functions below will be removed in a future version. {{{
 ########################################################################
 
 
@@ -388,5 +295,6 @@ def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leave
         LOGGER.info(f'Saved clusters: {out_path}')
 
     return clusters
-
+# }}}
+########################################################################
 # END
