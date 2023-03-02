@@ -27,6 +27,24 @@ from sklearn.utils.validation import check_is_fitted, check_memory
 LOGGER = logging.getLogger(__name__)
 
 
+def check_symmetry(dmat, atol=1e-6):
+    # Manually check the distance matrix for symmetry with absolute value tolerance.
+    assert dmat.shape[0] == dmat.shape[1], f'The distance matrix is not square: {dmat.shape}'
+    np.testing.assert_allclose(
+        np.diag(dmat),
+        0,
+        atol=atol,
+        err_msg=f'The diagonal values are not within tolerance to 0 (`diag - 0 > {atol}`)'
+    )
+    np.testing.assert_allclose(
+        dmat - dmat.T,
+        0,
+        atol=atol,
+        err_msg=f'The distance matrix is not symmetric (`d - d.T >{atol}`)'
+    )
+    return True
+
+
 class HierarchicalClustering(AgglomerativeClustering):
     # Notes:
     # - `affinity` is deprecated in sklearn v1.2 and will be removed in v1.4.
@@ -123,8 +141,9 @@ class HierarchicalClustering(AgglomerativeClustering):
         # Check for consistency between shape of X and the distance metric.
         if X.ndim == 1 and self.metric != "precomputed":
             raise ValueError("X should be a 2D array if metric is \"%s\"." % self.metric)
-        elif X.ndim != 1 and self.metric == "precomputed":
-            raise ValueError("X should be a 1D condensed distance matrix if metric is \"precomputed\"." % self.metric)
+        # # Removed: I think scikit learn only wants a 2D array.
+        # elif X.ndim != 1 and self.metric == "precomputed":
+        #     raise ValueError("X should be a 1D condensed distance matrix if metric is \"precomputed\"." % self.metric)
 
         if self.linkage == 'ward' and self.metric == 'precomputed':
             warnings.warn(
@@ -156,21 +175,22 @@ class HierarchicalClustering(AgglomerativeClustering):
         )
         dmat = metrics.pairwise_distances(features, **pairwise_distances_kwargs)
 
-        # Manually check the distance matrix for symmetry with absolute value tolerance.
-        atol = 1e-6
-        assert dmat.shape[0] == dmat.shape[1], f'The distance matrix is not square: {dmat.shape}'
-        np.testing.assert_allclose(
-            np.diag(dmat),
-            0,
-            atol=atol,
-            err_msg=f'The diagonal values are not within tolerance to 0 (`diag - 0 > {atol}`)'
-        )
-        np.testing.assert_allclose(
-            dmat - dmat.T,
-            0,
-            atol=atol,
-            err_msg=f'The distance matrix is not symmetric (`d - d.T >{atol}`)'
-        )
+        # # Manually check the distance matrix for symmetry with absolute value tolerance.
+        # atol = 1e-6
+        # assert dmat.shape[0] == dmat.shape[1], f'The distance matrix is not square: {dmat.shape}'
+        # np.testing.assert_allclose(
+        #     np.diag(dmat),
+        #     0,
+        #     atol=atol,
+        #     err_msg=f'The diagonal values are not within tolerance to 0 (`diag - 0 > {atol}`)'
+        # )
+        # np.testing.assert_allclose(
+        #     dmat - dmat.T,
+        #     0,
+        #     atol=atol,
+        #     err_msg=f'The distance matrix is not symmetric (`d - d.T >{atol}`)'
+        # )
+        is_symmetric = check_symmetry(dmat)
         self.pairwise_distances = distance.squareform(dmat, checks=False)
 
         # Compute the linkage matrix.
@@ -182,7 +202,8 @@ class HierarchicalClustering(AgglomerativeClustering):
         
         # Get the clusters.
         if self.cut_method == 'cutreeHybrid':
-            self.min_cluster_size_ = int(np.sqrt(self._n_samples))
+            # self.min_cluster_size_ = int(np.sqrt(self._n_samples))
+            self.min_cluster_size_ = 3
             self._cutreeHybrid = dynamicTreeCut.cutreeHybrid(
                 self.linkage_matrix,
                 self.pairwise_distances,
