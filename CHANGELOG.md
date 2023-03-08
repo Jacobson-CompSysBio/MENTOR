@@ -11,16 +11,24 @@
 
 # [Unreleased]
 
-## Added for new features.
+...
+
+# [0.5.0] - 2023/03/08
+
+## Added
 
 - `metric` parameter was added in sklearn `AgglomerativeClustering` (upstream).
+- `dynamicTreeCut` dependency for `HierarchicalClustering`
+- `check_symmetry` function to verify square (uncondensed) distance matrix
 
-## Changed for changes in existing functionality.
+## Changed
 
-- Use `scipy.cluster.hierarchy.{linkage,cut_tree}` to create `labels_` in
-  `HierarchicalClustering`.
+- Require `scikit-learn>=1.2.0`
+- `HierarchicalClustering` : Use `scipy.cluster.hierarchy.{linkage,cut_tree}` to create `labels_`.
+- `HierarchicalClustering` : Use `metric` parameter instead of `affinity`.
+- `HierarchicalClustering` : Use `dynamicTreeCut.cutreeHybrid` as default method for creating clusters.
 
-## Deprecated for soon-to-be removed features.
+## Deprecated
 
 - `affinity` parameter was decrepated in sklearn `AgglomerativeClustering` (upstream).
 
