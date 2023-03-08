@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from dynamicTreeCut import R_func as dtc_utils
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 from sklearn import metrics
@@ -204,10 +205,44 @@ class HierarchicalClustering(AgglomerativeClustering):
         if self.cut_method == 'cutreeHybrid':
             # self.min_cluster_size_ = int(np.sqrt(self._n_samples))
             self.min_cluster_size_ = 3
+            # Set the cutHeight parameter using default method (99% of dendrogram height).
+            # Passing this parameter is necessary to avoid a printed message from dynamicTreeCut.
+            # https://github.com/kylessmith/dynamicTreeCut/blob/3734243ee547bb9c220e5aef046587ca1694c7a7/dynamicTreeCut/dynamicTreeCut.py#L176
+            dendro_height = dtc_utils.get_heights(self.linkage_matrix)
+            dendro_merge = dtc_utils.get_merges(self.linkage_matrix)
+            nMerge = len(dendro_height)
+            refQuantile = 0.05
+            refMerge = np.round(nMerge * refQuantile)
+            if refMerge < 1:
+                refMerge = 1
+            refHeight = dendro_height[int(refMerge) - 1]
+            self.cutHeight_ = 0.99 * (np.max(dendro_height) - refHeight) + refHeight
+
             self._cutreeHybrid = dynamicTreeCut.cutreeHybrid(
                 self.linkage_matrix,
                 self.pairwise_distances,
-                minClusterSize=self.min_cluster_size_
+                minClusterSize=self.min_cluster_size_,
+                cutHeight=self.cutHeight_,
+                verbose=0,
+                # Defaults:
+                deepSplit=1,
+                maxCoreScatter=None,
+                minGap=None,
+                maxAbsCoreScatter=None,
+                minAbsGap=None,
+                minSplitHeight=None,
+                minAbsSplitHeight=None,
+                externalBranchSplitFnc=None,
+                minExternalSplit=None,
+                externalSplitOptions=[],
+                externalSplitFncNeedsDistance=None,
+                assumeSimpleExternalSpecification=True,
+                pamStage=True,
+                pamRespectsDendro=True,
+                useMedoids=False,
+                maxPamDist=None,
+                respectSmallClusters=True,
+                indent=0,
             )
             self.labels_ = self._cutreeHybrid['labels']
         else:
