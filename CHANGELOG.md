@@ -61,10 +61,10 @@ See also:
 
 <!-- LINKS -->
 
+[unreleased]: https://github.com/izaakm/jail-functional-partitioning/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/izaakm/jail-functional-partitioning/releases/tag/v0.5.1
+[0.4.0]: https://github.com/izaakm/jail-functional-partitioning/releases/tag/v0.4.0
 [About releases]: https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases
 [Example changelog]: https://github.com/Level/level/blob/master/CHANGELOG.md
-
-[unreleased]: https://github.com/izaakm/jail-functional-partitioning/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/izaakm/jail-functional-partitioning/releases/tag/v0.4.0
 
 <!-- END -->
