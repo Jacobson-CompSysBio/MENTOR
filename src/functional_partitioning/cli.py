@@ -348,7 +348,7 @@ def main():
             verify=True
         )
 
-        X = fp.partition(scores, ranks=ranks, max_rank='elbow')
+        X = fp.get_top_ranked(scores, ranks=ranks, max_rank='elbow')
 
         if args.cut_method == 'dynamic':
             cut_method = 'cutreeHybrid'
@@ -371,6 +371,10 @@ def main():
         mod.fit(X)
         clusters = pd.DataFrame(mod.labels_, index=labels)
         threshold = mod.cut_threshold_
+
+        if out_clusters is not None:
+            clusters.to_csv(out_clusters, sep='\t')
+            LOGGER.info(f'Clusters saved to {out_clusters}')
 
         if out_dendrogram is not None:
             # Set up the leaf labels for the dendrogram.

@@ -6,7 +6,7 @@ from functional_partitioning import _metrics as metrics
 
 LOGGER= logging.getLogger(__name__)
 
-def partition(scores, ranks=None, max_rank='elbow'):
+def get_top_ranked(scores, ranks=None, max_rank='elbow'):
     if not isinstance(scores, pd.DataFrame):
         scores = pd.DataFrame(scores)
 
