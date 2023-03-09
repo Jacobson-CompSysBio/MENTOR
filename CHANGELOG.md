@@ -4,14 +4,42 @@
 <!-- ## Added for new features. -->
 <!-- ## Changed for changes in existing functionality. -->
 <!-- ## Deprecated for soon-to-be removed features. -->
-<!-- ## Removed for now removed features. -->
 <!-- ## Fixed for any bug fixes. -->
+<!-- ## Removed for now removed features. -->
 <!-- ## Security in case of vulnerabilities. -->
 <!-- [<version>]: https://github.com/Level/level/releases/tag/<version> -->
 
 # [Unreleased]
 
-...
+## Added
+
+- Add `__all__` to `__init__.py`
+- Add `_version.py`, `_plot.py`
+- Add tests for CLI entry point
+
+## Changed
+
+- Allow passing `--cut-method=none` to return all clusterings
+- Clarify setting `out_{clusters,dendrogram}` variables
+- Move `calc_chi` function to `_metrics.py`
+- Move `calc_threshold` function to `_cluster.py`
+- Move `get_elbow` function to `_metrics.py`
+- Move plotting functions to `_plot.py`
+- Rename `functional_partitioning.py` to `cli.py`
+- Rename `get_top_ranked` function
+- Restructure package: prefix modules with underscore
+- Replace `--threshold` with `--cut-threshold` and `--cut-method`
+- Use `__version__` as string instead of `get_version`
+- Wrap `_plot_dendrogram_{polar,rectangular}` w/ `draw_dendrogram`
+
+<!-- ## Deprecated -->
+
+<!-- ## Removed -->
+
+<!-- ## Fixed -->
+
+<!-- ## Security -->
+
 
 # [0.5.1] - 2023/03/08
 
