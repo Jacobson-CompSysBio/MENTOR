@@ -5,6 +5,7 @@ Plotting functions.
 import matplotlib.pyplot as plt
 import numpy as np
 import logging
+import warnings
 
 from scipy.cluster import hierarchy
 
@@ -76,7 +77,7 @@ def savefig(out_path=None, **kwargs):
 
 
 def _plot_dendrogram_rectangular(
-    Z,
+    linkage_matrix=None,
     out_path=None,
     figsize='auto',
     draw_threshold=True,
@@ -110,7 +111,7 @@ def _plot_dendrogram_rectangular(
     elif kwargs.get('ax') is None:
         if figsize == 'auto':
             width = 5
-            height = np.shape(Z)[0] * 0.2
+            height = np.shape(linkage_matrix)[0] * 0.2
             if height < 10:
                 height = 10
             figsize = (width, height)
@@ -133,7 +134,7 @@ def _plot_dendrogram_rectangular(
 
     # One of the default colors for coloring the leaves is 'gray' (tab10 colors?).
     tree = hierarchy.dendrogram(
-        Z,
+        linkage_matrix,
         p=kwargs.get('p', 30),
         truncate_mode=kwargs.get('truncate_mode', None),
         color_threshold=kwargs.get('color_threshold', None),
@@ -165,7 +166,7 @@ def _plot_dendrogram_rectangular(
 
 
 def _plot_dendrogram_polar(
-    Z,
+    linkage_matrix=None,
     labels=None,
     leaf_fontsize=10,
     figsize='auto',
@@ -177,7 +178,7 @@ def _plot_dendrogram_polar(
     **kwargs
 ):
     '''
-    Z : linkage matrix
+    linkage_matrix : numpy.ndarray
     labels : list
         List of labels for the leaves of the dendrogram.
     leaf_fontsize : int
@@ -197,7 +198,7 @@ def _plot_dendrogram_polar(
     def smoothsegment(seg, Nsmooth=100):
         return np.concatenate([[seg[0]], np.linspace(seg[1], seg[2], Nsmooth), [seg[3]]])
 
-    tree = hierarchy.dendrogram(Z, no_plot=True, count_sort=True)
+    tree = hierarchy.dendrogram(linkage_matrix, no_plot=True, count_sort=True)
 
     if kwargs.get('no_plot'):
         pass
@@ -299,6 +300,7 @@ def draw_dendrogram(dendrogram_style=None, **kwargs):
     tree = {}
     if dendrogram_style and dendrogram_style.startswith('r'):
         # Rectangular dendrogram.
+        LOGGER.info('Drawing rectangular dendrogram.')
         try:
             tree = _plot_dendrogram_rectangular(
                 linkage_matrix=kwargs.get('linkage_matrix'),
@@ -309,10 +311,14 @@ def draw_dendrogram(dendrogram_style=None, **kwargs):
             )
         except Exception as e:
             # LOGGER.error('Plotting failed: %s', str(e))
-            warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
+            warnings.warn(
+                'Unable to draw the dendrogram, see error message:\n %s' % str(e),
+                UserWarning
+            )
             tree = {}
     elif dendrogram_style and dendrogram_style.startswith('p'):
         # Polar dendrogram.
+        LOGGER.info('Drawing polar dendrogram.')
         try:
             tree = _plot_dendrogram_polar(
                 linkage_matrix=kwargs.get('linkage_matrix'),
@@ -322,8 +328,13 @@ def draw_dendrogram(dendrogram_style=None, **kwargs):
             )
         except Exception as e:
             # LOGGER.error('Plotting failed: %s', str(e))
-            warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
+            warnings.warn(
+                'Unable to draw the dendrogram, see error message:\n %s' % str(e),
+                UserWarning
+            )
             tree = {}
+    else:
+        LOGGER.debug('No dendrogram requested.')
 
     return tree
 

@@ -273,6 +273,8 @@ def main():
         print(__version__)
         sys.exit(0)
 
+    LOGGER.debug(args)
+
     # Create dummy data for testing.
     if args.init_test_fullranks:
         from functional_partitioning import _datasets as datasets
@@ -284,10 +286,10 @@ def main():
     # Use --out-dir with default names, unless another path is explicitely
     # specified.
     if args.out_clusters is not None:
-        # Set the default path for the clusters.
         out_clusters = args.out_clusters
     elif args.outdir is not None:
-        out_clusters = os.path.join(args.outdir, 'clusters.tsv')
+        # Set the default path for the clusters.
+        out_clusters = args.outdir / 'clusters.tsv'
     else:
         out_clusters = None
 
@@ -296,10 +298,10 @@ def main():
     if args.no_plot:
         out_dendrogram = None
     elif args.out_dendrogram is not None:
-        # Set the default path for the dendrogram.
         out_dendrogram = args.out_dendrogram
     elif args.outdir is not None:
-        out_dendrogram = os.path.join(args.outdir, 'dendrogram.png')
+        # Set the default path for the dendrogram.
+        out_dendrogram = args.outdir / 'dendrogram.png'
     else:
         out_dendrogram = None
 
@@ -328,20 +330,18 @@ def main():
             threads=args.threads,
             verbose=args.verbose
         )
-        # print(command)
+
         res = rwrtoolkit.run(command)
         if res['returncode'] != 0:
             LOGGER.error('RWR-singletons failed.')
             LOGGER.error(command)
             LOGGER.error(res.stderr)
             sys.exit(1)
-        # print(res)
 
         rwrtoolkit.compress_results(args.outdir)
 
         try:
             path_to_fullranks = next(args.outdir.glob('RWR*fullranks*'))
-            # print(path_to_fullranks)
         except StopIteration:
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
@@ -383,6 +383,7 @@ def main():
         if out_dendrogram is not None:
             # Set up the leaf labels for the dendrogram.
             if args.labels_use_clusters:
+                # Label the leaves with the cluster ID.
                 label_mapper = plot.make_label_mapper(
                     nodetable=clusters,
                     use_locs=[0, 1], # List.
@@ -390,6 +391,7 @@ def main():
                 )
                 labels = [label_mapper.get(l, l) for l in labels]
             elif args.labels_use_names or args.labels_use_locs:
+                # Label the leaves using the node table.
                 label_mapper = plot.make_label_mapper(
                     nodetable=args.nodetable,
                     use_names=args.labels_use_names,
@@ -401,8 +403,10 @@ def main():
                 labels = None
 
             tree = plot.draw_dendrogram(
+                dendrogram_style=dendrogram_style,
                 linkage_matrix=linkage_matrix,
                 labels=labels,
+                threshold=threshold,
                 out_path=out_dendrogram,
                 no_plot=args.no_plot
             )
