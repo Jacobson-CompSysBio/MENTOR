@@ -47,29 +47,32 @@ def check_symmetry(dmat, atol=1e-6):
     return True
 
 
-def calc_threshold(Z, threshold, scores=None):
+def calc_cut_threshold(linkage_matrix, threshold, features=None):
     '''
-    Calculate a threshold for `cut_tree` from the linkage matrix `Z`.
+    Calculate a threshold for `cut_tree` from the linkage matrix `linkage_matrix`.
     '''
     if threshold == 'mean':
-        threshold = np.mean(Z[:,2])
+        threshold = np.mean(linkage_matrix[:,2])
     elif threshold == 'best_chi':
-        # Do NOT match to leaves yet, bc `scores` is NOT aligned to leaves.
-        # clusterings = get_clusters(Z, labels=labels)
-        clusterings = hierarchy.cut_tree(Z, n_clusters=None, height=None)
-        chi_scores = metrics.calc_chi(scores, clusterings)
-        best_at = np.nan_to_num(chi_scores).argmax()
+        if features is None:
+            raise ValueError('`features` must be provided if `threshold` is "best_chi"')
+        # Do NOT match to leaves yet, bc `features` is NOT aligned to leaves.
+        # clusterings = get_clusters(linkage_matrix, labels=labels)
+        clusterings = hierarchy.cut_tree(linkage_matrix, n_clusters=None, height=None)
+        chi_features = metrics.calc_chi(features, clusterings)
+        best_at = np.nan_to_num(chi_features).argmax()
 
         # # The absolute number of clusters changes from n-samples to 1; ie, the number of clusters uniquely corresponds to a specific branch/agglomeration step.
         # n_clusters = clusterings.iloc[:, best_at].nunique()
-        # clusters = get_clusters(Z, labels=labels, n_clusters=n_clusters, match_to_leaves=partition['tree']['leaves'])
+        # clusters = get_clusters(linkage_matrix, labels=labels, n_clusters=n_clusters, match_to_leaves=partition['tree']['leaves'])
 
         # Calculate the threshold from the linkage matrix.
-        h1 = Z[best_at, 2]
-        h0 = Z[best_at-1, 2]
+        h1 = linkage_matrix[best_at, 2]
+        h0 = linkage_matrix[best_at-1, 2]
         threshold = np.mean((h0, h1))
     else:
         pass
+
     return threshold
 
 
@@ -156,10 +159,20 @@ class HierarchicalClustering(AgglomerativeClustering):
         # [TODO] What does `check_memory` do?
         memory = check_memory(self.memory)
 
+        # distance_threshold is deprecated.
+        if self.distance_threshold is not None:
+            warnings.warn(
+                "The parameter 'distance_threshold' is deprecated in 0.5.1 "
+                "and will be removed in a future version. Use `cut_threshold`.",
+                DeprecationWarning,
+            )
+            if self.cut_threshold is None:
+                self.cut_threshold = self.distance_threshold
+
         if self.cut_method != 'cutreeHybrid':
-            # Only one of n_clusters or distance_threshold can be passed to hierarchy.cut_tree.
-            if self.n_clusters is not None and self.distance_threshold is not None:
-                raise ValueError("Provide n_clusters OR distance_threshold, not both.")
+            # Only one of n_clusters or cut_threshold can be passed to hierarchy.cut_tree.
+            if self.n_clusters is not None and self.cut_threshold is not None:
+                raise ValueError("Provide n_clusters OR cut_threshold, not both.")
             if self.n_clusters is not None and self.n_clusters <= 0:
                 raise ValueError(
                     "n_clusters should be an integer greater than 0. %s was provided."
@@ -272,11 +285,17 @@ class HierarchicalClustering(AgglomerativeClustering):
                 indent=0,
             )
             self.labels_ = self._cutreeHybrid['labels']
+            self.cut_threshold_ = None
         else:
+            self.cut_threshold_ = calc_cut_threshold(
+                self.linkage_matrix,
+                self.cut_threshold,
+                features=features
+            )
             self.labels_ = hierarchy.cut_tree(
                 self.linkage_matrix,
                 n_clusters=self.n_clusters,
-                height=self.distance_threshold
+                height=self.cut_threshold_
             )
 
         if self.labels_.ndim == 1:

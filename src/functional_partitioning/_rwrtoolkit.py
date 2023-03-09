@@ -268,7 +268,7 @@ def compress_results(dirname, **kwargs):
         gzip(f, **kwargs)
 
 
-def fullranks_to_matrix(path_or_dataframe, max_rank='elbow', drop_missing=True):
+def fullranks_to_matrix(path_or_dataframe, verify=True, drop_missing=True):
     '''
     Convert RWR "fullranks" file to matrix.
 
@@ -300,25 +300,13 @@ def fullranks_to_matrix(path_or_dataframe, max_rank='elbow', drop_missing=True):
     # Pivot full ranks -> ranks matrix.
     ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
     scores = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
-    assert ranks.shape == scores.shape
-    assert ranks.index.equals(scores.index)
     labels = ranks.index.to_list()
 
-    if max_rank == 'elbow':
-        # Find elbow and set max_rank.
-        mean_scores = fullranks.groupby('rank')['Score'].mean()
-        max_rank = metrics.get_elbow(mean_scores)
+    if verify:
+        assert ranks.shape == scores.shape
+        assert ranks.index.equals(scores.index)
 
-    # Filter the rank vectors.
-    mask = (ranks <= max_rank).fillna(False)
-    col_mask = mask.any()
-
-    # Get pairwise distances.
-    # dmat = 1 - ranks.loc[:, col_mask].T.corr(method='spearman')
-    X_ranks = ranks.loc[:, col_mask]
-    X_scores = scores.loc[:, col_mask]
-
-    return X_ranks, X_scores, labels, max_rank
+    return scores, ranks, labels
 
 
 # END

@@ -34,30 +34,13 @@ from functional_partitioning import _cluster as cluster
 from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 from functional_partitioning import _plot as plot
+from functional_partitioning import _functional_partitioning as fp
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 def parse_args(test=None):
-
-    def _valid_threshold_values(arg):
-        try:
-            if isinstance(arg, str):
-                arg = arg.lower()
-
-            if arg is None:
-                return None
-            elif arg == 'mean':
-                return arg
-            elif arg == 'best_chi':
-                return arg
-            elif arg == 'none':
-                return None
-            else:
-                return float(arg)
-        except:
-            raise argparse.ArgumentTypeError(f'Threshold must be one of "mean", "best_chi", or <float>; you gave "{arg}".')
 
     parser = argparse.ArgumentParser(
         description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
@@ -90,12 +73,18 @@ def parse_args(test=None):
         help='Do not perform functional partitioning.'
     )
     parser.add_argument(
-        '--threshold', '-t',
+        '--cut-threshold', '-t',
         action='store',
-        type=_valid_threshold_values,
-        help=(
-            'Apply threshold to dendrogram. Genes in branches below this threshold will be grouped into clusters; other genes are considered isolates (separate clusters, each with a single gene). Value can be float or "mean". If the value is "mean", then use the mean branch height as the cluster threshold; this can be useful for a first pass.'
-        )
+        default=0.3,
+        type=float,
+        help=('Cut the dendrogram at this threshold. Only used if `--cut-method=hard`.')
+    )
+    parser.add_argument(
+        '--cut-method', '-m',
+        action='store',
+        choices=['dynamic', 'hard'],
+        default='dynamic',
+        help=(f'If `dynamic`, use dynamicTreeCut to determine clusters without a hard threshold. Otherwise, use with `--cut-threshold` to provide a numeric cut threshold.')
     )
     parser.add_argument(
         '--dendrogram-style', '-s',
@@ -353,32 +342,35 @@ def main():
     # Run functional partitioning or exit.
     if args.partition:
         # Run functional partitioning.
-        X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(
+        scores, ranks, labels = rwrtoolkit.fullranks_to_matrix(
             path_to_fullranks,
-            max_rank='elbow',
-            drop_missing=True
+            drop_missing=True,
+            verify=True
         )
 
-        linkage_matrix = cluster.cluster_hierarchical(
-            X_ranks.fillna(0),
-            corr_method='spearman',
-            linkage_method='average'
-        )
+        X = fp.partition(scores, ranks=ranks, max_rank='elbow')
 
-        threshold = cluster.calc_threshold(
-            linkage_matrix,
-            args.threshold,
-            scores=X_scores.fillna(X_scores.max(axis=1))
-        )
+        if args.cut_method == 'dynamic':
+            cut_method = 'cutreeHybrid'
+        else:
+            cut_method = args.cut_method
 
-        clusters = cluster.get_clusters(
-            linkage_matrix,
-            labels=labels,
-            threshold=threshold,
+        mod = cluster.HierarchicalClustering(
             n_clusters=None,
-            match_to_leaves=None,
-            out_path=out_clusters
+            metric=metrics.spearman_d,
+            cut_method=cut_method,
+            cut_threshold=args.cut_threshold,
+            memory=None,
+            connectivity=None,
+            compute_full_tree="auto",
+            linkage="average",
+            compute_distances=False,
+            compute_linkage_matrix=True,
+            compute_dendrogram=True,
         )
+        mod.fit(X)
+        clusters = pd.DataFrame(mod.labels_, index=labels)
+        threshold = mod.cut_threshold_
 
         if out_dendrogram is not None:
             # Set up the leaf labels for the dendrogram.
@@ -400,11 +392,12 @@ def main():
                 )
                 labels = [label_mapper.get(l, l) for l in labels]
             else:
-                labels = None
+                # Use default labels.
+                pass
 
             tree = plot.draw_dendrogram(
                 dendrogram_style=dendrogram_style,
-                linkage_matrix=linkage_matrix,
+                linkage_matrix=mod.linkage_matrix,
                 labels=labels,
                 threshold=threshold,
                 out_path=out_dendrogram,
