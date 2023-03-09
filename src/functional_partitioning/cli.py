@@ -82,9 +82,9 @@ def parse_args(test=None):
     parser.add_argument(
         '--cut-method', '-m',
         action='store',
-        choices=['dynamic', 'hard'],
+        choices=['dynamic', 'hard', 'none'],
         default='dynamic',
-        help=(f'If `dynamic`, use dynamicTreeCut to determine clusters without a hard threshold. Otherwise, use with `--cut-threshold` to provide a numeric cut threshold.')
+        help=(f'If `dynamic`, use dynamicTreeCut to determine clusters without a hard threshold. If `none`, return all the clusterings. Otherwise, use with `--cut-threshold` to provide a numeric cut threshold.')
     )
     parser.add_argument(
         '--dendrogram-style', '-s',
@@ -352,14 +352,19 @@ def main():
 
         if args.cut_method == 'dynamic':
             cut_method = 'cutreeHybrid'
+            cut_threshold = args.cut_threshold
+        elif args.cut_method == 'none':
+            cut_method = None
+            cut_threshold = None
         else:
             cut_method = args.cut_method
+            cut_threshold = args.cut_threshold
 
         mod = cluster.HierarchicalClustering(
             n_clusters=None,
             metric=metrics.spearman_d,
             cut_method=cut_method,
-            cut_threshold=args.cut_threshold,
+            cut_threshold=cut_threshold,
             memory=None,
             connectivity=None,
             compute_full_tree="auto",
