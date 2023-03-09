@@ -364,15 +364,13 @@ def main():
             corr_method='spearman',
             linkage_method='average'
         )
+
         threshold = cluster.calc_threshold(
             linkage_matrix,
             args.threshold,
             scores=X_scores.fillna(X_scores.max(axis=1))
         )
-        # print('threshold:', threshold)
 
-        # print('linkage matrix:')
-        # print(linkage_matrix)
         clusters = cluster.get_clusters(
             linkage_matrix,
             labels=labels,
@@ -381,61 +379,33 @@ def main():
             match_to_leaves=None,
             out_path=out_clusters
         )
-        # print('clusters:')
-        # print(clusters)
 
-        if args.labels_use_clusters:
-            label_mapper = plot.make_label_mapper(
-                nodetable=clusters,
-                use_locs=[0, 1], # List.
-                sep=args.labels_sep
-            )
-            labels = [label_mapper.get(l, l) for l in labels]
-        elif args.labels_use_names or args.labels_use_locs:
-            label_mapper = plot.make_label_mapper(
-                nodetable=args.nodetable,
-                use_names=args.labels_use_names,
-                use_locs=args.labels_use_locs,
-                sep=args.labels_sep
-            )
-            labels = [label_mapper.get(l, l) for l in labels]
-        else:
-            label_mapper = None
-        # print(label_mapper)
-        # print(labels)
+        if out_dendrogram is not None:
+            # Set up the leaf labels for the dendrogram.
+            if args.labels_use_clusters:
+                label_mapper = plot.make_label_mapper(
+                    nodetable=clusters,
+                    use_locs=[0, 1], # List.
+                    sep=args.labels_sep
+                )
+                labels = [label_mapper.get(l, l) for l in labels]
+            elif args.labels_use_names or args.labels_use_locs:
+                label_mapper = plot.make_label_mapper(
+                    nodetable=args.nodetable,
+                    use_names=args.labels_use_names,
+                    use_locs=args.labels_use_locs,
+                    sep=args.labels_sep
+                )
+                labels = [label_mapper.get(l, l) for l in labels]
+            else:
+                labels = None
 
-        if dendrogram_style is None:
-            # Catch None, bc `None.startswith` raises error.
-            tree = {}
-        elif dendrogram_style.startswith('r'):
-            # Rectangular dendrogram.
-            try:
-                tree = plot.plot_dendrogram(
-                    linkage_matrix,
-                    labels=labels,
-                    color_threshold=threshold,
-                    out_path=out_dendrogram,
-                    no_plot=args.no_plot
-                )
-            except Exception as e:
-                # LOGGER.error('Plotting failed: %s', str(e))
-                warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
-                tree = {}
-        elif dendrogram_style.startswith('p'):
-            # Polar dendrogram.
-            try:
-                tree = plot.plot_dendrogram_polar(
-                    linkage_matrix,
-                    labels=labels,
-                    out_path=out_dendrogram,
-                    no_plot=args.no_plot
-                )
-            except Exception as e:
-                # LOGGER.error('Plotting failed: %s', str(e))
-                warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
-                tree = {}
-        else:
-            tree = {}
+            tree = plot.draw_dendrogram(
+                linkage_matrix=linkage_matrix,
+                labels=labels,
+                out_path=out_dendrogram,
+                no_plot=args.no_plot
+            )
     else:
         # Exit.
         pass

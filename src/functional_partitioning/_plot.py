@@ -75,7 +75,7 @@ def savefig(out_path=None, **kwargs):
             LOGGER.error('Failed to save figure: %s', str(e))
 
 
-def plot_dendrogram(
+def _plot_dendrogram_rectangular(
     Z,
     out_path=None,
     figsize='auto',
@@ -164,7 +164,7 @@ def plot_dendrogram(
     return tree
 
 
-def plot_dendrogram_polar(
+def _plot_dendrogram_polar(
     Z,
     labels=None,
     leaf_fontsize=10,
@@ -294,5 +294,37 @@ def plot_dendrogram_polar(
 
     return tree
 
+
+def draw_dendrogram(dendrogram_style=None, **kwargs):
+    tree = {}
+    if dendrogram_style and dendrogram_style.startswith('r'):
+        # Rectangular dendrogram.
+        try:
+            tree = _plot_dendrogram_rectangular(
+                linkage_matrix=kwargs.get('linkage_matrix'),
+                labels=kwargs.get('labels'),
+                color_threshold=kwargs.get('threshold'),
+                out_path=kwargs.get('out_path'),
+                no_plot=kwargs.get('no_plot')
+            )
+        except Exception as e:
+            # LOGGER.error('Plotting failed: %s', str(e))
+            warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
+            tree = {}
+    elif dendrogram_style and dendrogram_style.startswith('p'):
+        # Polar dendrogram.
+        try:
+            tree = _plot_dendrogram_polar(
+                linkage_matrix=kwargs.get('linkage_matrix'),
+                labels=kwargs.get('labels'),
+                out_path=kwargs.get('out_path'),
+                no_plot=kwargs.get('no_plot')
+            )
+        except Exception as e:
+            # LOGGER.error('Plotting failed: %s', str(e))
+            warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
+            tree = {}
+
+    return tree
 
 # END.
