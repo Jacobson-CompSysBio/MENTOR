@@ -15,6 +15,14 @@ References
 [2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
 '''
 
+# from .version import __version__
+# Error when run as a script:
+# > ImportError: attempted relative import with no known parent package
+
+from functional_partitioning._version import get_version
+
+__version__ = get_version()
+
 import argparse
 import os
 import sys
@@ -28,11 +36,9 @@ import pathlib
 # from sklearn import metrics
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
-from functional_partitioning import cluster, metrics, rwrtoolkit
-
-# from .version import __version__
-# Error when run as a script:
-# > ImportError: attempted relative import with no known parent package
+from functional_partitioning import _cluster as cluster
+from functional_partitioning import _metrics as metrics
+from functional_partitioning import _rwrtoolkit as rwrtoolkit
 
 DPI = 300
 LOGGER = logging.getLogger(__name__)
@@ -633,6 +639,12 @@ def parse_args(test=None):
         default=0,
         help='Default: WARNING; once: INFO; twice: DEBUG'
     )
+    parser.add_argument(
+        '--version',
+        action='store_true',
+        default=False,
+        help='Print version and exit.'
+    )
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -673,6 +685,9 @@ def main():
         logger_config['level'] = logging.DEBUG
     logging.basicConfig(**logger_config)
 
+    if args.version:
+        print(__version__)
+        sys.exit(0)
 
     # LOGGER.debug('debug message')
     # LOGGER.info('info message')
@@ -681,7 +696,7 @@ def main():
     # LOGGER.critical('critical message')
 
     if args.init_test_fullranks:
-        from functional_partitioning import datasets
+        from functional_partitioning import _datasets as datasets
         fullranks = datasets.make_fullranks_table()
         # print('fullranks:')
         # print(fullranks)

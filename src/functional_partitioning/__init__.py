@@ -1,5 +1,7 @@
-from . import functional_partitioning
-from . import datasets
-from . import cluster
+from functional_partitioning._version import get_version
 
-__version__ = '0.5.0'
+__version__ = get_version()
+
+# from . import functional_partitioning
+# from . import _datasets as datasets
+# from . import _cluster as cluster

@@ -5,6 +5,7 @@
 _*
 !.gitignore
 !.gitkeep
+!_*.py
 
 # Directories
 bin
