@@ -1,8 +1,8 @@
-from functional_partitioning._version import get_version
-from functional_partitioning import _functional_partitioning as functional_partitioning
+# from functional_partitioning._version import get_version
+from functional_partitioning._version import __version__
 
-__all__ = ['functional_partitioning']
-__version__ = get_version()
+# __version__ = get_version()
+__all__ = ['__version__']
 
 # from . import functional_partitioning
 # from . import _datasets as datasets

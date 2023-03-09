@@ -15,9 +15,7 @@ References
 [2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
 '''
 
-from functional_partitioning._version import get_version
-
-__version__ = get_version()
+from functional_partitioning._version import __version__
 
 import argparse
 import os
@@ -34,7 +32,7 @@ from functional_partitioning import _cluster as cluster
 from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 from functional_partitioning import _plot as plot
-from functional_partitioning import _functional_partitioning as fp
+from functional_partitioning import _utils as utils
 
 
 LOGGER = logging.getLogger(__name__)
@@ -348,7 +346,7 @@ def main():
             verify=True
         )
 
-        X = fp.get_top_ranked(scores, ranks=ranks, max_rank='elbow')
+        X = utils.get_top_ranked(scores, ranks=ranks, max_rank='elbow')
 
         if args.cut_method == 'dynamic':
             cut_method = 'cutreeHybrid'
@@ -417,5 +415,6 @@ def main():
         pass
 
     return 0
+
 
 # END.

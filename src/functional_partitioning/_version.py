@@ -11,5 +11,7 @@
 #     os.chdir(cwd)
 #     return version
 
-def get_version():
-    return 'v0.5.1'
+# def get_version():
+#     return 'v0.5.1'
+
+__version__ = 'v0.5.1'
