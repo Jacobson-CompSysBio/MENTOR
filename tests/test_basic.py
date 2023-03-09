@@ -1,6 +1,7 @@
-import joblib
 import itertools
+import joblib
 import numpy as np
+import os
 
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
@@ -41,6 +42,10 @@ CHECKSUMS = {
 
 RANDOM_STATE = 42
 
+# Test entry point
+def test_entrypoint():
+    exit_status = os.system('functional_partitioning --help')
+    assert exit_status == 0
 
 # Test data sets.
 
