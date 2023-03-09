@@ -134,4 +134,30 @@ def get_elbow(y_true, min_size=3, **kwargs):
     return idx_of_elbow
 
 
+def calc_chi(X_true, clusters):
+    if isinstance(clusters, (pd.DataFrame, pd.Series)):
+        clusters = clusters.to_numpy()
+    # CHI is only valid for clusterings with n-clusters between 2 and n samples-1.
+    # Filling with NaN is more accurate, but plotting the values is misleading if the user
+    # is unaware that the missing values are not plotted.
+    n_samples = X_true.shape[0]
+    n_cuts = clusters.shape[-1]
+    chi_scores = []
+    for i in range(n_cuts):
+        labels_pred = clusters[:, i]
+        n_clusters = len(set(labels_pred))
+        if n_clusters < 2:
+            chi_scores.append(np.nan)
+            # chi_scores.append(0)
+            continue
+        elif n_clusters > (n_samples - 1):
+            chi_scores.append(np.nan)
+            # chi_scores.append(0)
+            continue
+        chi = calinski_harabasz_score(X_true, labels_pred)
+
+        chi_scores.append(chi)
+    chi_scores = np.array(chi_scores)
+    return chi_scores
+
 # END
