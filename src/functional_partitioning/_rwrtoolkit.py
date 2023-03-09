@@ -10,7 +10,6 @@ import gzip as gzip_module
 import shutil
 import pandas as pd
 
-from functional_partitioning import functional_partitioning as fp
 from functional_partitioning import _metrics as metrics
 
 

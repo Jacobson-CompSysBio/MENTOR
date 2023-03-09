@@ -6,8 +6,6 @@ import os
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
-# from functional_partitioning import datasets, cluster, metrics, rwrtoolkit
-from functional_partitioning import functional_partitioning as fp
 from functional_partitioning import _cluster as cluster
 from functional_partitioning import _datasets as datasets
 from functional_partitioning import _metrics as metrics
