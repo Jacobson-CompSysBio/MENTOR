@@ -33,7 +33,6 @@ CHECKSUMS = {
     'fullranks_to_matrix_X_ranks': '9101f73917fc9678808ce47d720ec411',
     'fullranks_to_matrix_X_scores' : '3c6d835ec34107f53bd13f9f1e1a16ce',
     'fullranks_to_matrix_labels' : 'bdcc8bd8b0edc2e52b82d39b282493b7',
-    'fullranks_to_matrix_max_rank' : 'c763ff8f88aacdbe4b423f930ff3afeb',
     # Helper functions.
     'calc_threshold_mean' : '6b88a48bc7f8bcf7ec27d6e8592fae6a',
     'calc_threshold_best_chi' : 'fb42bd8c5d5c3bec691d6c7c1d37bede',
@@ -257,26 +256,36 @@ def test_spearman_distance_matrix_ranks():
 
 def test_rwrtoolkit_fullranks_to_matrix_X_ranks():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
     assert joblib.hash(X_ranks) == CHECKSUMS['fullranks_to_matrix_X_ranks']
 
 
 def test_rwrtoolkit_fullranks_to_matrix_X_scores():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
     assert joblib.hash(X_scores) == CHECKSUMS['fullranks_to_matrix_X_scores']
 
 
 def test_rwrtoolkit_fullranks_to_matrix_labels():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
     assert joblib.hash(labels) == CHECKSUMS['fullranks_to_matrix_labels']
+
+
+# def test_rwrtoolkit_fullranks_to_matrix_max_rank():
+#     fullranks = datasets.make_fullranks_table()
+#     X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
+#     mean_scores = X_scores.mean()
+#     max_rank = metrics.get_elbow(mean_scores)
+#     assert joblib.hash(max_rank) == CHECKSUMS['fullranks_to_matrix_max_rank']
 
 
 def test_rwrtoolkit_fullranks_to_matrix_max_rank():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(fullranks)
-    assert joblib.hash(max_rank) == CHECKSUMS['fullranks_to_matrix_max_rank']
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
+    mean_scores = X_scores.mean()
+    max_rank = metrics.get_elbow(mean_scores)  # 17.
+    assert max_rank == 17
 
 
 # Test helper functions.
@@ -292,10 +301,10 @@ def test_calc_threshold_mean():
         linkage_method='average'
     )
 
-    threshold = cluster.calc_threshold(
+    threshold = cluster.calc_cut_threshold(
         linkage_matrix,
         threshold='mean',
-        scores=None
+        features=None
     )
 
     assert joblib.hash(threshold) == CHECKSUMS['calc_threshold_mean']
@@ -316,10 +325,10 @@ def test_calc_threshold_best_chi():
         linkage_method='average'
     )
 
-    threshold = cluster.calc_threshold(
+    threshold = cluster.calc_cut_threshold(
         linkage_matrix,
         threshold='best_chi',
-        scores=scores
+        features=scores
     )
 
     assert joblib.hash(threshold) == CHECKSUMS['calc_threshold_best_chi']
@@ -349,7 +358,8 @@ def test_get_clusters_labels_none_threshold_05():
 
 def test_get_clusters_labels_default_threshold_05():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+    # X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
 
     X_ranks = X_ranks.fillna(0)
 
@@ -373,7 +383,8 @@ def test_get_clusters_labels_default_threshold_05():
 
 def test_make_label_mapper_labels_default():
     fullranks = datasets.make_fullranks_table()
-    X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+    # X_ranks, _, labels, _ = rwrtoolkit.fullranks_to_matrix(fullranks)
+    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
 
     X_ranks = X_ranks.fillna(0)
 
