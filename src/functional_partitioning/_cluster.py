@@ -48,6 +48,9 @@ def check_symmetry(dmat, atol=1e-6):
 
 
 def calc_threshold(Z, threshold, scores=None):
+    '''
+    Calculate a threshold for `cut_tree` from the linkage matrix `Z`.
+    '''
     if threshold == 'mean':
         threshold = np.mean(Z[:,2])
     elif threshold == 'best_chi':

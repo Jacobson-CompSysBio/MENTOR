@@ -12,6 +12,7 @@ from functional_partitioning import _cluster as cluster
 from functional_partitioning import _datasets as datasets
 from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
+from functional_partitioning import _plot as plot
 
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
@@ -393,7 +394,7 @@ def test_make_label_mapper_labels_default():
         out_path=None
     )
 
-    label_mapper = fp.make_label_mapper(
+    label_mapper = plot.make_label_mapper(
         nodetable=clusters,
         use_locs=[0, 1], # List.
     )
