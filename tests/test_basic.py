@@ -293,7 +293,7 @@ def test_calc_threshold_mean():
         linkage_method='average'
     )
 
-    threshold = fp.calc_threshold(
+    threshold = cluster.calc_threshold(
         linkage_matrix,
         threshold='mean',
         scores=None
@@ -317,7 +317,7 @@ def test_calc_threshold_best_chi():
         linkage_method='average'
     )
 
-    threshold = fp.calc_threshold(
+    threshold = cluster.calc_threshold(
         linkage_matrix,
         threshold='best_chi',
         scores=scores

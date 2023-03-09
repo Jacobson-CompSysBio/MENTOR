@@ -40,29 +40,6 @@ DPI = 300
 LOGGER = logging.getLogger(__name__)
 
 
-def calc_threshold(Z, threshold, scores=None):
-    if threshold == 'mean':
-        threshold = np.mean(Z[:,2])
-    elif threshold == 'best_chi':
-        # Do NOT match to leaves yet, bc `scores` is NOT aligned to leaves.
-        # clusterings = get_clusters(Z, labels=labels)
-        clusterings = hierarchy.cut_tree(Z, n_clusters=None, height=None)
-        chi_scores = metrics.calc_chi(scores, clusterings)
-        best_at = np.nan_to_num(chi_scores).argmax()
-
-        # # The absolute number of clusters changes from n-samples to 1; ie, the number of clusters uniquely corresponds to a specific branch/agglomeration step.
-        # n_clusters = clusterings.iloc[:, best_at].nunique()
-        # clusters = get_clusters(Z, labels=labels, n_clusters=n_clusters, match_to_leaves=partition['tree']['leaves'])
-
-        # Calculate the threshold from the linkage matrix.
-        h1 = Z[best_at, 2]
-        h0 = Z[best_at-1, 2]
-        threshold = np.mean((h0, h1))
-    else:
-        pass
-    return threshold
-
-
 def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '):
     '''
     Create a label mapper.
@@ -676,7 +653,7 @@ def main():
             corr_method='spearman',
             linkage_method='average'
         )
-        threshold = calc_threshold(
+        threshold = cluster.calc_threshold(
             linkage_matrix,
             args.threshold,
             scores=X_scores.fillna(X_scores.max(axis=1))

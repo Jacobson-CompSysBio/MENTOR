@@ -8,6 +8,7 @@ from scipy.spatial import distance
 # from sklearn.metrics import *
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics import pairwise_distances
 
 LOGGER = logging.getLogger(__name__)
 

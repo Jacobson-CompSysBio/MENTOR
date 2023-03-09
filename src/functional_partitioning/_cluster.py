@@ -18,7 +18,8 @@ import warnings
 from dynamicTreeCut import R_func as dtc_utils
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
-from sklearn import metrics
+# from sklearn import metrics
+from functional_partitioning import _metrics as metrics
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.cluster import ( AgglomerativeClustering, KMeans )
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
@@ -44,6 +45,29 @@ def check_symmetry(dmat, atol=1e-6):
         err_msg=f'The distance matrix is not symmetric (`d - d.T >{atol}`)'
     )
     return True
+
+
+def calc_threshold(Z, threshold, scores=None):
+    if threshold == 'mean':
+        threshold = np.mean(Z[:,2])
+    elif threshold == 'best_chi':
+        # Do NOT match to leaves yet, bc `scores` is NOT aligned to leaves.
+        # clusterings = get_clusters(Z, labels=labels)
+        clusterings = hierarchy.cut_tree(Z, n_clusters=None, height=None)
+        chi_scores = metrics.calc_chi(scores, clusterings)
+        best_at = np.nan_to_num(chi_scores).argmax()
+
+        # # The absolute number of clusters changes from n-samples to 1; ie, the number of clusters uniquely corresponds to a specific branch/agglomeration step.
+        # n_clusters = clusterings.iloc[:, best_at].nunique()
+        # clusters = get_clusters(Z, labels=labels, n_clusters=n_clusters, match_to_leaves=partition['tree']['leaves'])
+
+        # Calculate the threshold from the linkage matrix.
+        h1 = Z[best_at, 2]
+        h0 = Z[best_at-1, 2]
+        threshold = np.mean((h0, h1))
+    else:
+        pass
+    return threshold
 
 
 class HierarchicalClustering(AgglomerativeClustering):
