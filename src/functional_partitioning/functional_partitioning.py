@@ -15,10 +15,6 @@ References
 [2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
 '''
 
-# from .version import __version__
-# Error when run as a script:
-# > ImportError: attempted relative import with no known parent package
-
 from functional_partitioning._version import get_version
 
 __version__ = get_version()
@@ -33,7 +29,6 @@ import logging
 import warnings
 import pathlib
 
-# from sklearn import metrics
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 from functional_partitioning import _cluster as cluster
@@ -41,81 +36,8 @@ from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 
 DPI = 300
+
 LOGGER = logging.getLogger(__name__)
-
-def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
-    '''
-    y_true, y_pred, *, sample_weight=None, multioutput='uniform_average', squared=True
-    '''
-    if y_pred is None:
-        y_pred = np.linspace(y_true[0], y_true[-1], len(y_true))
-    if len(y_true) != len(y_pred):
-        raise ValueError('y_true and y_pred must be the same length.')
-    mse = metrics.mean_squared_error(y_true, y_pred, **kwargs)
-    rmse = np.sqrt(mse)
-    return rmse
-
-
-def _root_mean_squared_error_at_c(y_true, c, **kwargs):
-    '''
-    Root mean squared error at c
-    '''
-    b = len(y_true)
-    l_start = 0
-    l_stop = c+1
-    r_start = c
-    r_stop = b+1
-    Lc = y_true[l_start:l_stop]
-    Rc = y_true[r_start:r_stop]
-    LOGGER.debug(rf'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
-    # RMSE at c is the sum of RMSE to the left and RMSE to the right.
-    rmse_c = (
-        ( (c-1)/(b-1) ) * _root_mean_squared_error(Lc, **kwargs)
-    ) + (
-        ( (b-c)/(b-1) ) * _root_mean_squared_error(Rc, **kwargs)
-    )
-    return rmse_c
-
-
-def get_elbow(y_true, min_size=3, **kwargs):
-    r'''
-    RMSE_{c}={c-1\over b-1}\times RMSE(L_{c})+{b-c\over b-1}\times RMSE(R_{c}) \eqno{\hbox{[1]}}
-
-    Parameters
-    ----------
-    y_true : array-like
-        The true values.
-    min_size : int
-        Minimum size of the left and right clusters.
-
-    Returns
-    -------
-    c : int
-        The index of the elbow.
-
-    Examples
-    --------
-    >>> y_true = scores_matrix.values
-    >>> c = get_elbow(y_true)
-    '''
-
-    if isinstance(y_true, pd.DataFrame):
-        raise ValueError('y_true must be a numpy array or pandas Series.')
-    elif isinstance(y_true, pd.Series):
-        y_true = y_true.values
-    else:
-        pass
-
-    b = len(y_true)
-
-    rmse_over_c = []
-
-    for c in range(min_size, b-(min_size+1)):
-        rmse_at_c = _root_mean_squared_error_at_c(y_true, c, **kwargs)
-        rmse_over_c.append(rmse_at_c)
-    # Adjust index by min_size.
-    idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
-    return idx_of_elbow
 
 
 def calc_chi(X_true, clusters):
@@ -668,32 +590,30 @@ def main():
     # print(args)
 
     # Logging:
-    # - Using `LOGGER.setLevel` isn't working, use `logging.basicConfig`
-    #   instead.
+    # - `LOGGER.setLevel` isn't working, use `logging.basicConfig` instead.
     # - `logging.basicConfig` should be called *once*.
-    # - `logging.basicConfig` also affects settings for imported modules, eg,
-    #   matplotlib.
-    logger_config = dict(format='[%(asctime)s|%(levelname)s] %(message)s', datefmt='%FT%T')
-    if args.verbose == 0:
-        # LOGGER.setLevel(logging.WARNING)
-        logger_config['level'] = logging.WARNING
-    elif args.verbose == 1:
-        # LOGGER.setLevel(logging.INFO)
+    # - `logging.basicConfig` also affects settings for imported modules, eg, matplotlib.
+    logger_config = dict(
+        format='[%(asctime)s|%(levelname)s] %(message)s',
+        datefmt='%FT%T',
+        level=logging.WARNING
+    )
+    if args.verbose == 1:
         logger_config['level'] = logging.INFO
     elif args.verbose >= 2:
-        # LOGGER.setLevel(logging.DEBUG)
         logger_config['level'] = logging.DEBUG
     logging.basicConfig(**logger_config)
 
-    if args.version:
-        print(__version__)
-        sys.exit(0)
-
+    # Test logging messages.
     # LOGGER.debug('debug message')
     # LOGGER.info('info message')
     # LOGGER.warning('warn message')
     # LOGGER.error('error message')
     # LOGGER.critical('critical message')
+
+    if args.version:
+        print(__version__)
+        sys.exit(0)
 
     if args.init_test_fullranks:
         from functional_partitioning import _datasets as datasets

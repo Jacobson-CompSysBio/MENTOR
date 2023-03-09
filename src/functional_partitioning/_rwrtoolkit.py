@@ -11,6 +11,7 @@ import shutil
 import pandas as pd
 
 from functional_partitioning import functional_partitioning as fp
+from functional_partitioning import _metrics as metrics
 
 
 if 'PATH_TO_RWRTOOLKIT' in os.environ:
@@ -307,7 +308,7 @@ def fullranks_to_matrix(path_or_dataframe, max_rank='elbow', drop_missing=True):
     if max_rank == 'elbow':
         # Find elbow and set max_rank.
         mean_scores = fullranks.groupby('rank')['Score'].mean()
-        max_rank = fp.get_elbow(mean_scores)
+        max_rank = metrics.get_elbow(mean_scores)
 
     # Filter the rank vectors.
     mask = (ranks <= max_rank).fillna(False)
