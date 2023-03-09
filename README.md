@@ -23,7 +23,9 @@ Usage
 ```
 usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
                                [--nodetable NODETABLE] [--partition]
-                               [--threshold THRESHOLD]
+                               [--no-partition]
+                               [--cut-threshold CUT_THRESHOLD]
+                               [--cut-method {dynamic,hard,none}]
                                [--dendrogram-style {rectangular,r,polar,p,none,n}]
                                [--no-plot] [--labels-use-clusters]
                                [--labels-use-names [LABELS_USE_NAMES ...]]
@@ -37,70 +39,83 @@ usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
                                [--method METHOD] [--folds FOLDS]
                                [--restart RESTART] [--tau TAU]
                                [--numranked NUMRANKED] [--modname MODNAME]
-                               [--plot PLOT] [--threads THREADS] [--verbose]
+                               [--plot PLOT] [--threads THREADS]
+                               [--init-test-fullranks INIT_TEST_FULLRANKS]
+                               [--verbose] [--version]
 
 Partition seeds from `RWR-CV --method=singletons ...` into clusters.
 
 options:
-    -h, --help           
-        show this help message and exit
-    --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
-        Path to "fullranks" file from `RWR-CV --method=singletons ...`
-        (default: None)
-    --nodetable NODETABLE
-        Path to "nodetable" file. This is a TSV file where the first column is
-        the node name (i.e., the seed genes from RWR-fullranks). (default:
-        None)
-    --partition, -p      
-        [PLACEHOLDER] Perform functional partitioning on "seed genes" from RWR
-        fullranks file. This is the default. (default: True)
-    --threshold THRESHOLD, -t THRESHOLD
-        Apply threshold to dendrogram. Genes in branches below this threshold
-        will be grouped into clusters; other genes are considered isolates
-        (separate clusters, each with a single gene). Value can be float or
-        "mean". If the value is "mean", then use the mean branch height as the
-        cluster threshold; this can be useful for a first pass. (default: 0)
-    --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
-        Plot the dendrogram in rectangular or polar coordinates. Default is
-        rectangular. (default: rectangular)
-    --no-plot            
-        Do not plot the dendrogram. (default: False)
-    --labels-use-clusters
-    --labels-use-names [LABELS_USE_NAMES ...]
-        Label the dendrogram using columns from the nodetable. This is
-        a space-separated list of column names from the nodetable. Pass columns
-        as strings (column names). (default: None)
-    --labels-use-locs [LABELS_USE_LOCS ...]
-        Label the dendrogram using columns from the nodetable. This is
-        a space-separated list of integers indicating columns from the
-        nodetable (0-index, e.g., the first column, which contains the node
-        names, has index 0; the second column has index 1, etc). (default:
-        None)
-    --labels-sep LABELS_SEP
-        The separator that will be used if multiple columns from nodetable are
-        used to label the dendrogram. (default: | )
-    --outdir OUTDIR      
-        Save dendrogram and clusters to path. (default: None)
-    --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
-        Save dendrogram to path. (default: None)
-    --out-clusters OUT_CLUSTERS, -c OUT_CLUSTERS
-        Save clusters to path as tsv file with columns "label", "cluster". When
-        --threshold is 0 (the default) each gene is put into a separate cluster
-        (i.e., every cluster has only a single gene). (default: None)
-    --path-to-conda-env PATH_TO_CONDA_ENV
-    --path-to-rwrtoolkit PATH_TO_RWRTOOLKIT
-    --multiplex MULTIPLEX
-    --geneset GENESET
-    --method METHOD
-    --folds FOLDS
-    --restart RESTART
-    --tau TAU
-    --numranked NUMRANKED
-    --modname MODNAME
-    --plot PLOT
-    --threads THREADS
-    --verbose, -v        
-        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
+  -h, --help            show this help message and exit
+  --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
+                        Path to "fullranks" file from `RWR-CV
+                        --method=singletons ...` (default: None)
+  --nodetable NODETABLE
+                        Path to "nodetable" file. This is a TSV file where the
+                        first column is the node name (i.e., the seed genes
+                        from RWR-fullranks). (default: None)
+  --partition, -p       Perform functional partitioning on "seed genes" from
+                        RWR fullranks file. This is the default. (default:
+                        True)
+  --no-partition        Do not perform functional partitioning. (default:
+                        True)
+  --cut-threshold CUT_THRESHOLD, -t CUT_THRESHOLD
+                        Cut the dendrogram at this threshold. Only used if
+                        `--cut-method=hard`. (default: 0.3)
+  --cut-method {dynamic,hard,none}, -m {dynamic,hard,none}
+                        If `dynamic`, use dynamicTreeCut to determine clusters
+                        without a hard threshold. If `none`, return all the
+                        clusterings. Otherwise, use with `--cut-threshold` to
+                        provide a numeric cut threshold. (default: dynamic)
+  --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
+                        Plot the dendrogram in rectangular or polar
+                        coordinates. If "none", then do not plot the
+                        dendrogram (this is redundant with --no-plot).
+                        (default: rectangular)
+  --no-plot             Do not plot the dendrogram. (default: False)
+  --labels-use-clusters
+  --labels-use-names [LABELS_USE_NAMES ...]
+                        Label the dendrogram using columns from the nodetable.
+                        This is a space-separated list of column names from
+                        the nodetable. Pass columns as strings (column names).
+                        (default: None)
+  --labels-use-locs [LABELS_USE_LOCS ...]
+                        Label the dendrogram using columns from the nodetable.
+                        This is a space-separated list of integers indicating
+                        columns from the nodetable (0-index, e.g., the first
+                        column, which contains the node names, has index 0;
+                        the second column has index 1, etc). (default: None)
+  --labels-sep LABELS_SEP
+                        The separator that will be used if multiple columns
+                        from nodetable are used to label the dendrogram.
+                        (default: | )
+  --outdir OUTDIR       Save dendrogram and clusters to path. (default: None)
+  --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
+                        Save dendrogram to path. (default: None)
+  --out-clusters OUT_CLUSTERS, -c OUT_CLUSTERS
+                        Save clusters to path as tsv file with columns
+                        "label", "cluster". When --threshold is 0 (the
+                        default) each gene is put into a separate cluster
+                        (i.e., every cluster has only a single gene).
+                        (default: None)
+  --path-to-conda-env PATH_TO_CONDA_ENV
+  --path-to-rwrtoolkit PATH_TO_RWRTOOLKIT
+  --multiplex MULTIPLEX
+  --geneset GENESET
+  --method METHOD
+  --folds FOLDS
+  --restart RESTART
+  --tau TAU
+  --numranked NUMRANKED
+  --modname MODNAME
+  --plot PLOT
+  --threads THREADS
+  --init-test-fullranks INIT_TEST_FULLRANKS
+                        Create fullranks file for testing at the given path.
+                        (default: None)
+  --verbose, -v         Default: WARNING; once: INFO; twice: DEBUG (default:
+                        0)
+  --version             Print version and exit. (default: False)
 ```
 
 Examples
