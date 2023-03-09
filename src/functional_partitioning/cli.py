@@ -24,7 +24,6 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import logging
 import warnings
 import pathlib
@@ -36,14 +35,9 @@ from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 from functional_partitioning import _plot as plot
 
-DPI = 300
 
 LOGGER = logging.getLogger(__name__)
 
-
-########################################################################
-# Parse args {{{
-########################################################################
 
 def parse_args(test=None):
 
@@ -87,7 +81,13 @@ def parse_args(test=None):
         '--partition', '-p',
         action='store_true',
         default=True,
-        help='[PLACEHOLDER] Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
+        help='Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
+    )
+    parser.add_argument(
+        '--no-partition',
+        action='store_false',
+        dest='partition',
+        help='Do not perform functional partitioning.'
     )
     parser.add_argument(
         '--threshold', '-t',
@@ -102,7 +102,7 @@ def parse_args(test=None):
         action='store',
         choices=['rectangular', 'r', 'polar', 'p', 'none', 'n'],
         default='rectangular',
-        help='Plot the dendrogram in rectangular or polar coordinates. Default is rectangular.'
+        help='Plot the dendrogram in rectangular or polar coordinates. If "none", then do not plot the dendrogram (this is redundant with --no-plot).'
     )
     parser.add_argument(
         '--no-plot',
@@ -242,11 +242,6 @@ def parse_args(test=None):
 
     return args
 
-# }}}
-########################################################################
-# Main. {{{
-########################################################################
-
 
 def main():
     args = parse_args()
@@ -278,6 +273,7 @@ def main():
         print(__version__)
         sys.exit(0)
 
+    # Create dummy data for testing.
     if args.init_test_fullranks:
         from functional_partitioning import _datasets as datasets
         fullranks = datasets.make_fullranks_table()
@@ -285,31 +281,35 @@ def main():
         # print(fullranks)
         fullranks.to_csv(args.init_test_fullranks, sep='\t', index=False)
 
-    if args.outdir is not None:
-        # Use --out-dir with default names, unless another path is explicitely specified.
-
-        if args.out_dendrogram is None:
-            # Set the default path for the dendrogram.
-            out_dendrogram = os.path.join(args.outdir, 'dendrogram.png')
-        else:
-            out_dendrogram = args.out_dendrogram
-
-        if args.out_clusters is None:
-            # Set the default path for the clusters.
-            out_clusters = os.path.join(args.outdir, 'clusters.tsv')
-        else:
-            out_clusters = args.out_clusters
-    else:
-        out_dendrogram = args.out_dendrogram
+    # Use --out-dir with default names, unless another path is explicitely
+    # specified.
+    if args.out_clusters is not None:
+        # Set the default path for the clusters.
         out_clusters = args.out_clusters
+    elif args.outdir is not None:
+        out_clusters = os.path.join(args.outdir, 'clusters.tsv')
+    else:
+        out_clusters = None
 
+    # Use --out-dir with default names, unless another path is explicitely
+    # specified.
+    if args.no_plot:
+        out_dendrogram = None
+    elif args.out_dendrogram is not None:
+        # Set the default path for the dendrogram.
+        out_dendrogram = args.out_dendrogram
+    elif args.outdir is not None:
+        out_dendrogram = os.path.join(args.outdir, 'dendrogram.png')
+    else:
+        out_dendrogram = None
 
-    if args.dendrogram_style.startswith(('r', 'p')):
+    # Set dendrogram style (rectangular or polar).
+    if out_dendrogram is not None and args.dendrogram_style.startswith(('r', 'p')):
         dendrogram_style = args.dendrogram_style
     else:
         dendrogram_style = None
 
-
+    # Run RWR-singletons or get the fullranks file.
     if args.multiplex and args.geneset:
         # Run RWR-singletons.
         command = rwrtoolkit.rwr_singletons(
@@ -346,20 +346,18 @@ def main():
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
 
+    else:
+        # Read the fullranks file from existing RWR-singletons results.
+        path_to_fullranks = args.rwr_fullranks
+
+    # Run functional partitioning or exit.
+    if args.partition:
+        # Run functional partitioning.
         X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(
             path_to_fullranks,
             max_rank='elbow',
             drop_missing=True
         )
-    else:
-        X_ranks, X_scores, labels, max_rank = rwrtoolkit.fullranks_to_matrix(
-            args.rwr_fullranks,
-            max_rank='elbow',
-            drop_missing=True
-        )
-
-
-    if args.partition:
 
         linkage_matrix = cluster.cluster_hierarchical(
             X_ranks.fillna(0),
@@ -410,6 +408,7 @@ def main():
             # Catch None, bc `None.startswith` raises error.
             tree = {}
         elif dendrogram_style.startswith('r'):
+            # Rectangular dendrogram.
             try:
                 tree = plot.plot_dendrogram(
                     linkage_matrix,
@@ -419,9 +418,11 @@ def main():
                     no_plot=args.no_plot
                 )
             except Exception as e:
-                LOGGER.error('Plotting failed: %s', str(e))
+                # LOGGER.error('Plotting failed: %s', str(e))
+                warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
                 tree = {}
         elif dendrogram_style.startswith('p'):
+            # Polar dendrogram.
             try:
                 tree = plot.plot_dendrogram_polar(
                     linkage_matrix,
@@ -430,12 +431,15 @@ def main():
                     no_plot=args.no_plot
                 )
             except Exception as e:
-                LOGGER.error('Plotting failed: %s', str(e))
+                # LOGGER.error('Plotting failed: %s', str(e))
+                warnings.warn('[WARNING] Unable to draw the dendrogram, see error message:\n %s' % str(e))
                 tree = {}
         else:
             tree = {}
+    else:
+        # Exit.
+        pass
 
     return 0
 
-# }}}
-########################################################################
+# END.

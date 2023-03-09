@@ -2,6 +2,16 @@
 Plotting functions.
 '''
 
+import matplotlib.pyplot as plt
+import numpy as np
+import logging
+
+from scipy.cluster import hierarchy
+
+DPI = 300
+
+LOGGER = logging.getLogger(__name__)
+
 def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '):
     '''
     Create a label mapper.
