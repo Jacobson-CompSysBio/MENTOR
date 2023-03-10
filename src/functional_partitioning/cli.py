@@ -396,10 +396,12 @@ def main():
         threshold = mod.cut_threshold_
 
         if out_clusters is not None:
+            out_clusters.parent.mkdir(parents=False, exist_ok=True)
             clusters.to_csv(out_clusters, sep='\t')
             LOGGER.info(f'Clusters saved to {out_clusters}')
 
         if out_dissimilarity_matrix is not None:
+            out_dissimilarity_matrix.parent.mkdir(parents=False, exist_ok=True)
             dmat = pd.DataFrame(
                 distance.squareform(mod.pairwise_distances, checks=False),
                 index=labels,
@@ -411,6 +413,7 @@ def main():
             dmat = None
 
         if out_dissimilarity_stats is not None:
+            out_dissimilarity_stats.parent.mkdir(parents=False, exist_ok=True)
             with open(out_dissimilarity_stats, 'w') as f:
                 # print(
                 #     'mean of pair-wise dissimilarities',
@@ -454,6 +457,7 @@ def main():
 
 
         if out_dissimilarity_distribution is not None:
+            out_dissimilarity_distribution.parent.mkdir(parents=False, exist_ok=True)
             # print(mod.pairwise_distances)
             # print(np.mean(mod.pairwise_distances))
             plot.pairwise_distances_violin(
@@ -462,6 +466,7 @@ def main():
             )
 
         if out_dendrogram is not None:
+            out_dendrogram.parent.mkdir(parents=False, exist_ok=True)
             # Set up the leaf labels for the dendrogram.
             if args.labels_use_clusters:
                 # Label the leaves with the cluster ID.

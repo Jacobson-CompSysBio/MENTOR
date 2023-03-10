@@ -129,6 +129,7 @@ def get_elbow(y_true, min_size=3, **kwargs):
 
     for c in range(min_size, b-(min_size+1)):
         rmse_at_c = _root_mean_squared_error_at_c(y_true, c, **kwargs)
+        LOGGER.debug(f'rmse_at_c: {rmse_at_c}')
         rmse_over_c.append(rmse_at_c)
     # Adjust index by min_size.
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
