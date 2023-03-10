@@ -2,15 +2,20 @@
 Wrapper functions for RWRtoolkit
 '''
 
+import gzip as gzip_module
+import logging
+import numpy as np
 import os
+import pandas as pd
 import pathlib
 import shlex
-import subprocess
-import gzip as gzip_module
 import shutil
-import pandas as pd
+import subprocess
 
 from functional_partitioning import _metrics as metrics
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 if 'PATH_TO_RWRTOOLKIT' in os.environ:
@@ -268,7 +273,7 @@ def compress_results(dirname, **kwargs):
         gzip(f, **kwargs)
 
 
-def fullranks_to_matrix(path_or_dataframe, verify=True, drop_missing=True):
+def fullranks_to_matrix(path_or_dataframe, to='scores', drop_missing=True):
     '''
     Convert RWR "fullranks" file to matrix.
 
@@ -297,16 +302,56 @@ def fullranks_to_matrix(path_or_dataframe, verify=True, drop_missing=True):
         # Drop rows with seeds that were not found in the network.
         fullranks = fullranks.query('seed!="missing"')
 
-    # Pivot full ranks -> ranks matrix.
-    ranks = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
-    scores = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
-    labels = ranks.index.to_list()
+    # Pivot fullranks -> scores or ranks matrix.
+    if to.lower().startswith('score'):
+        mat = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
+    elif to.lower().startswith('rank'):
+        mat = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
+    else:
+        raise ValueError(f'Invalid value for `to`: {to}')
 
-    if verify:
-        assert ranks.shape == scores.shape
-        assert ranks.index.equals(scores.index)
+    return mat
 
-    return scores, ranks, labels
+
+def transform_fullranks(path_or_dataframe, drop_missing=True, max_rank='elbow'):
+    if isinstance(path_or_dataframe, pd.DataFrame):
+        fullranks = path_or_dataframe
+    else:
+        # Load the full ranks.
+        fullranks = pd.read_table(path_or_dataframe)
+
+    if drop_missing:
+        # Drop rows with seeds that were not found in the network.
+        fullranks = fullranks.query('seed!="missing"')
+
+    if max_rank == 'elbow':
+        # Find elbow and set max_rank.
+        y = fullranks.groupby('rank')['Score'].mean()
+        max_rank = metrics.get_elbow(y)
+        LOGGER.info(f'Set max_rank to {max_rank}.')
+
+    ranks = fullranks_to_matrix(fullranks, to='rank', drop_missing=drop_missing)
+    scores = fullranks_to_matrix(fullranks, to='scores', drop_missing=drop_missing)
+    labels = scores.index.to_list()
+
+    assert (ranks.index == scores.index).all()
+    assert (ranks.columns == scores.columns).all()
+
+    # Filter the rank vectors.
+    mask = (ranks <= max_rank).fillna(False)
+    col_mask = mask.any()
+
+    features = scores.loc[:, col_mask]
+
+    # Re-rank them.
+    features = features.rank(axis=1, method='first', ascending=False)
+
+    for i in labels:
+        # Fill the seed in each vector as 0; ie, give the seed the best rank.
+        if ( i in features.columns.to_list() ) and np.isnan(features.loc[i, i]):
+            features.loc[i, i] = 0
+
+    return features, labels
 
 
 # END

@@ -318,6 +318,17 @@ def main():
     else:
         dendrogram_style = None
 
+    # Set up cut parameters for HierarchicalClustering.
+    if args.cut_method == 'dynamic':
+        cut_method = 'cutreeHybrid'
+        cut_threshold = args.cut_threshold
+    elif args.cut_method == 'none':
+        cut_method = None
+        cut_threshold = None
+    else:
+        cut_method = args.cut_method
+        cut_threshold = args.cut_threshold
+
     # Run RWR-singletons or get the fullranks file.
     if args.multiplex and args.geneset:
         # Run RWR-singletons.
@@ -360,23 +371,11 @@ def main():
     # Run functional partitioning or exit.
     if args.partition:
         # Run functional partitioning.
-        scores, ranks, labels = rwrtoolkit.fullranks_to_matrix(
+        X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing=True,
-            verify=True
+            max_rank='elbow',
         )
-
-        X = utils.get_top_ranked(scores, ranks=ranks, max_rank='elbow')
-
-        if args.cut_method == 'dynamic':
-            cut_method = 'cutreeHybrid'
-            cut_threshold = args.cut_threshold
-        elif args.cut_method == 'none':
-            cut_method = None
-            cut_threshold = None
-        else:
-            cut_method = args.cut_method
-            cut_threshold = args.cut_threshold
 
         mod = cluster.HierarchicalClustering(
             n_clusters=None,
@@ -415,30 +414,13 @@ def main():
         if out_dissimilarity_stats is not None:
             out_dissimilarity_stats.parent.mkdir(parents=False, exist_ok=True)
             with open(out_dissimilarity_stats, 'w') as f:
-                # print(
-                #     'mean of pair-wise dissimilarities',
-                #     np.mean(mod.pairwise_distances),
-                #     sep='\t',
-                #     file=f
-                # )
-                # print(
-                #     'median of pair-wise dissimilarities',
-                #     np.median(mod.pairwise_distances),
-                #     sep='\t',
-                #     file=f
-                # )
                 try:
                     dist_summary = metrics.summarize_pairwise_dissimilarities(
                         mod.pairwise_distances,
                         mod.labels_
                     )
                     for key, value in dist_summary.items():
-                        print(
-                            key,
-                            value,
-                            sep='\t',
-                            file=f
-                        )
+                        print(key, value, sep='\t', file=f)
                 except:
                     pass
                 try:
@@ -446,20 +428,12 @@ def main():
                         X,
                         mod.labels_
                     )
-                    print(
-                        'calinski_harabasz_score',
-                        chi,
-                        sep='\t',
-                        file=f
-                    )
+                    print('calinski_harabasz_score', chi, sep='\t', file=f)
                 except:
                     pass
 
-
         if out_dissimilarity_distribution is not None:
             out_dissimilarity_distribution.parent.mkdir(parents=False, exist_ok=True)
-            # print(mod.pairwise_distances)
-            # print(np.mean(mod.pairwise_distances))
             plot.pairwise_distances_violin(
                 mod.pairwise_distances,
                 out_path=out_dissimilarity_distribution
