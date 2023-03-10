@@ -244,7 +244,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         # Get the clusters.
         if self.cut_method == 'cutreeHybrid':
             # self.min_cluster_size_ = int(np.sqrt(self._n_samples))
-            self.min_cluster_size_ = 3
+            self.min_cluster_size_ = 1
             # Set the cutHeight parameter using default method (99% of dendrogram height).
             # Passing this parameter is necessary to avoid a printed message from dynamicTreeCut.
             # https://github.com/kylessmith/dynamicTreeCut/blob/3734243ee547bb9c220e5aef046587ca1694c7a7/dynamicTreeCut/dynamicTreeCut.py#L176
