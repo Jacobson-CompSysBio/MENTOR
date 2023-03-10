@@ -13,6 +13,7 @@
 
 ## Added
 
+- Add basic summary statistics for pairwise distances
 - Add `__all__` to `__init__.py`
 - Add `_version.py`, `_plot.py`
 - Add tests for CLI entry point

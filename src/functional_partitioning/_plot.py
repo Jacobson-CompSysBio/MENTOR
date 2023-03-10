@@ -2,9 +2,10 @@
 Plotting functions.
 '''
 
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
-import logging
+import seaborn as sns
 import warnings
 
 from scipy.cluster import hierarchy
@@ -62,7 +63,6 @@ def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '
     label_mapper = nodetable[col_names].agg(join, axis=1).to_dict()
 
     return label_mapper
-
 
 
 def savefig(out_path=None, **kwargs):
@@ -160,7 +160,10 @@ def _plot_dendrogram_rectangular(
     else:
         if title is not None:
             plt.gca().set_title(f"{title}", fontsize=15)
-        savefig(out_path=out_path)
+        # savefig(out_path=out_path)
+        if out_path:
+            savefig(out_path=out_path)
+            plt.close()
 
     return tree
 
@@ -291,7 +294,10 @@ def _plot_dendrogram_polar(
         if title is not None:
             ax.set_title(f"{title}", fontsize=15)
 
-        savefig(out_path=out_path)
+        # savefig(out_path=out_path)
+        if out_path:
+            savefig(out_path=out_path)
+            plt.close()
 
     return tree
 
@@ -337,5 +343,32 @@ def draw_dendrogram(dendrogram_style=None, **kwargs):
         LOGGER.debug('No dendrogram requested.')
 
     return tree
+
+def pairwise_distances_violin(
+    data,
+    title=None,
+    out_path=None,
+    ax=None,
+    ):
+
+    # Horizontal violin plot.
+    if ax is None:
+        plt.figure()
+        ax = plt.gca()
+    p = sns.violinplot(
+        data=data,
+        orient='h',
+        cut=0,
+        ax=ax
+    )
+    plt.xlabel('dissimilarity')
+    plt.ylabel('distribution')
+    if title:
+        plt.title(title)
+    if out_path:
+        savefig(out_path=out_path)
+        plt.close()
+
+
 
 # END.

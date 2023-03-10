@@ -280,25 +280,37 @@ def main():
     # specified.
     if args.no_clusters:
         out_clusters = None
+        out_dissimilarity_matrix = None
+        out_dissimilarity_stats = None
     elif args.out_clusters is not None:
         out_clusters = args.out_clusters
+        out_dissimilarity_matrix = args.out_clusters.with_name('dissimilarity-matrix.tsv')
+        out_dissimilarity_stats = args.out_clusters.with_name('dissimilarity-stats.tsv')
     elif args.outdir is not None:
         # Set the default path for the clusters.
         out_clusters = args.outdir / 'clusters.tsv'
+        out_dissimilarity_matrix = args.outdir / 'dissimilarity-matrix.tsv'
+        out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
     else:
         out_clusters = None
+        out_dissimilarity_matrix = None
+        out_dissimilarity_stats = None
 
     # Use --out-dir with default names, unless another path is explicitely
     # specified.
     if args.no_plot:
         out_dendrogram = None
+        out_dissimilarity_distribution = None
     elif args.out_dendrogram is not None:
         out_dendrogram = args.out_dendrogram
+        out_dissimilarity_distribution = args.out_dendrogram.with_name('distribution-of-pairwise-dissimilarities.png')
     elif args.outdir is not None:
         # Set the default path for the dendrogram.
         out_dendrogram = args.outdir / 'dendrogram.png'
+        out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
     else:
         out_dendrogram = None
+        out_dissimilarity_distribution = None
 
     # Set dendrogram style (rectangular or polar).
     if out_dendrogram is not None and args.dendrogram_style.startswith(('r', 'p')):
@@ -386,6 +398,68 @@ def main():
         if out_clusters is not None:
             clusters.to_csv(out_clusters, sep='\t')
             LOGGER.info(f'Clusters saved to {out_clusters}')
+
+        if out_dissimilarity_matrix is not None:
+            dmat = pd.DataFrame(
+                distance.squareform(mod.pairwise_distances, checks=False),
+                index=labels,
+                columns=labels
+            )
+            dmat.to_csv(out_dissimilarity_matrix, sep='\t')
+            LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
+        else:
+            dmat = None
+
+        if out_dissimilarity_stats is not None:
+            with open(out_dissimilarity_stats, 'w') as f:
+                # print(
+                #     'mean of pair-wise dissimilarities',
+                #     np.mean(mod.pairwise_distances),
+                #     sep='\t',
+                #     file=f
+                # )
+                # print(
+                #     'median of pair-wise dissimilarities',
+                #     np.median(mod.pairwise_distances),
+                #     sep='\t',
+                #     file=f
+                # )
+                try:
+                    dist_summary = metrics.summarize_pairwise_dissimilarities(
+                        mod.pairwise_distances,
+                        mod.labels_
+                    )
+                    for key, value in dist_summary.items():
+                        print(
+                            key,
+                            value,
+                            sep='\t',
+                            file=f
+                        )
+                except:
+                    pass
+                try:
+                    chi = metrics.calinski_harabasz_score_(
+                        X,
+                        mod.labels_
+                    )
+                    print(
+                        'calinski_harabasz_score',
+                        chi,
+                        sep='\t',
+                        file=f
+                    )
+                except:
+                    pass
+
+
+        if out_dissimilarity_distribution is not None:
+            # print(mod.pairwise_distances)
+            # print(np.mean(mod.pairwise_distances))
+            plot.pairwise_distances_violin(
+                mod.pairwise_distances,
+                out_path=out_dissimilarity_distribution
+            )
 
         if out_dendrogram is not None:
             # Set up the leaf labels for the dendrogram.

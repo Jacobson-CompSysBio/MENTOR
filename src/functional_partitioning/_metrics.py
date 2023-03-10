@@ -161,4 +161,47 @@ def calc_chi(X_true, clusters):
     chi_scores = np.array(chi_scores)
     return chi_scores
 
+
+def calinski_harabasz_score_(X, labels, **kwargs):
+    if labels.ndim == 1:
+        pass
+    elif labels.ndim == 2:
+        if labels.shape[0] == 1 or labels.shape[1] == 1:
+            labels = labels.ravel()
+    else:
+        raise ValueError(f'labels must be 1-D, you gave {labels.shape}')
+
+    return calinski_harabasz_score(X, labels, **kwargs)
+
+
+def summarize_pairwise_dissimilarities(dissimilarities, labels):
+    if labels.ndim == 1:
+        pass
+    elif labels.ndim == 2:
+        if labels.shape[0] == 1 or labels.shape[1] == 1:
+            labels = labels.ravel()
+    else:
+        raise ValueError(f'labels must be 1-D, you gave {labels.shape}')
+
+    within_dissimilarity = []
+    between_dissimilarity = []
+
+    for i, pair in enumerate(itertools.combinations(labels, 2)):
+        if pair[0] == pair[1]:
+            within_dissimilarity.append(dissimilarities[i])
+        else:
+            between_dissimilarity.append(dissimilarities[i])
+
+    result = {
+        'pairwise_dissimilarity_mean': np.mean(dissimilarities),
+        'pairwise_dissimilarity_median': np.median(dissimilarities),
+        'within_cluster_dissimilarity_mean': np.mean(within_dissimilarity),
+        'between_cluster_dissimilarity_mean': np.mean(between_dissimilarity),
+        'within_cluster_dissimilarity_median': np.median(within_dissimilarity),
+        'between_cluster_dissimilarity_median': np.median(between_dissimilarity)
+    }
+
+    return result
+
+
 # END
