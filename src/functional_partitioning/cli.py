@@ -92,12 +92,6 @@ def parse_args(test=None):
         help='Plot the dendrogram in rectangular or polar coordinates. If "none", then do not plot the dendrogram (this is redundant with --no-plot).'
     )
     parser.add_argument(
-        '--no-plot',
-        action='store_true',
-        default=False,
-        help='Do not plot the dendrogram.'
-    )
-    parser.add_argument(
         '--labels-use-clusters',
         action='store_true',
         default=False,
@@ -135,9 +129,21 @@ def parse_args(test=None):
         help='Save dendrogram to path.'
     )
     parser.add_argument(
+        '--no-plot',
+        action='store_true',
+        default=False,
+        help='Do not plot the dendrogram.'
+    )
+    parser.add_argument(
         '--out-clusters', '-c',
         action='store',
         help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
+    )
+    parser.add_argument(
+        '--no-clusters',
+        action='store_true',
+        default=False,
+        help='Do not export clusters to file.'
     )
     parser.add_argument(
         '--path-to-conda-env',
@@ -272,7 +278,9 @@ def main():
 
     # Use --out-dir with default names, unless another path is explicitely
     # specified.
-    if args.out_clusters is not None:
+    if args.no_clusters:
+        out_clusters = None
+    elif args.out_clusters is not None:
         out_clusters = args.out_clusters
     elif args.outdir is not None:
         # Set the default path for the clusters.
