@@ -287,6 +287,7 @@ def test_rwrtoolkit_fullranks_to_matrix_max_rank():
     max_rank = metrics.get_elbow(mean_scores)  # 17.
     assert max_rank == 17
 
+# [TODO] Add new test for elbow using mean of scores-vs-ranks vector.
 
 # Test helper functions.
 
