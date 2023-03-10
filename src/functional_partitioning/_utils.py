@@ -17,7 +17,7 @@ def get_top_ranked(scores, ranks=None, max_rank='elbow'):
 
     if max_rank == 'elbow':
         # Find elbow and set max_rank.
-        mean_scores = scores.mean()
+        mean_scores = scores.mean().sort_values(ascending=False)
         max_rank = metrics.get_elbow(mean_scores)
         LOGGER.info(f'Set max_rank to {max_rank}.')
 
@@ -32,7 +32,7 @@ def get_top_ranked(scores, ranks=None, max_rank='elbow'):
     
     for i in features.index:
         # Fill the seed in each vector as 0; ie, give the seed the best rank.
-        if np.isnan(features.loc[i, i]):
+        if ( i in features.columns.to_list() ) and np.isnan(features.loc[i, i]):
             features.loc[i, i] = 0
     
     return features
