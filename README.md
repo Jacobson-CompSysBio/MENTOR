@@ -121,6 +121,26 @@ options:
 Examples
 ========
 
+If you have a gene set and a multiplex network, run RWR and partition the
+geneset:
+
+```sh
+functional_partitioning \
+    --path-to-rwrtoolkit <path to RWRtoolkit directory> \
+    --multiplex <path to multiplex object> \
+    --geneset <path to your gene set> \
+    --outdir <path to output directory>
+```
+
+If you already have results from RWRtoolkit, you can pass in your 'fullranks'
+file:
+
+```sh
+functional_partitioning \
+    --rwr-fullranks <path to fullranks file> \
+    --outdir <path to output directory>
+```
+
 You can change the labels on the leaves of the dendrogram. This requires that
 you have a nodetable file. The nodetable is a TSV file with the first column as
 the seed genes use for RWR-CV (singletons), e.g., something like this:
