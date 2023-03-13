@@ -94,6 +94,8 @@ def _plot_dendrogram_rectangular(
     kwargs
         Passed to `hierarchy.dendrogram`
     '''
+    _orientation = kwargs.get('orientation', 'left')
+
     if kwargs.get('color_threshold') is None:
         # Do not allow 'color_threshold' to be None.
         # - Set it to 0 to prevent dendrogram from using default color_threshold.
@@ -114,20 +116,27 @@ def _plot_dendrogram_rectangular(
             height = np.shape(linkage_matrix)[0] * 0.2
             if height < 10:
                 height = 10
-            figsize = (width, height)
+            if _orientation == 'top' or _orientation == 'bottom':
+                # Swap the width and height.
+                width, height = height, width
+            figsize_ = (width, height)
+        else:
+            figsize_ = figsize
         # Initialize the figure.
         plt.rc('figure', facecolor='white')
-        plt.figure(figsize=figsize)
+        plt.figure(figsize=figsize_)
 
     if kwargs.get('no_plot'):
         pass
     elif draw_threshold and kwargs.get('color_threshold', 0) > 0:
         # You have to know the orientation: left/right > vline, top/bottom > hline.
-        _orientation = kwargs.get('orientation', 'left')
         if _orientation == 'left' or _orientation == 'right':
             plot_line = plt.axvline
         elif _orientation == 'top' or _orientation == 'bottom':
             plot_line = plt.axhline
+            if figsize == 'auto':
+                width, height = height, width
+                figsize_ = (width, height)
         else:
             raise ValueError(f'`orientation` must be one of ["top", "bottom", "left", "right"]: {_orientation}')
         plot_line(kwargs.get('color_threshold'), c='k', linewidth=1, linestyle='dotted')
