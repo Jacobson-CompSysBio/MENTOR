@@ -176,7 +176,7 @@ def calinski_harabasz_score_(X, labels, **kwargs):
 
 
 def summarize_pairwise_dissimilarities(dissimilarities, labels):
-    if dissimilarities.ndim >=1:
+    if dissimilarities.ndim > 1:
         raise ValueError(f'dissimilarities must be 1-D, you gave {dissimilarities.shape}')
 
     if labels.ndim == 1:
