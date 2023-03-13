@@ -99,6 +99,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         compute_dendrogram=True,
         cut_threshold=None,
         cut_method='cutreeHybrid',
+        optimal_ordering=False
     ):
         # # Handle 'affinity', which will be removed in v1.4. Sklearn passes
         # # 'affinity' to 'pdist' as 'metric' (eg, in the `_average` method).
@@ -137,6 +138,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         self.linkage_method = None
         # [TODO] Change 'metric' to 'linkage_metric'
         self.linkage_metric = None
+        self.optimal_ordering = optimal_ordering
 
     # [TODO] Add fit method
     # [TODO] Add fit_predict method
@@ -239,6 +241,7 @@ class HierarchicalClustering(AgglomerativeClustering):
             self.pairwise_distances,
             metric='precomputed',
             method=self.linkage,
+            optimal_ordering=self.optimal_ordering
         )
         
         # Get the clusters.
