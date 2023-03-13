@@ -9,12 +9,12 @@ and a distance function. The distance function should take two vectors as
 input and return a scalar distance between them.
 '''
 
-import dynamicTreeCut
 import logging
 import numpy as np
 import pandas as pd
 import warnings
 
+from dynamicTreeCut import dynamicTreeCut
 from dynamicTreeCut import R_func as dtc_utils
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
