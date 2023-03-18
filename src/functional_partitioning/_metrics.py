@@ -177,6 +177,20 @@ def calinski_harabasz_score_(X, labels, **kwargs):
 
 
 def summarize_pairwise_dissimilarities(dissimilarities, labels):
+    '''
+    Parameters
+    ----------
+    dissimilarities : array-like
+        A condensed distance matrix (1-D array of dissimilarities).
+    labels : array-like
+        A 1-D array of labels.
+
+    Returns
+    -------
+    summary : dict
+    '''
+    # [TODO] Verify the length dissimilarities matches the number of pairs of
+    # labels (n choose k).
     if dissimilarities.ndim > 1:
         raise ValueError(f'dissimilarities must be 1-D, you gave {dissimilarities.shape}')
 
