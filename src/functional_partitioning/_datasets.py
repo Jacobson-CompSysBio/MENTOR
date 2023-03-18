@@ -31,7 +31,7 @@ def make_scores_matrix(**kwargs):
 
 def make_ranks_matrix(**kwargs):
     scores = make_scores_matrix(**kwargs)
-    ranks = scores.rank(axis=1, ascending=False)
+    ranks = scores.rank(axis=1, ascending=False, method='first')
     return ranks
 
 def make_fullranks_table(**kwargs):
