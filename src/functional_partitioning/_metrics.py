@@ -94,14 +94,14 @@ def _root_mean_squared_error_at_c(y_true, c, **kwargs):
     return rmse_c
 
 
-def get_elbow(y_true, min_size=3, **kwargs):
+def get_elbow(Y, min_size=3, **kwargs):
     r'''
     RMSE_{c}={c-1\over b-1}\times RMSE(L_{c})+{b-c\over b-1}\times RMSE(R_{c}) \eqno{\hbox{[1]}}
 
     Parameters
     ----------
-    y_true : array-like
-        The true values.
+    Y : array-like
+        1-D array of values to find the elbow of.
     min_size : int
         Minimum size of the left and right clusters.
 
@@ -112,25 +112,26 @@ def get_elbow(y_true, min_size=3, **kwargs):
 
     Examples
     --------
-    >>> y_true = scores_matrix.values
-    >>> c = get_elbow(y_true)
+    >>> y = get_scores_vs_ranks_curve(scores_matrix)
+    >>> max_rank = get_elbow(y)
     '''
 
-    if isinstance(y_true, pd.DataFrame):
-        raise ValueError('y_true must be a numpy array or pandas Series.')
-    elif isinstance(y_true, pd.Series):
-        y_true = y_true.values
+    if isinstance(Y, pd.DataFrame):
+        raise ValueError('Y must be a numpy array or pandas Series.')
+    elif isinstance(Y, pd.Series):
+        Y = Y.values
     else:
         pass
 
-    b = len(y_true)
+    b = len(Y)
 
     rmse_over_c = []
 
     for c in range(min_size, b-(min_size+1)):
-        rmse_at_c = _root_mean_squared_error_at_c(y_true, c, **kwargs)
+        rmse_at_c = _root_mean_squared_error_at_c(Y, c, **kwargs)
         LOGGER.debug(f'rmse_at_c: {rmse_at_c}')
         rmse_over_c.append(rmse_at_c)
+
     # Adjust index by min_size.
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
     return idx_of_elbow
@@ -206,6 +207,31 @@ def summarize_pairwise_dissimilarities(dissimilarities, labels):
     }
 
     return result
+
+
+def get_scores_vs_ranks_curve(scores, ranks=None):
+    '''
+    Convert the scores to ranks (or use the provided ranks), and then get the
+    mean score at each rank.
+
+    Parameters
+    ----------
+    scores : array-like
+        The scores matrix
+    ranks : array-like, optional
+        The ranks matrix. If not provided, the scores will be converted to ranks.
+
+    Returns
+    -------
+    mean_score_vs_rank : array-like
+    '''
+    stacked_scores = scores.stack()
+    if ranks is None:
+        stacked_ranks = stacked_scores.groupby(level=0).rank(ascending=False, method='first')
+    else:
+        stacked_ranks = ranks.stack()
+    mean_score_vs_rank = stacked_scores.groupby(stacked_ranks).mean()
+    return mean_score_vs_rank
 
 
 # END
