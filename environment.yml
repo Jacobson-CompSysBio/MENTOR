@@ -4,13 +4,15 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - ipykernel
   - mamba
   - matplotlib
   - numpy
   - pandas
   - pip
   - python
-  - scikit-learn
+  - scikit-learn>=1.2
   - scipy
   - seaborn
+  - pytest
+  - pip:
+    - dynamicTreeCut
