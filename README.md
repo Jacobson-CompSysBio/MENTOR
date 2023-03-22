@@ -11,11 +11,27 @@ Functional Partitioning
 Installation
 ============
 
+Standard installation:
+
 ```sh
 $ git clone https://github.com/izaakm/jail-functional-partitioning
 $ cd jail-functional-partitioning
 $ pip install .
+$ functional_partitiong --help
 ```
+
+If you prefer to install dependencies with conda, you can use the provided
+`environment.yml` file:
+
+```sh
+$ git clone https://github.com/izaakm/jail-functional-partitioning
+$ cd jail-functional-partitioning
+$ conda env create -f ./environment.yml
+$ pip install .  # Just set up the `functional_partitioning` executable
+$ functional_partitiong --help
+```
+
+
 
 Usage
 =====
