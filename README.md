@@ -16,8 +16,7 @@ Standard installation:
 ```sh
 $ git clone https://github.com/izaakm/jail-functional-partitioning
 $ cd jail-functional-partitioning
-$ pip install .
-$ functional_partitiong --help
+$ make
 ```
 
 If you prefer to install dependencies with conda, you can use the provided
@@ -26,42 +25,56 @@ If you prefer to install dependencies with conda, you can use the provided
 ```sh
 $ git clone https://github.com/izaakm/jail-functional-partitioning
 $ cd jail-functional-partitioning
-$ conda env create -f ./environment.yml
-$ pip install .  # Just set up the `functional_partitioning` executable
-$ functional_partitiong --help
+$ conda env update -f ./environment.yml
+$ make
 ```
 
+Or create a new environment for 'functional-partitioning':
+
+```sh
+$ git clone https://github.com/izaakm/jail-functional-partitioning
+$ cd jail-functional-partitioning
+$ conda env create -f ./environment.yml
+$ conda activate functional-partitioning
+$ make
+```
+
+Verify the installation:
+
+```sh
+$ functional_partitiong --help
+```
 
 
 Usage
 =====
 
 ```
+
 usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
                                [--nodetable NODETABLE] [--partition]
-                               [--no-partition]
-                               [--cut-threshold CUT_THRESHOLD]
+                               [--no-partition] [--cut-threshold CUT_THRESHOLD]
                                [--cut-method {dynamic,hard,none}]
-                               [--dendrogram-style {rectangular,r,polar,p,none,n}]
-                               [--no-plot] [--labels-use-clusters]
-                               [--labels-use-names [LABELS_USE_NAMES ...]]
-                               [--labels-use-locs [LABELS_USE_LOCS ...]]
-                               [--labels-sep LABELS_SEP] [--outdir OUTDIR]
-                               [--out-dendrogram OUT_DENDROGRAM]
-                               [--out-clusters OUT_CLUSTERS]
+                               [--dendrogram-style
+                               {rectangular,r,polar,p,none,n}]
+                               [--labels-use-clusters] [--labels-use-names
+                               [LABELS_USE_NAMES ...]] [--labels-use-locs
+                               [LABELS_USE_LOCS ...]] [--labels-sep LABELS_SEP]
+                               [--outdir OUTDIR] [--out-dendrogram
+                               OUT_DENDROGRAM] [--no-plot] [--out-clusters
+                               OUT_CLUSTERS] [--no-clusters]
                                [--path-to-conda-env PATH_TO_CONDA_ENV]
                                [--path-to-rwrtoolkit PATH_TO_RWRTOOLKIT]
                                [--multiplex MULTIPLEX] [--geneset GENESET]
-                               [--method METHOD] [--folds FOLDS]
-                               [--restart RESTART] [--tau TAU]
-                               [--numranked NUMRANKED] [--modname MODNAME]
-                               [--plot PLOT] [--threads THREADS]
-                               [--init-test-fullranks INIT_TEST_FULLRANKS]
-                               [--verbose] [--version]
+                               [--method METHOD] [--folds FOLDS] [--restart
+                               RESTART] [--tau TAU] [--numranked NUMRANKED]
+                               [--modname MODNAME] [--plot PLOT] [--threads
+                               THREADS] [--init-test-fullranks
+                               INIT_TEST_FULLRANKS] [--verbose] [--version]
 
 Partition seeds from `RWR-CV --method=singletons ...` into clusters.
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
                         Path to "fullranks" file from `RWR-CV
@@ -71,10 +84,8 @@ options:
                         first column is the node name (i.e., the seed genes
                         from RWR-fullranks). (default: None)
   --partition, -p       Perform functional partitioning on "seed genes" from
-                        RWR fullranks file. This is the default. (default:
-                        True)
-  --no-partition        Do not perform functional partitioning. (default:
-                        True)
+                        RWR fullranks file. This is the default. (default: True)
+  --no-partition        Do not perform functional partitioning. (default: True)
   --cut-threshold CUT_THRESHOLD, -t CUT_THRESHOLD
                         Cut the dendrogram at this threshold. Only used if
                         `--cut-method=hard`. (default: 0.3)
@@ -85,15 +96,14 @@ options:
                         provide a numeric cut threshold. (default: dynamic)
   --dendrogram-style {rectangular,r,polar,p,none,n}, -s {rectangular,r,polar,p,none,n}
                         Plot the dendrogram in rectangular or polar
-                        coordinates. If "none", then do not plot the
-                        dendrogram (this is redundant with --no-plot).
-                        (default: rectangular)
-  --no-plot             Do not plot the dendrogram. (default: False)
+                        coordinates. If "none", then do not plot the dendrogram
+                        (this is redundant with --no-plot). (default:
+                        rectangular)
   --labels-use-clusters
   --labels-use-names [LABELS_USE_NAMES ...]
                         Label the dendrogram using columns from the nodetable.
-                        This is a space-separated list of column names from
-                        the nodetable. Pass columns as strings (column names).
+                        This is a space-separated list of column names from the
+                        nodetable. Pass columns as strings (column names).
                         (default: None)
   --labels-use-locs [LABELS_USE_LOCS ...]
                         Label the dendrogram using columns from the nodetable.
@@ -108,12 +118,14 @@ options:
   --outdir OUTDIR       Save dendrogram and clusters to path. (default: None)
   --out-dendrogram OUT_DENDROGRAM, -d OUT_DENDROGRAM
                         Save dendrogram to path. (default: None)
+  --no-plot             Do not plot the dendrogram. (default: False)
   --out-clusters OUT_CLUSTERS, -c OUT_CLUSTERS
                         Save clusters to path as tsv file with columns
                         "label", "cluster". When --threshold is 0 (the
                         default) each gene is put into a separate cluster
                         (i.e., every cluster has only a single gene).
                         (default: None)
+  --no-clusters         Do not export clusters to file. (default: False)
   --path-to-conda-env PATH_TO_CONDA_ENV
   --path-to-rwrtoolkit PATH_TO_RWRTOOLKIT
   --multiplex MULTIPLEX
@@ -127,10 +139,8 @@ options:
   --plot PLOT
   --threads THREADS
   --init-test-fullranks INIT_TEST_FULLRANKS
-                        Create fullranks file for testing at the given path.
-                        (default: None)
-  --verbose, -v         Default: WARNING; once: INFO; twice: DEBUG (default:
-                        0)
+                        Create fullranks file for testing at the given path. (default: None)
+  --verbose, -v         Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version             Print version and exit. (default: False)
 ```
 
