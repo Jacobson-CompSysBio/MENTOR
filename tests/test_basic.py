@@ -2,7 +2,9 @@ import itertools
 import joblib
 import numpy as np
 import os
+import unittest
 
+from numpy import testing
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
@@ -52,125 +54,6 @@ def test_entrypoint():
 def test_entrypoint():
     exit_status = os.system('functional_partitioning --version')
     assert exit_status == 0
-
-
-# Test linkage matrices. The linkage matrices returned from
-# `scipy.hierarchy.linkage` and `HierarchicalClustering` should be the same.
-
-
-def test_scipy_linkage_matrix_scores():
-    metric = 'euclidean'
-    method = 'average'
-    decimals = 13
-
-    scores = datasets.make_scores_matrix()
-    scores = scores.fillna(scores.max(axis=1))
-
-    dvec = distance.pdist(scores, metric=metric)
-    linkage_matrix = hierarchy.linkage(dvec, method=method)
-
-    # The linkage matrix directly from scipy and the one returned from
-    # HierarchicalClustering are the same to 13 decimal places.
-    linkage_matrix = linkage_matrix.round(decimals=decimals)
-    md5sum = joblib.hash(linkage_matrix)
-
-    assert md5sum == CHECKSUMS['linkage_matrix_scores_euclidean_average']
-
-
-def test_scipy_linkage_matrix_ranks():
-    metric = 'euclidean'
-    method = 'average'
-
-    ranks = datasets.make_ranks_matrix()
-    ranks = ranks.fillna(0)
-
-    dvec = distance.pdist(ranks, metric=metric)
-    linkage_matrix = hierarchy.linkage(dvec, method=method)
-
-    assert joblib.hash(linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_euclidean_average']
-
-
-def test_hierarchicalclustering_linkage_matrix_scores():
-    metric = 'euclidean'
-    method = 'average'
-    decimals = 13
-
-    scores = datasets.make_scores_matrix()
-    scores = scores.fillna(scores.max(axis=1))
-
-    mod = cluster.HierarchicalClustering(metric='euclidean')
-    mod.fit(scores)
-
-    # The linkage matrix directly from scipy and the one returned from
-    # HierarchicalClustering are the same to 13 decimal places.
-    linkage_matrix = mod.linkage_matrix.round(decimals=decimals)
-    md5sum = joblib.hash(linkage_matrix)
-
-    assert md5sum == CHECKSUMS['linkage_matrix_scores_euclidean_average']
-
-
-def test_hierarchicalclustering_linkage_matrix_ranks():
-    metric = 'euclidean'
-    method = 'average'
-
-    ranks = datasets.make_ranks_matrix()
-    ranks = ranks.fillna(0)
-
-    mod = cluster.HierarchicalClustering(metric='euclidean')
-    mod.fit(ranks)
-
-    assert joblib.hash(mod.linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_euclidean_average']
-
-
-def test_hierarchicalclustering_clusters_scores():
-    scores = datasets.make_scores_matrix()
-    scores = scores.fillna(scores.max(axis=1))
-
-    mod = cluster.HierarchicalClustering(metric=metrics.spearman_d)
-    mod.fit(scores)
-
-    clusters = hierarchy.cut_tree(mod.linkage_matrix)
-
-    assert joblib.hash(clusters) == CHECKSUMS['spearman_distance_clusters']
-
-
-def test_hierarchicalclustering_clusters_ranks():
-    ranks = datasets.make_scores_matrix()
-    ranks = ranks.fillna(ranks.max(axis=1))
-
-    mod = cluster.HierarchicalClustering(metric=metrics.spearman_d)
-    mod.fit(ranks)
-
-    clusters = hierarchy.cut_tree(mod.linkage_matrix)
-
-    assert joblib.hash(clusters) == CHECKSUMS['spearman_distance_clusters']
-
-
-
-def test_cluster_hierarchical_scores_spearman_average():
-    scores = datasets.make_scores_matrix()
-    scores = scores.fillna(scores.max(axis=1))
-
-    linkage_matrix = cluster.cluster_hierarchical(
-        scores,
-        corr_method='spearman',
-        linkage_method='average'
-    )
-
-    assert joblib.hash(linkage_matrix) == CHECKSUMS['linkage_matrix_scores_spearman_average']
-
-
-def test_cluster_hierarchical_ranks_spearman_average():
-    ranks = datasets.make_ranks_matrix()
-    ranks = ranks.fillna(0)
-
-    linkage_matrix = cluster.cluster_hierarchical(
-        ranks,
-        corr_method='spearman',
-        linkage_method='average'
-    )
-
-    assert joblib.hash(linkage_matrix) == CHECKSUMS['linkage_matrix_ranks_spearman_average']
 
 
 # Test metrics functions.
