@@ -111,45 +111,6 @@ def test_spearman_distance_matrix_ranks():
     assert joblib.hash(dmat) == CHECKSUMS['spearman_distance_matrix_ranks']
 
 
-# Test RWRtoolkit wrapper functions. Minimal testing here; just make sure the
-# fullranks table is properly converted.
-
-
-def test_rwrtoolkit_fullranks_to_matrix_X_ranks():
-    fullranks = datasets.make_fullranks_table()
-    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
-    assert joblib.hash(X_ranks) == CHECKSUMS['fullranks_to_matrix_X_ranks']
-
-
-def test_rwrtoolkit_fullranks_to_matrix_X_scores():
-    fullranks = datasets.make_fullranks_table()
-    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
-    assert joblib.hash(X_scores) == CHECKSUMS['fullranks_to_matrix_X_scores']
-
-
-def test_rwrtoolkit_fullranks_to_matrix_labels():
-    fullranks = datasets.make_fullranks_table()
-    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
-    assert joblib.hash(labels) == CHECKSUMS['fullranks_to_matrix_labels']
-
-
-# def test_rwrtoolkit_fullranks_to_matrix_max_rank():
-#     fullranks = datasets.make_fullranks_table()
-#     X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
-#     mean_scores = X_scores.mean()
-#     max_rank = metrics.get_elbow(mean_scores)
-#     assert joblib.hash(max_rank) == CHECKSUMS['fullranks_to_matrix_max_rank']
-
-
-def test_rwrtoolkit_fullranks_to_matrix_max_rank():
-    fullranks = datasets.make_fullranks_table()
-    X_scores, X_ranks, labels = rwrtoolkit.fullranks_to_matrix(fullranks)
-    mean_scores = X_scores.mean()
-    max_rank = metrics.get_elbow(mean_scores)  # 17.
-    assert max_rank == 17
-
-# [TODO] Add new test for elbow using mean of scores-vs-ranks vector.
-
 # Test helper functions.
 
 

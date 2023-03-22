@@ -17,6 +17,7 @@ from functional_partitioning import _plot as plot
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 
+RANDOM_STATE = 42
 
 CHECKSUMS = {
     'features': '05f5c7599ac919bddb182aec8d2aaf16',
@@ -42,9 +43,6 @@ CHECKSUMS = {
     'get_clusters_labels_default_threshold_05' : 'cee8925663a74cb41bd759e6291b8e6d',
     'label_mapper_labels_default' : '38fe01a29198ab24055b1faf53d68cc5'
 }
-
-
-RANDOM_STATE = 42
 
 
 # X (features) and y (target).
