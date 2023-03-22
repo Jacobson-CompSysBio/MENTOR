@@ -53,27 +53,6 @@ def test_entrypoint():
     exit_status = os.system('functional_partitioning --version')
     assert exit_status == 0
 
-# Test data sets.
-
-# def test_make_features(random_state=RANDOM_STATE):
-#     X, y = datasets.make_features()
-#     assert joblib.hash(X) == CHECKSUMS['features']
-
-
-# def test_make_scores_matrix(random_state=RANDOM_STATE):
-#     scores_matrix = datasets.make_scores_matrix()
-#     assert joblib.hash(scores_matrix) == CHECKSUMS['scores_matrix']
-
-
-# def test_make_ranks_matrix(random_state=RANDOM_STATE):
-#     ranks_matrix = datasets.make_ranks_matrix()
-#     assert joblib.hash(ranks_matrix) == CHECKSUMS['ranks_matrix']
-
-
-# def test_make_fullranks_table(random_state=RANDOM_STATE):
-#     fullranks = datasets.make_fullranks_table()
-#     assert joblib.hash(fullranks) == CHECKSUMS['fullranks']
-
 
 # Test linkage matrices. The linkage matrices returned from
 # `scipy.hierarchy.linkage` and `HierarchicalClustering` should be the same.
