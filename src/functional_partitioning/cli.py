@@ -208,7 +208,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--init-test-fullranks',
         action='store',
-        help='Create fullranks file for testing at the given path.'
+        help='Create fullranks file for testing at the given path. Use with --no-partition to dump the fullranks file and exit cleanly.'
     )
     parser.add_argument(
         '--verbose', '-v',
