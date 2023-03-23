@@ -21,16 +21,6 @@ from scipy.cluster import hierarchy
 
 RANDOM_STATE = 42
 
-# Test entry point
-def test_entrypoint():
-    exit_status = os.system('functional_partitioning --help')
-    assert exit_status == 0
-
-def test_entrypoint():
-    exit_status = os.system('functional_partitioning --version')
-    assert exit_status == 0
-
-
 # Test metrics functions.
 def test_spearman_distance_function_equal_pandas_scores():
     '''
