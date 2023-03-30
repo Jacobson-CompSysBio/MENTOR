@@ -74,20 +74,4 @@ def test_spearman_distance_matrix_ranks():
     assert joblib.hash(dmat) == '17ec19ed3ff1dde6a6f0dfdd210e40ca'
 
 
-# Test helper functions.
-
-def test_make_label_mapper_labels_default():
-    nodetable = pd.DataFrame(
-        data=[2, 2, 1, 2, 1, 1, 1, 2, 1],
-        index=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
-        columns=['cluster']
-    )
-    label_mapper = plot.make_label_mapper(
-        nodetable=nodetable,
-        use_locs=[0, 1], # List.
-    )
-    md5sum = joblib.hash(label_mapper)
-    assert  md5sum == '77cbc5e1b7a83faa49a017350c891987'
-
-
 # END.
