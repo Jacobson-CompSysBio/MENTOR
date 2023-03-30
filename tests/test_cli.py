@@ -51,18 +51,18 @@ def test_init_fullranks_exists():
     os.system(f'functional_partitioning --init-test-fullranks {path_to_fullranks} --no-partition')
     assert path_to_fullranks.exists()
 
-class TestInitFullranks(unittest.TestCase):
-    '''Basic example of how to use setUpClass and tearDownClass'''
-    @classmethod
-    def setUpClass(cls):
-        cls._path_to_fullranks = _initialize_test_fullranks()
-
-    @classmethod
-    def tearDownClass(cls):
-        os.remove(cls._path_to_fullranks)
-
-    def test_foo(self):
-        assert os.path.exists(self._path_to_fullranks)
+# class TestInitFullranks(unittest.TestCase):
+#     '''Basic example of how to use setUpClass and tearDownClass'''
+#     @classmethod
+#     def setUpClass(cls):
+#         cls._path_to_fullranks = _initialize_test_fullranks()
+# 
+#     @classmethod
+#     def tearDownClass(cls):
+#         os.remove(cls._path_to_fullranks)
+# 
+#     def test_foo(self):
+#         assert os.path.exists(self._path_to_fullranks)
 
 # Test the CLI.
 class TestFunctionalPartitioning(unittest.TestCase):
@@ -99,6 +99,25 @@ class TestFunctionalPartitioning(unittest.TestCase):
 
     def test_plot_exists(self):
         assert (self._outdir / 'distribution-of-pairwise-dissimilarities.png').exists()
+
+
+class TestOutClusters(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._path_to_fullranks = _initialize_test_fullranks()
+        cls._outdir = _initialize_outdir()
+        cls._out_clusters = cls._outdir / 'clusters-foo.tsv'
+        cls._exit_code = os.system(f'functional_partitioning --rwr-fullranks {cls._path_to_fullranks} --outdir {cls._outdir} --out-clusters {cls._out_clusters}')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.remove(cls._path_to_fullranks)
+
+    def test_exit_code(self):
+        assert self._exit_code == 0
+
+    def test_clusters_exists(self):
+        assert self._out_clusters.exists()
 
 
 # END.
