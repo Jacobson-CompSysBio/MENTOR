@@ -53,13 +53,13 @@ def make_label_mapper(nodetable=None, use_names=False, use_locs=False, sep=' | '
     # Move the index to a column, preserving the 'name' of the index.
     # nodetable.insert(0, '__index__', nodetable.index)
     idx = nodetable.index
-    nodetable = nodetable.reset_index()
+    nodetable = nodetable.reset_index(col_level=0)
     nodetable.index = idx
 
     columns = nodetable.columns.to_list()
     if use_locs:
         col_names = [columns[i] for i in use_locs]
-    elif use_cols:
+    elif use_names:
         col_names = use_names
     label_mapper = nodetable[col_names].agg(join, axis=1).to_dict()
 
