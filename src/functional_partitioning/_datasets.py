@@ -7,6 +7,20 @@ import joblib
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
+
+def make_nodetable():
+    _index = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    _labels = [2, 2, 1, 2, 1, 1, 1, 2, 1]
+    _genenames = ['GENE_AAA', 'GENE_BBB', 'GENE_CCC', 'GENE_DDD', 'GENE_EEE', 'GENE_FFF', 'GENE_GGG', 'GENE_HHH', 'GENE_III']
+    _columns = ['label', 'genename']
+    nodetable = pd.DataFrame(
+        data=zip(_labels, _genenames),
+        index=_index,
+        columns=[_columns]
+    )
+    return nodetable
+
+
 def make_features(**kwargs):
     scaler = preprocessing.MinMaxScaler(feature_range=(0.01, 0.99))
     X, y = datasets.make_blobs(
