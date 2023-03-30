@@ -125,6 +125,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--out-dendrogram', '-d',
         action='store',
+        type=pathlib.Path,
         help='Save dendrogram to path.'
     )
     parser.add_argument(
@@ -136,6 +137,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--out-clusters', '-c',
         action='store',
+        type=pathlib.Path,
         help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
     )
     parser.add_argument(
