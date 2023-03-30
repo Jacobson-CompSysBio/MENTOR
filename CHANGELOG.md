@@ -16,7 +16,12 @@
 <!-- ## Added -->
 <!-- ## Changed -->
 <!-- ## Deprecated -->
-<!-- ## Fixed -->
+
+## Fixed
+
+- Import pandas in plot module
+- Use type `pathlib.Path` for `--out-{dendrogram,clusters}`
+
 <!-- ## Removed -->
 <!-- ## Security -->
 
