@@ -13,7 +13,10 @@
 
 <!-- # [<version>] - <date> -->
 <!-- [<version>]: https://github.com/izaakm/jail-functional-partitioning/releases/tag/v<version> -->
-<!-- ## Added -->
+## Added
+
+- Tests for plot module
+
 <!-- ## Changed -->
 <!-- ## Deprecated -->
 
@@ -21,6 +24,7 @@
 
 - Import pandas in plot module
 - Use type `pathlib.Path` for `--out-{dendrogram,clusters}`
+- Parameter `use_names` in `make_label_mapper`
 
 <!-- ## Removed -->
 <!-- ## Security -->
