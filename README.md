@@ -42,7 +42,7 @@ $ make
 Verify the installation:
 
 ```sh
-$ functional_partitiong --help
+$ functional_partitioning --help
 ```
 
 
@@ -167,7 +167,7 @@ functional_partitioning \
     --outdir <path to output directory>
 ```
 
-The default cut method is to use `dynamicTreeCut`, explicitely:
+The default cut method is to use `dynamicTreeCut`, explicitly:
 
 ```sh
 functional_partitioning \
