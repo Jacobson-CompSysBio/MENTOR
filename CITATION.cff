@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: >-
+  Functional Partitioning: A Software Package for RWR-based
+  Gene Cluster Identification
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - family-names: Miller
+    given-names: J. Izaak
+    orcid: 'https://orcid.org/0000-0000-0000-0000'
+  - family-names: Sullivan
+    given-names: Kyle
+  - family-names: McDevitt
+    given-names: Mikaela Cashman
+  - family-names: Lane
+    given-names: Matt
+  - family-names: Kainer
+    given-names: David
+  - family-names: Jones
+    given-names: Piet
+  - family-names: Lagergren
+    given-names: John
+  - family-names: Merlet
+    given-names: Jean
+  - family-names: O'Brien
+    given-names: Chris
+  - family-names: Pavicic
+    given-names: Mirko
+  - family-names: Jacobson
+    given-names: Daniel
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.8077553
+repository-code: 'https://github.com/izaakm/jail-functional-partitioning'
+license: MIT
+version: 0.6.3
+date-released: '2023-06-24'
