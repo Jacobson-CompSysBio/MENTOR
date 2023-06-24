@@ -1,6 +1,10 @@
 % Functional Partitioning
 % J. Izaak Miller
 
+<!-- BADGES {{{ -->
+[![DOI](https://zenodo.org/badge/526587672.svg)](https://zenodo.org/badge/latestdoi/526587672)
+<!-- BADGES }}} -->
+
 Functional Partitioning: A Software Package for RWR-based Gene Cluster Identification
 =======================
 
