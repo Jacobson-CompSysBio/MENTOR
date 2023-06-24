@@ -1,7 +1,7 @@
 % Functional Partitioning
 % J. Izaak Miller
 
-Functional Partitioning
+Functional Partitioning: A Software Package for RWR-based Gene Cluster Identification
 =======================
 
 - Integrate multi-omics data using multiplex networks.
