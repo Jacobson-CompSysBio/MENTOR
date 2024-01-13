@@ -479,7 +479,7 @@ def main():
                 no_plot=args.no_plot
             )
     elif args.fancy_dendrogram:
-	print('running fancy dendrogram')
+        print('running fancy dendrogram')
     else:
         # Exit.
         pass
