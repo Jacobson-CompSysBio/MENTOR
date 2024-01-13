@@ -60,7 +60,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--partition', '-p',
         action='store_true',
-        default=True,
+        default=False,
         help='Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
     )
     parser.add_argument(
