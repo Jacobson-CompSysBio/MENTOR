@@ -224,6 +224,12 @@ def parse_args(test=None):
         default=False,
         help='Print version and exit.'
     )
+    parser.add_argument(
+        '--fancy-dendrogram',
+        action='store_true',
+        default=False,
+        help='Plot a fancy dendrogram.'
+    )
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -472,6 +478,8 @@ def main():
                 out_path=out_dendrogram,
                 no_plot=args.no_plot
             )
+    elif args.fancy_dendrogram:
+	print('running fancy dendrogram')
     else:
         # Exit.
         pass
