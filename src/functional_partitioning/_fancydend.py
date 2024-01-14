@@ -38,7 +38,8 @@ def fancy_dendrogram(
     if map is not None:
         command += f' --map={map}'
     if outdir is not None:
-        command += f' --outdir={outdir}/' # fix this later in either mine or izaaks code
+        command += f' --outdir={outdir}' # fix this later in either mine or izaaks code
+        command = command + '/'
     if subcluster is True:
         command += f' --subcluster'
     if increment is not None:
