@@ -5,7 +5,6 @@ import logging
 
 from scipy import stats
 from scipy.spatial import distance
-# from sklearn.metrics import *
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import calinski_harabasz_score
 from sklearn.metrics import pairwise_distances
@@ -38,15 +37,6 @@ def spearman_d(U, v=None, to_numpy=True):
         samples). If `U` is 1-D and `v` is not none, return the Spearman
         distance (float).
     '''
-    # The alternate method to calculate Spearman distances is to apply the
-    # `_spearman_distance` function to all rows of the array/dataframe like
-    # this:
-    # >>> dvec = [_spearman_distance(u, v) for u,v in itertools.combinations(U, 2)]
-    # >>> dmat = distance.squareform(dvec)
-    # This^ is 1-2 orders of magnitude slower than the built-in `.corr` method
-    # in pandas. Therefore, if `U` is an array, convert it to a dataframe, and
-    # use the `.corr` method. Not sure at what point the performance trade off
-    # for converting data type might become a bottleneck.
     if v is None:
         if isinstance(U, np.ndarray):
             U = pd.DataFrame(U)
@@ -56,7 +46,6 @@ def spearman_d(U, v=None, to_numpy=True):
         else:
             return 1 - U.T.corr(method='spearman')
     else:
-        # Assume both `U` and `v` are 1D.
         return _spearman_distance(U, v)
 
 
@@ -85,7 +74,6 @@ def _root_mean_squared_error_at_c(y_true, c, **kwargs):
     Lc = y_true[l_start:l_stop]
     Rc = y_true[r_start:r_stop]
     LOGGER.debug(rf'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
-    # RMSE at c is the sum of RMSE to the left and RMSE to the right.
     rmse_c = (
         ( (c-1)/(b-1) ) * _root_mean_squared_error(Lc, **kwargs)
     ) + (
@@ -132,7 +120,6 @@ def get_elbow(Y, min_size=3, **kwargs):
         LOGGER.debug(f'rmse_at_c: {rmse_at_c}')
         rmse_over_c.append(rmse_at_c)
 
-    # Adjust index by min_size.
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
     return idx_of_elbow
 
@@ -140,9 +127,6 @@ def get_elbow(Y, min_size=3, **kwargs):
 def calc_chi(X_true, clusters):
     if isinstance(clusters, (pd.DataFrame, pd.Series)):
         clusters = clusters.to_numpy()
-    # CHI is only valid for clusterings with n-clusters between 2 and n samples-1.
-    # Filling with NaN is more accurate, but plotting the values is misleading if the user
-    # is unaware that the missing values are not plotted.
     n_samples = X_true.shape[0]
     n_cuts = clusters.shape[-1]
     chi_scores = []
@@ -151,11 +135,9 @@ def calc_chi(X_true, clusters):
         n_clusters = len(set(labels_pred))
         if n_clusters < 2:
             chi_scores.append(np.nan)
-            # chi_scores.append(0)
             continue
         elif n_clusters > (n_samples - 1):
             chi_scores.append(np.nan)
-            # chi_scores.append(0)
             continue
         chi = calinski_harabasz_score(X_true, labels_pred)
 
@@ -189,8 +171,6 @@ def summarize_pairwise_dissimilarities(dissimilarities, labels):
     -------
     summary : dict
     '''
-    # [TODO] Verify the length dissimilarities matches the number of pairs of
-    # labels (n choose k).
     if dissimilarities.ndim > 1:
         raise ValueError(f'dissimilarities must be 1-D, you gave {dissimilarities.shape}')
 
@@ -246,6 +226,3 @@ def get_scores_vs_ranks_curve(scores, ranks=None):
         stacked_ranks = ranks.stack()
     mean_score_vs_rank = stacked_scores.groupby(stacked_ranks).mean()
     return mean_score_vs_rank
-
-
-# END
