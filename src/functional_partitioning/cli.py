@@ -32,7 +32,7 @@ from functional_partitioning import _cluster as cluster
 from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 from functional_partitioning import _plot as plot
-
+from functional_partitioning impot _fancydend as fd
 
 LOGGER = logging.getLogger(__name__)
 
@@ -229,6 +229,78 @@ def parse_args(test=None):
         action='store_true',
         default=False,
         help='Plot a fancy dendrogram.'
+    )
+    parser.add_argument(
+        '--distances',
+        action='store',
+        help='Full path to the distance matrix file'
+    )
+    parser.add_argument(
+        '--clusters',
+        action='store',
+        default=3,
+        type=int,
+        help='Number of initial clusters desired in dendrogram'
+    )
+    parser.add_argument(
+        '--map',
+        action='store',
+        help='Full path to the gene symbol mapping file'
+    )
+    parser.add_argument(
+        '--subcluster',
+        action='store_true',
+        default=False,
+        help='Specify if you want to subcluster dendrogram'
+    )
+    parser.add_argument(
+        '--increment',
+        action='store',
+        default = 5,
+        type=int,
+        help='Increment to use in subclustering'
+    )
+    parser.add_argument(
+        '--maxsize',
+        action='store',
+        default = 40,
+        type=int,
+        help='Maximum size for clades if subclustering'
+    )
+    parser.add_argument(
+        '--export',
+        action='store_true',
+        default=False,
+        help='Export the plot'
+    )
+    parser.add_argument(
+        '--heatmaps',
+        action='store',
+        help='Full path to the heatmap file if you want to include a heatmap'
+    )
+    parser.add_argument(
+        '--pcutoff',
+        action='store',
+        type=float,
+        help='Adjusted p-value cutoff to use if p-values present in the heatmap table'
+    )
+    parser.add_argument(
+        '--squish',
+        action='store',
+        help='If continuous columns in heatmap present squish the upper and lower bounds of color scheme to lower_bound,upper_bound'
+    )
+    parser.add_argument(
+        '--relwidths',
+        action='store',
+        default='1,1',
+        help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width'
+    )
+    parser.add_argument(
+        '--plotwidth',
+        action='store',
+        default=30,
+        type=int,
+        help='Width of the dendrogram/heatmap visualization'
     )
 
     if len(sys.argv)==1:
@@ -478,8 +550,27 @@ def main():
                 out_path=out_dendrogram,
                 no_plot=args.no_plot
             )
+    
     elif args.fancy_dendrogram:
+        
+        # run fancy dendrogram
         print('running fancy dendrogram')
+        fd.fancy_dendrogram(
+            distances = args.distances,
+            clusters = args.clusters,
+            map = args.map,
+            outdir = args.outdir,
+            subcluster = args.subcluster,
+            increment = args.increment,
+            maxsize = args.maxsize,
+            export = args.export,
+            heatmaps = args.heatmaps,
+            pcutoff = args.pcutoff,
+            squish = args.squish,
+            relwidths = args.relwidths,
+            plotwidth = args.plotwidth,
+        ) 
+            
     else:
         # Exit.
         pass
