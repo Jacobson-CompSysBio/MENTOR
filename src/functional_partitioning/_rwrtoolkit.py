@@ -47,8 +47,8 @@ def _activate_env(
     -------
     str
     '''
-    path_to_conda_env = os.path.expanduser(path_to_conda_env)  # Tilde expansion.
-    path_to_conda_env = os.path.realpath(path_to_conda_env)    # Resolve symlinks.
+    path_to_conda_env = os.path.expanduser(path_to_conda_env)
+    path_to_conda_env = os.path.realpath(path_to_conda_env)
 
     command = (
         'set +eu && '
@@ -78,7 +78,7 @@ def rwr_singletons(
     threads=None,
     verbose=None
 ):
-    # {{{
+
     '''
     Return the command to run RWR-singletons.
 
@@ -138,16 +138,14 @@ def rwr_singletons(
     tau : list
         List of values will be converted to string for RWR_KFOLD.R
     '''
-    # }}}
+
     if path_to_conda_env is not None:
         command = _activate_env(path_to_conda_env) + ' && Rscript'
     else:
         command = 'Rscript'
 
     if path_to_rwrtoolkit is not None:
-        # Scripts are located at `$PATH_TO_RWRTOOLKIT/inst/scripts/run_*.R`.
         exe = os.path.join(path_to_rwrtoolkit, 'inst', 'scripts', 'run_cv.R')
-        # cmd_list.append(exe)
         command += f' "{exe}"'
 
     if data is not None:
@@ -162,13 +160,10 @@ def rwr_singletons(
         command += f' --restart "{restart}"'
     if tau is not None:
         if isinstance(tau, (int, float)):
-            # It's a single value. This doesn't make sense, actually.
             tau = str(tau)
         elif isinstance(tau, str):
-            # Assume it's like `1,1,1`
             pass
         else:
-            # Assume it's list-like (iterable).
             tau = ','.join(map(str, tau))
         command += f' --tau "{tau}"'
     if numranked is not None:
@@ -176,7 +171,6 @@ def rwr_singletons(
     if modname is not None:
         command += f' --modname "{modname}"'
     if plot is not None:
-        # Flag => store_true.
         command += f' --plot'
     if out_fullranks is not None:
         command += f' --out-fullranks "{out_fullranks}"'
@@ -187,7 +181,6 @@ def rwr_singletons(
     if threads is not None:
         command += f' --threads "{threads}"'
     if verbose is not None:
-        # Flag => store_true.
         command += f' --verbose'
 
     return command
@@ -216,7 +209,6 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
     if isinstance(commands, str):
         command = commands
     else:
-        # Assume it's list-like.
         command = sep.join(commands)
 
     result = dict(
@@ -236,7 +228,6 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
             print('[WARNING] Command exited with non-zero status: {}'.format(res.returncode), file=sys.stderr)
             print(command, file=sys.stderr)
             print(res.stderr.decode(), file=sys.stderr)
-        # Convert result to dict. Decode bytes to str bc bytes are not json serializable.
         result.update(
             stdout=res.stdout.decode(),
             stderr=res.stderr.decode(),
@@ -295,14 +286,11 @@ def fullranks_to_matrix(path_or_dataframe, to='scores', drop_missing=True):
     if isinstance(path_or_dataframe, pd.DataFrame):
         fullranks = path_or_dataframe
     else:
-        # Load the full ranks.
         fullranks = pd.read_table(path_or_dataframe)
 
     if drop_missing:
-        # Drop rows with seeds that were not found in the network.
         fullranks = fullranks.query('seed!="missing"')
 
-    # Pivot fullranks -> scores or ranks matrix.
     if to.lower().startswith('score'):
         mat = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
     elif to.lower().startswith('rank'):
@@ -317,15 +305,12 @@ def transform_fullranks(path_or_dataframe, drop_missing=True, max_rank='elbow'):
     if isinstance(path_or_dataframe, pd.DataFrame):
         fullranks = path_or_dataframe
     else:
-        # Load the full ranks.
         fullranks = pd.read_table(path_or_dataframe)
 
     if drop_missing:
-        # Drop rows with seeds that were not found in the network.
         fullranks = fullranks.query('seed!="missing"')
 
     if max_rank == 'elbow':
-        # Find elbow and set max_rank.
         y = fullranks.groupby('rank')['Score'].mean()
         max_rank = metrics.get_elbow(y)
         LOGGER.info(f'Set max_rank to {max_rank}.')
@@ -337,21 +322,15 @@ def transform_fullranks(path_or_dataframe, drop_missing=True, max_rank='elbow'):
     assert (ranks.index == scores.index).all()
     assert (ranks.columns == scores.columns).all()
 
-    # Filter the rank vectors.
     mask = (ranks <= max_rank).fillna(False)
     col_mask = mask.any()
 
     features = scores.loc[:, col_mask]
 
-    # Re-rank them.
     features = features.rank(axis=1, method='first', ascending=False)
 
     for i in labels:
-        # Fill the seed in each vector as 0; ie, give the seed the best rank.
         if ( i in features.columns.to_list() ) and np.isnan(features.loc[i, i]):
             features.loc[i, i] = 0
 
     return features, labels
-
-
-# END
