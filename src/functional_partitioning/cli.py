@@ -57,12 +57,12 @@ def parse_args(test=None):
         default=False,
         help='Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
     )
-    parser.add_argument(
-        '--no-partition',
-        action='store_false',
-        dest='partition',
-        help='Do not perform functional partitioning.'
-    )
+#    parser.add_argument(
+#        '--no-partition',
+#        action='store_false',
+#        dest='partition',
+#        help='Do not perform functional partitioning.'
+#    )
 #    parser.add_argument(
 #        '--cut-threshold', '-t',
 #        action='store',
@@ -204,7 +204,7 @@ def parse_args(test=None):
 #    parser.add_argument(
 #        '--init-test-fullranks',
 #        action='store',
-#        help='Create fullranks file for testing at the given path. Use with --no-partition to dump the fullranks file and exit cleanly.'
+#        help='Create fullranks file for testing at the given path. Use with -- to dump the fullranks file and exit cleanly.'
 #    )
     parser.add_argument(
         '--verbose', '-v',
@@ -426,21 +426,21 @@ def main():
         )
 
         mod = cluster.HierarchicalClustering(
-            n_clusters=None,
+            #n_clusters=None,
             metric=metrics.spearman_d,
-            cut_method=cut_method,
-            cut_threshold=cut_threshold,
+            #cut_method=cut_method,
+            #cut_threshold=cut_threshold,
             memory=None,
             connectivity=None,
-            compute_full_tree="auto",
+            #compute_full_tree="auto",
             linkage="average",
             compute_distances=False,
-            compute_linkage_matrix=True,
-            compute_dendrogram=True,
+            compute_linkage_matrix=True
+            #compute_dendrogram=True,
         )
         mod.fit(X)
-        clusters = pd.DataFrame(mod.labels_, index=labels)
-        threshold = mod.cut_threshold_
+        #clusters = pd.DataFrame(mod.labels_, index=labels)
+#        threshold = mod.cut_threshold_
 
 #        if out_clusters is not None:
 #            out_clusters.parent.mkdir(parents=False, exist_ok=True)
