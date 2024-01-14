@@ -454,6 +454,23 @@ def main():
                 index=labels,
                 columns=labels
             )
+            # plot dendrogram
+            print('running fancy dendrogram')
+            fd.fancy_dendrogram(
+                distances = args.distances,
+                clusters = args.clusters,
+                map = args.map,
+                outdir = args.outdir,
+                subcluster = args.subcluster,
+                increment = args.increment,
+                maxsize = args.maxsize,
+                export = args.export,
+                heatmaps = args.heatmaps,
+                pcutoff = args.pcutoff,
+                squish = args.squish,
+                relwidths = args.relwidths,
+                plotwidth = args.plotwidth,
+            )
             dmat.to_csv(out_dissimilarity_matrix, sep='\t')
             LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
         else:
@@ -516,8 +533,8 @@ def main():
  #               no_plot=args.no_plot
  #           )
     
-    elif args.fancy_dendrogram:
-        
+#    elif args.fancy_dendrogram:
+    elif args.distances is not None:         
         # run fancy dendrogram
         print('running fancy dendrogram')
         fd.fancy_dendrogram(
