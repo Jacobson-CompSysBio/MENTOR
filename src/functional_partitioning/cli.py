@@ -46,11 +46,11 @@ def parse_args(test=None):
         action='store',
         help='Path to "fullranks" file from `RWR-CV --method=singletons ...`'
     )
-    parser.add_argument(
-        '--nodetable',
-        action='store',
-        help='Path to "nodetable" file. This is a TSV file where the first column is the node name (i.e., the seed genes from RWR-fullranks).'
-    )
+#    parser.add_argument(
+#        '--nodetable',
+#        action='store',
+#        help='Path to "nodetable" file. This is a TSV file where the first column is the node name (i.e., the seed genes from RWR-fullranks).'
+#    )
     parser.add_argument(
         '--partition', '-p',
         action='store_true',
@@ -63,83 +63,83 @@ def parse_args(test=None):
         dest='partition',
         help='Do not perform functional partitioning.'
     )
-    parser.add_argument(
-        '--cut-threshold', '-t',
-        action='store',
-        default=0.3,
-        type=float,
-        help=('Cut the dendrogram at this threshold. Only used if `--cut-method=hard`.')
-    )
-    parser.add_argument(
-        '--cut-method', '-m',
-        action='store',
-        choices=['dynamic', 'hard', 'none'],
-        default='dynamic',
-        help=(f'If `dynamic`, use dynamicTreeCut to determine clusters without a hard threshold. If `none`, return all the clusterings. Otherwise, use with `--cut-threshold` to provide a numeric cut threshold.')
-    )
-    parser.add_argument(
-        '--dendrogram-style', '-s',
-        action='store',
-        choices=['rectangular', 'r', 'polar', 'p', 'none', 'n'],
-        default='rectangular',
-        help='Plot the dendrogram in rectangular or polar coordinates. If "none", then do not plot the dendrogram (this is redundant with --no-plot).'
-    )
-    parser.add_argument(
-        '--labels-use-clusters',
-        action='store_true',
-        default=False,
-        help=''
-    )
-    parser.add_argument(
-        '--labels-use-names',
-        action='store',
-        nargs='*',
-        type=str,
-        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of column names from the nodetable. Pass columns as strings (column names).'
-    )
-    parser.add_argument(
-        '--labels-use-locs',
-        action='store',
-        nargs='*',
-        type=int,
-        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of integers indicating columns from the nodetable (0-index, e.g., the first column, which contains the node names, has index 0; the second column has index 1, etc).'
-    )
-    parser.add_argument(
-        '--labels-sep',
-        action='store',
-        default=' | ',
-        help='The separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
-    )
+#    parser.add_argument(
+#        '--cut-threshold', '-t',
+#        action='store',
+#        default=0.3,
+#        type=float,
+#        help=('Cut the dendrogram at this threshold. Only used if `--cut-method=hard`.')
+#    )
+#    parser.add_argument(
+#        '--cut-method', '-m',
+#        action='store',
+#        choices=['dynamic', 'hard', 'none'],
+#        default='dynamic',
+#        help=(f'If `dynamic`, use dynamicTreeCut to determine clusters without a hard threshold. If `none`, return all the clusterings. Otherwise, use with `--cut-threshold` to provide a numeric cut threshold.')
+#    )
+#    parser.add_argument(
+#        '--dendrogram-style', '-s',
+#        action='store',
+#        choices=['rectangular', 'r', 'polar', 'p', 'none', 'n'],
+#        default='rectangular',
+#        help='Plot the dendrogram in rectangular or polar coordinates. If "none", then do not plot the dendrogram (this is redundant with --no-plot).'
+#    )
+#    parser.add_argument(
+#        '--labels-use-clusters',
+#        action='store_true',
+#        default=False,
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--labels-use-names',
+#        action='store',
+#        nargs='*',
+#        type=str,
+#        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of column names from the nodetable. Pass columns as strings (column names).'
+#    )
+#    parser.add_argument(
+#        '--labels-use-locs',
+#        action='store',
+#        nargs='*',
+#        type=int,
+#        help='Label the dendrogram using columns from the nodetable. This is a space-separated list of integers indicating columns from the nodetable (0-index, e.g., the first column, which contains the node names, has index 0; the second column has index 1, etc).'
+#    )
+#    parser.add_argument(
+#        '--labels-sep',
+#        action='store',
+#        default=' | ',
+#        help='The separator that will be used if multiple columns from nodetable are used to label the dendrogram.'
+#    )
     parser.add_argument(
         '--outdir',
         action='store',
         type=pathlib.Path,
         help='Save dendrogram and clusters to path.'
     )
-    parser.add_argument(
-        '--out-dendrogram', '-d',
-        action='store',
-        type=pathlib.Path,
-        help='Save dendrogram to path.'
-    )
-    parser.add_argument(
-        '--no-plot',
-        action='store_true',
-        default=False,
-        help='Do not plot the dendrogram.'
-    )
-    parser.add_argument(
-        '--out-clusters', '-c',
-        action='store',
-        type=pathlib.Path,
-        help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
-    )
-    parser.add_argument(
-        '--no-clusters',
-        action='store_true',
-        default=False,
-        help='Do not export clusters to file.'
-    )
+#    parser.add_argument(
+#        '--out-dendrogram', '-d',
+#        action='store',
+#        type=pathlib.Path,
+#        help='Save dendrogram to path.'
+#    )
+#    parser.add_argument(
+#        '--no-plot',
+#        action='store_true',
+#        default=False,
+#        help='Do not plot the dendrogram.'
+#    )
+#    parser.add_argument(
+#        '--out-clusters', '-c',
+#        action='store',
+#        type=pathlib.Path,
+#        help='Save clusters to path as tsv file with columns "label", "cluster". When --threshold is 0 (the default) each gene is put into a separate cluster (i.e., every cluster has only a single gene).'
+#    )
+#    parser.add_argument(
+#        '--no-clusters',
+#        action='store_true',
+#        default=False,
+#        help='Do not export clusters to file.'
+#    )
     parser.add_argument(
         '--path-to-conda-env',
         action='store',
@@ -191,21 +191,21 @@ def parse_args(test=None):
         action='store',
         help=''
     )
-    parser.add_argument(
-        '--plot',
-        action='store',
-        help=''
-    )
+#    parser.add_argument(
+#        '--plot',
+#        action='store',
+#        help=''
+#    )
     parser.add_argument(
         '--threads',
         action='store',
         help=''
     )
-    parser.add_argument(
-        '--init-test-fullranks',
-        action='store',
-        help='Create fullranks file for testing at the given path. Use with --no-partition to dump the fullranks file and exit cleanly.'
-    )
+#    parser.add_argument(
+#        '--init-test-fullranks',
+#        action='store',
+#        help='Create fullranks file for testing at the given path. Use with --no-partition to dump the fullranks file and exit cleanly.'
+#    )
     parser.add_argument(
         '--verbose', '-v',
         action='count',
@@ -328,55 +328,57 @@ def main():
 
     LOGGER.debug(args)
 
-    if args.init_test_fullranks:
-        from functional_partitioning import _datasets as datasets
-        fullranks = datasets.make_fullranks_table()
-        fullranks.to_csv(args.init_test_fullranks, sep='\t', index=False)
+#    if args.init_test_fullranks:
+#        from functional_partitioning import _datasets as datasets
+#        fullranks = datasets.make_fullranks_table()
+#        fullranks.to_csv(args.init_test_fullranks, sep='\t', index=False)
 
-    if args.no_clusters:
-        out_clusters = None
-        out_dissimilarity_matrix = None
-        out_dissimilarity_stats = None
-    elif args.out_clusters is not None:
-        out_clusters = args.out_clusters
-        out_dissimilarity_matrix = args.out_clusters.with_name('dissimilarity-matrix.tsv')
-        out_dissimilarity_stats = args.out_clusters.with_name('dissimilarity-stats.tsv')
-    elif args.outdir is not None:
-        out_clusters = args.outdir / 'clusters.tsv'
+#    if args.no_clusters:
+#        out_clusters = None
+#        out_dissimilarity_matrix = None
+#        out_dissimilarity_stats = None
+#    elif args.out_clusters is not None:
+#        out_clusters = args.out_clusters
+#        out_dissimilarity_matrix = args.out_clusters.with_name('dissimilarity-matrix.tsv')
+#        out_dissimilarity_stats = args.out_clusters.with_name('dissimilarity-stats.tsv')
+#    elif args.outdir is not None:
+#        out_clusters = args.outdir / 'clusters.tsv'
+    if args.outdir is not None:
         out_dissimilarity_matrix = args.outdir / 'dissimilarity-matrix.tsv'
         out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
     else:
-        out_clusters = None
+#        out_clusters = None
+        out_dendrogram = None
         out_dissimilarity_matrix = None
         out_dissimilarity_stats = None
 
-    if args.no_plot:
-        out_dendrogram = None
-        out_dissimilarity_distribution = None
-    elif args.out_dendrogram is not None:
-        out_dendrogram = args.out_dendrogram
-        out_dissimilarity_distribution = args.out_dendrogram.with_name('distribution-of-pairwise-dissimilarities.png')
-    elif args.outdir is not None:
-        out_dendrogram = args.outdir / 'dendrogram.png'
-        out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
-    else:
-        out_dendrogram = None
-        out_dissimilarity_distribution = None
+#    if args.no_plot:
+#        out_dendrogram = None
+#        out_dissimilarity_distribution = None
+#    elif args.out_dendrogram is not None:
+#        out_dendrogram = args.out_dendrogram
+#        out_dissimilarity_distribution = args.out_dendrogram.with_name('distribution-of-pairwise-dissimilarities.png')
+#    elif args.outdir is not None:
+#        out_dendrogram = args.outdir / 'dendrogram.png'
+#        out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
+#    else:
+#        out_dendrogram = None
+#        out_dissimilarity_distribution = None
 
-    if out_dendrogram is not None and args.dendrogram_style.startswith(('r', 'p')):
-        dendrogram_style = args.dendrogram_style
-    else:
-        dendrogram_style = None
+#    if out_dendrogram is not None and args.dendrogram_style.startswith(('r', 'p')):
+#        dendrogram_style = args.dendrogram_style
+#    else:
+#        dendrogram_style = None
 
-    if args.cut_method == 'dynamic':
-        cut_method = 'cutreeHybrid'
-        cut_threshold = args.cut_threshold
-    elif args.cut_method == 'none':
-        cut_method = None
-        cut_threshold = None
-    else:
-        cut_method = args.cut_method
-        cut_threshold = args.cut_threshold
+#    if args.cut_method == 'dynamic':
+#        cut_method = 'cutreeHybrid'
+#        cut_threshold = args.cut_threshold
+#    elif args.cut_method == 'none':
+#        cut_method = None
+#        cut_threshold = None
+#    else:
+#        cut_method = args.cut_method
+#        cut_threshold = args.cut_threshold
 
     if args.multiplex and args.geneset:
         # run rwr singletons
@@ -440,10 +442,10 @@ def main():
         clusters = pd.DataFrame(mod.labels_, index=labels)
         threshold = mod.cut_threshold_
 
-        if out_clusters is not None:
-            out_clusters.parent.mkdir(parents=False, exist_ok=True)
-            clusters.to_csv(out_clusters, sep='\t')
-            LOGGER.info(f'Clusters saved to {out_clusters}')
+#        if out_clusters is not None:
+#            out_clusters.parent.mkdir(parents=False, exist_ok=True)
+#            clusters.to_csv(out_clusters, sep='\t')
+#            LOGGER.info(f'Clusters saved to {out_clusters}')
 
         if out_dissimilarity_matrix is not None:
             out_dissimilarity_matrix.parent.mkdir(parents=False, exist_ok=True)
@@ -485,34 +487,34 @@ def main():
                 out_path=out_dissimilarity_distribution
             )
 
-        if out_dendrogram is not None:
-            out_dendrogram.parent.mkdir(parents=False, exist_ok=True)
-            if args.labels_use_clusters:
-                label_mapper = plot.make_label_mapper(
-                    nodetable=clusters,
-                    use_locs=[0, 1],
-                    sep=args.labels_sep
-                )
-                labels = [label_mapper.get(l, l) for l in labels]
-            elif args.labels_use_names or args.labels_use_locs:
-                label_mapper = plot.make_label_mapper(
-                    nodetable=args.nodetable,
-                    use_names=args.labels_use_names,
-                    use_locs=args.labels_use_locs,
-                    sep=args.labels_sep
-                )
-                labels = [label_mapper.get(l, l) for l in labels]
-            else:
-                pass
+#        if out_dendrogram is not None:
+#            out_dendrogram.parent.mkdir(parents=False, exist_ok=True)
+#            if args.labels_use_clusters:
+#                label_mapper = plot.make_label_mapper(
+#                    nodetable=clusters,
+#                    use_locs=[0, 1],
+#                    sep=args.labels_sep
+#                )
+#                labels = [label_mapper.get(l, l) for l in labels]
+#            elif args.labels_use_names or args.labels_use_locs:
+#                label_mapper = plot.make_label_mapper(
+#                    nodetable=args.nodetable,
+#                    use_names=args.labels_use_names,
+#                    use_locs=args.labels_use_locs,
+#                    sep=args.labels_sep
+#                )
+#                labels = [label_mapper.get(l, l) for l in labels]
+#            else:
+#                pass
 
-            tree = plot.draw_dendrogram(
-                dendrogram_style=dendrogram_style,
-                linkage_matrix=mod.linkage_matrix,
-                labels=labels,
-                threshold=threshold,
-                out_path=out_dendrogram,
-                no_plot=args.no_plot
-            )
+ #           tree = plot.draw_dendrogram(
+ #               dendrogram_style=dendrogram_style,
+ #               linkage_matrix=mod.linkage_matrix,
+ #               labels=labels,
+ #               threshold=threshold,
+ #               out_path=out_dendrogram,
+ #               no_plot=args.no_plot
+ #           )
     
     elif args.fancy_dendrogram:
         
