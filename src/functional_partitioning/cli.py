@@ -457,7 +457,7 @@ def main():
             # plot dendrogram
             print('running fancy dendrogram')
             fd.fancy_dendrogram(
-                distances = args.distances,
+                distances = out_dissimilarity_matrix,
                 clusters = args.clusters,
                 map = args.map,
                 outdir = args.outdir,
