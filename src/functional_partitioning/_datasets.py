@@ -3,7 +3,6 @@ import numpy as np
 import string
 import joblib
 
-# from sklearn.datasets import make_blobs
 from sklearn import datasets, preprocessing
 from matplotlib import pyplot
 
@@ -29,12 +28,9 @@ def make_features(**kwargs):
         centers=kwargs.get('centers', 2),
         random_state=kwargs.get('random_state', 42),
     )
-    # print(X.min(), X.max())
     X = scaler.fit_transform(X)
-    # print(X.min(), X.max())
     for i in range(X.shape[0]):
         X[i, i] = np.nan
-    # print(X.min(), X.max())
     X.shape
     return X, y
 
@@ -58,4 +54,3 @@ def make_fullranks_table(**kwargs):
         right_index=True
     ).reset_index().rename(columns={'level_0': 'seed', 'level_1': 'NodeNames'}).dropna(how='any')
     return fullranks
-
