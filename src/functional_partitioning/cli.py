@@ -348,7 +348,7 @@ def main():
         out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
     else:
 #        out_clusters = None
-        out_dendrogram = None
+#        out_dendrogram = None
         out_dissimilarity_matrix = None
         out_dissimilarity_stats = None
 
