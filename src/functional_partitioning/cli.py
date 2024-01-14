@@ -32,7 +32,7 @@ from functional_partitioning import _cluster as cluster
 from functional_partitioning import _metrics as metrics
 from functional_partitioning import _rwrtoolkit as rwrtoolkit
 from functional_partitioning import _plot as plot
-from functional_partitioning impot _fancydend as fd
+from functional_partitioning import _fancydend as fd
 
 LOGGER = logging.getLogger(__name__)
 
