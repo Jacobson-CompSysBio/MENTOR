@@ -10,6 +10,14 @@ dependencies:
   - pandas
   - pip
   - python
+  - r-base=4.1
+  - r-tidyverse
+  - r-cowplot
+  - r-dendextend
+  - r-rcolorbrewer
+  - r-optparse
+  - r-ggnewscale
+  - r-latex2exp
   - scikit-learn>=1.2
   - scipy
   - seaborn
