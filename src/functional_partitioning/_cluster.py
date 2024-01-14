@@ -258,54 +258,54 @@ class HierarchicalClustering(AgglomerativeClustering):
 ########################################################################
 
 
-def cluster_hierarchical(X, corr_method='spearman', linkage_method='average'):
-    if not isinstance(X, pd.DataFrame):
-        X = pd.DataFrame(X)
-    dmat = 1 - X.T.corr(method=corr_method)
-    dvec = distance.squareform(dmat)
-    Z = hierarchy.linkage(dvec, method=linkage_method)
-    return Z
+#def cluster_hierarchical(X, corr_method='spearman', linkage_method='average'):
+#    if not isinstance(X, pd.DataFrame):
+#        X = pd.DataFrame(X)
+#    dmat = 1 - X.T.corr(method=corr_method)
+#    dvec = distance.squareform(dmat)
+#    Z = hierarchy.linkage(dvec, method=linkage_method)
+#    return Z
 
 
-def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leaves=None, out_path=None):
-    '''
-    Get clusters from linkage matrix `Z` at given threshold.
-
-    Parameters
-    ----------
-    Z : linkage matrix
-    labels : list
-    threshold : int, float
-    match_to_leave : None, list
-        List of ints to order the rows. Use `tree['leaves']` to visually match
-        the list of cluster labels to the leaves of the dendrogram.  See
-        example below.
-
-    Examples
-    --------
-    Z, labels = cluster_hierarchical(fullranks)
-    tree = plot_dendrogram(Z, labels)
-
-    # Genes are ordered in same order as `labels`:
-    clusters = get_clusters(Z, labels, threshold=t)
-
-    # Genes are ordered the same as `tree['leaves']`:
-    clusters = get_clusters(Z, labels, threshold=t, match_to_leaves=tree['leaves'])
-    '''
-    if not threshold and not n_clusters:
-        clusters = hierarchy.cut_tree(Z, n_clusters=None, height=None)
-    else:
-        clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold).flatten()
-    clusters = pd.DataFrame(clusters, index=labels)
-    clusters.index.name = 'node_label'
-
-    if match_to_leaves is not None:
-        clusters = clusters.iloc[match_to_leaves[::-1]]
-
-    if out_path is not None:
-        clusters.to_csv(out_path, sep='\t')
-        LOGGER.info(f'Saved clusters: {out_path}')
-
-    return clusters
+#def get_clusters(Z, labels=None, threshold=None, n_clusters=None, match_to_leaves=None, out_path=None):
+#    '''
+#    Get clusters from linkage matrix `Z` at given threshold.
+#
+#    Parameters
+#    ----------
+#    Z : linkage matrix
+#    labels : list
+#    threshold : int, float
+#    match_to_leave : None, list
+#        List of ints to order the rows. Use `tree['leaves']` to visually match
+#        the list of cluster labels to the leaves of the dendrogram.  See
+#        example below.
+#
+#    Examples
+#    --------
+#    Z, labels = cluster_hierarchical(fullranks)
+#    tree = plot_dendrogram(Z, labels)
+#
+#    # Genes are ordered in same order as `labels`:
+#    clusters = get_clusters(Z, labels, threshold=t)
+#
+#    # Genes are ordered the same as `tree['leaves']`:
+#    clusters = get_clusters(Z, labels, threshold=t, match_to_leaves=tree['leaves'])
+#    '''
+#    if not threshold and not n_clusters:
+#        clusters = hierarchy.cut_tree(Z, n_clusters=None, height=None)
+#    else:
+#        clusters = hierarchy.cut_tree(Z, n_clusters=n_clusters, height=threshold).flatten()
+#    clusters = pd.DataFrame(clusters, index=labels)
+#    clusters.index.name = 'node_label'
+#
+#    if match_to_leaves is not None:
+#        clusters = clusters.iloc[match_to_leaves[::-1]]
+#
+#    if out_path is not None:
+#        clusters.to_csv(out_path, sep='\t')
+#        LOGGER.info(f'Saved clusters: {out_path}')
+#
+#    return clusters
 
 ########################################################################
