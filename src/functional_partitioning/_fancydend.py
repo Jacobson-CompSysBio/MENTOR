@@ -32,28 +32,29 @@ def fancy_dendrogram(
 
     command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/fp_create_dendogram.R'
     if distances is not None:
-        command += f' --distances "{distances}"'
+        command += f' --distances={distances}'
     if clusters is not None:
-        command += f' --clusters "{clusters}"'
+        command += f' --clusters={clusters}'
     if map is not None:
-        command += f' --map "{map}"'
+        command += f' --map={map}'
     if outdir is not None:
-        command += f' --outdir "{outdir}"'
-    if subcluster is not None:
-        command += f' --subcluster "{subcluster}"'
+        command += f' --outdir={outdir}'
+    if subcluster is True:
+        command += f' --subcluster'
     if increment is not None:
-        command += f' --increment "{increment}"'
+        command += f' --increment={increment}'
     if maxsize is not None:
-        command += f' --maxsize "{maxsize}"'
-    if export is not None:
-        command += f' --export "{export}"'
+        command += f' --maxsize={maxsize}'
+    if export is True:
+        command += f' --export'
     if heatmaps is not None:
-        command += f' --heatmaps "{heatmaps}"'
+        command += f' --heatmaps={heatmaps}'
     if squish is not None:
-        command += f' --squish "{squish}"'
+        command += f' --squish={squish}'
     if relwidths is not None:
-        command += f' --relwidths "{relwidths}"'
+        command += f' --relwidths={relwidths}'
     if plotwidth is not None:
-        command += f' --plotwidth "{plotwidth}"'
+        command += f' --plotwidth={plotwidth}'
+    print('running command: ' + command)
     subprocess.run(command,shell = True,capture_output = False)
 
