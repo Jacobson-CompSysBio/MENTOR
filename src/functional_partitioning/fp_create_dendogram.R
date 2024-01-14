@@ -102,7 +102,7 @@ option_list <- list(
   make_option(
     c("-q","--squish"),
     type = "character",
-    default = NULL,
+    default = "-1,1",
     help = "if you have FC values squish the upper and lower bounds to two numbers formatted as 'lower_bound,upper_bound'",
     metavar = "character"
   ),
