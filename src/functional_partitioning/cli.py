@@ -16,7 +16,6 @@ References
 '''
 
 from functional_partitioning._version import __version__
-
 import argparse
 import os
 import sys
@@ -25,7 +24,6 @@ import numpy as np
 import logging
 import warnings
 import pathlib
-
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 from functional_partitioning import _cluster as cluster
@@ -43,10 +41,6 @@ def parse_args(test=None):
         description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    # parser.add_argument(
-    #     'positional',
-    #     help='The positional argument.'
-    # )
     parser.add_argument(
         '--rwr-fullranks', '-f',
         action='store',
@@ -317,12 +311,6 @@ def parse_args(test=None):
 
 def main():
     args = parse_args()
-    # print(args)
-
-    # Logging:
-    # - `LOGGER.setLevel` isn't working, use `logging.basicConfig` instead.
-    # - `logging.basicConfig` should be called *once*.
-    # - `logging.basicConfig` also affects settings for imported modules, eg, matplotlib.
     logger_config = dict(
         format='[%(asctime)s|%(levelname)s] %(message)s',
         datefmt='%FT%T',
@@ -334,29 +322,17 @@ def main():
         logger_config['level'] = logging.DEBUG
     logging.basicConfig(**logger_config)
 
-    # Test logging messages.
-    # LOGGER.debug('debug message')
-    # LOGGER.info('info message')
-    # LOGGER.warning('warn message')
-    # LOGGER.error('error message')
-    # LOGGER.critical('critical message')
-
     if args.version:
         print(__version__)
         sys.exit(0)
 
     LOGGER.debug(args)
 
-    # Create dummy data for testing.
     if args.init_test_fullranks:
         from functional_partitioning import _datasets as datasets
         fullranks = datasets.make_fullranks_table()
-        # print('fullranks:')
-        # print(fullranks)
         fullranks.to_csv(args.init_test_fullranks, sep='\t', index=False)
 
-    # Use --out-dir with default names, unless another path is explicitely
-    # specified.
     if args.no_clusters:
         out_clusters = None
         out_dissimilarity_matrix = None
@@ -366,7 +342,6 @@ def main():
         out_dissimilarity_matrix = args.out_clusters.with_name('dissimilarity-matrix.tsv')
         out_dissimilarity_stats = args.out_clusters.with_name('dissimilarity-stats.tsv')
     elif args.outdir is not None:
-        # Set the default path for the clusters.
         out_clusters = args.outdir / 'clusters.tsv'
         out_dissimilarity_matrix = args.outdir / 'dissimilarity-matrix.tsv'
         out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
@@ -375,8 +350,6 @@ def main():
         out_dissimilarity_matrix = None
         out_dissimilarity_stats = None
 
-    # Use --out-dir with default names, unless another path is explicitely
-    # specified.
     if args.no_plot:
         out_dendrogram = None
         out_dissimilarity_distribution = None
@@ -384,20 +357,17 @@ def main():
         out_dendrogram = args.out_dendrogram
         out_dissimilarity_distribution = args.out_dendrogram.with_name('distribution-of-pairwise-dissimilarities.png')
     elif args.outdir is not None:
-        # Set the default path for the dendrogram.
         out_dendrogram = args.outdir / 'dendrogram.png'
         out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
     else:
         out_dendrogram = None
         out_dissimilarity_distribution = None
 
-    # Set dendrogram style (rectangular or polar).
     if out_dendrogram is not None and args.dendrogram_style.startswith(('r', 'p')):
         dendrogram_style = args.dendrogram_style
     else:
         dendrogram_style = None
 
-    # Set up cut parameters for HierarchicalClustering.
     if args.cut_method == 'dynamic':
         cut_method = 'cutreeHybrid'
         cut_threshold = args.cut_threshold
@@ -408,9 +378,8 @@ def main():
         cut_method = args.cut_method
         cut_threshold = args.cut_threshold
 
-    # Run RWR-singletons or get the fullranks file.
     if args.multiplex and args.geneset:
-        # Run RWR-singletons.
+        # run rwr singletons
         command = rwrtoolkit.rwr_singletons(
             path_to_conda_env=args.path_to_conda_env,
             path_to_rwrtoolkit=args.path_to_rwrtoolkit,
@@ -444,12 +413,10 @@ def main():
             sys.exit(1)
 
     else:
-        # Read the fullranks file from existing RWR-singletons results.
         path_to_fullranks = args.rwr_fullranks
 
-    # Run functional partitioning or exit.
     if args.partition:
-        # Run functional partitioning.
+        # run functional partitioning
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing=True,
@@ -520,17 +487,14 @@ def main():
 
         if out_dendrogram is not None:
             out_dendrogram.parent.mkdir(parents=False, exist_ok=True)
-            # Set up the leaf labels for the dendrogram.
             if args.labels_use_clusters:
-                # Label the leaves with the cluster ID.
                 label_mapper = plot.make_label_mapper(
                     nodetable=clusters,
-                    use_locs=[0, 1], # List.
+                    use_locs=[0, 1],
                     sep=args.labels_sep
                 )
                 labels = [label_mapper.get(l, l) for l in labels]
             elif args.labels_use_names or args.labels_use_locs:
-                # Label the leaves using the node table.
                 label_mapper = plot.make_label_mapper(
                     nodetable=args.nodetable,
                     use_names=args.labels_use_names,
@@ -539,7 +503,6 @@ def main():
                 )
                 labels = [label_mapper.get(l, l) for l in labels]
             else:
-                # Use default labels.
                 pass
 
             tree = plot.draw_dendrogram(
@@ -572,10 +535,6 @@ def main():
         ) 
             
     else:
-        # Exit.
         pass
 
     return 0
-
-
-# END.
