@@ -45,25 +45,25 @@ def check_symmetry(dmat, atol=1e-6):
     return True
 
 
-def calc_cut_threshold(linkage_matrix, threshold, features=None):
-    '''
-    Calculate a threshold for `cut_tree` from the linkage matrix `linkage_matrix`.
-    '''
-    if threshold == 'mean':
-        threshold = np.mean(linkage_matrix[:,2])
-    elif threshold == 'best_chi':
-        if features is None:
-            raise ValueError('`features` must be provided if `threshold` is "best_chi"')
-        clusterings = hierarchy.cut_tree(linkage_matrix, n_clusters=None, height=None)
-        chi_features = metrics.calc_chi(features, clusterings)
-        best_at = np.nan_to_num(chi_features).argmax()
-        h1 = linkage_matrix[best_at, 2]
-        h0 = linkage_matrix[best_at-1, 2]
-        threshold = np.mean((h0, h1))
-    else:
-        pass
+#def calc_cut_threshold(linkage_matrix, threshold, features=None):
+#    '''
+#    Calculate a threshold for `cut_tree` from the linkage matrix `linkage_matrix`.
+#    '''
+#    if threshold == 'mean':
+#        threshold = np.mean(linkage_matrix[:,2])
+#    elif threshold == 'best_chi':
+#        if features is None:
+#            raise ValueError('`features` must be provided if `threshold` is "best_chi"')
+#        clusterings = hierarchy.cut_tree(linkage_matrix, n_clusters=None, height=None)
+#        chi_features = metrics.calc_chi(features, clusterings)
+#        best_at = np.nan_to_num(chi_features).argmax()
+#        h1 = linkage_matrix[best_at, 2]
+#        h0 = linkage_matrix[best_at-1, 2]
+#        threshold = np.mean((h0, h1))
+#    else:
+#        pass
 
-    return threshold
+#    return threshold
 
 
 class HierarchicalClustering(AgglomerativeClustering):
@@ -76,48 +76,48 @@ class HierarchicalClustering(AgglomerativeClustering):
 
     def __init__(
         self,
-        n_clusters=None, # Changed default.
+        #n_clusters=None, # Changed default.
         *,
         metric='euclidean',
         memory=None,
         connectivity=None,
-        compute_full_tree="auto",
+        #compute_full_tree="auto",
         linkage="average",
-        distance_threshold=None,
+        #distance_threshold=None,
         compute_distances=False,
         compute_linkage_matrix=True,
-        compute_dendrogram=True,
-        cut_threshold=None,
-        cut_method='cutreeHybrid',
-        optimal_ordering=False
+        #compute_dendrogram=True,
+        #cut_threshold=None,
+        #cut_method='cutreeHybrid',
+        #optimal_ordering=False
     ):
 
         super_kwargs = dict(
             affinity = metric,
             metric = metric,
-            n_clusters = n_clusters,
-            distance_threshold = distance_threshold,
+            #n_clusters = n_clusters,
+            #distance_threshold = distance_threshold,
             memory = memory,
             connectivity = connectivity,
-            compute_full_tree = compute_full_tree,
+            #compute_full_tree = compute_full_tree,
             linkage = linkage,
             compute_distances = compute_distances,
         )
         super().__init__(**super_kwargs)
-        self._cutreeHybrid = None
+        #self._cutreeHybrid = None
         self._n_samples = None
-        self.compute_dendrogram = compute_dendrogram
+        #self.compute_dendrogram = compute_dendrogram
         self.compute_linkage_matrix = compute_linkage_matrix
-        self.cut_method = cut_method
-        self.cut_threshold = cut_threshold
-        self.dendrogram = None
+        #self.cut_method = cut_method
+        #self.cut_threshold = cut_threshold
+        #self.dendrogram = None
         self.distances_ = 'deprecated'
-        self.labels_ = None
+        #self.labels_ = None
         self.method = linkage # use <method> instead of linkage
-        self.min_cluster_size_ = None
+        #self.min_cluster_size_ = None
         self.linkage_method = None
         self.linkage_metric = None # use <linkage_metric> instead
-        self.optimal_ordering = optimal_ordering
+        #self.optimal_ordering = optimal_ordering
 
     # add <fit> and <fit_predict> method
     def _fit(self, X, **kwargs):
@@ -138,23 +138,23 @@ class HierarchicalClustering(AgglomerativeClustering):
         """
         memory = check_memory(self.memory)
         
-        if self.distance_threshold is not None:
-            warnings.warn(
-                "The parameter 'distance_threshold' is deprecated in 0.5.1 "
-                "and will be removed in a future version. Use `cut_threshold`.",
-                DeprecationWarning,
-            )
-            if self.cut_threshold is None:
-                self.cut_threshold = self.distance_threshold
+        #if self.distance_threshold is not None:
+        #    warnings.warn(
+        #        "The parameter 'distance_threshold' is deprecated in 0.5.1 "
+        #        "and will be removed in a future version. Use `cut_threshold`.",
+        #        DeprecationWarning,
+        #    )
+        #    if self.cut_threshold is None:
+        #        self.cut_threshold = self.distance_threshold
 
-        if self.cut_method != 'cutreeHybrid':
-            if self.n_clusters is not None and self.cut_threshold is not None:
-                raise ValueError("Provide n_clusters OR cut_threshold, not both.")
-            if self.n_clusters is not None and self.n_clusters <= 0:
-                raise ValueError(
-                    "n_clusters should be an integer greater than 0. %s was provided."
-                    % str(self.n_clusters)
-                )
+        #if self.cut_method != 'cutreeHybrid':
+        #    if self.n_clusters is not None and self.cut_threshold is not None:
+        #        raise ValueError("Provide n_clusters OR cut_threshold, not both.")
+        #    if self.n_clusters is not None and self.n_clusters <= 0:
+        #        raise ValueError(
+        #            "n_clusters should be an integer greater than 0. %s was provided."
+        #            % str(self.n_clusters)
+        #        )
 
         if X.ndim == 1 and self.metric != "precomputed":
             raise ValueError("X should be a 2D array if metric is \"%s\"." % self.metric)
@@ -193,62 +193,62 @@ class HierarchicalClustering(AgglomerativeClustering):
             optimal_ordering=self.optimal_ordering
         )
         
-        if self.cut_method == 'cutreeHybrid':
-            self.min_cluster_size_ = 1
-            dendro_height = dtc_utils.get_heights(self.linkage_matrix)
-            dendro_merge = dtc_utils.get_merges(self.linkage_matrix)
-            nMerge = len(dendro_height)
-            refQuantile = 0.05
-            refMerge = np.round(nMerge * refQuantile)
-            if refMerge < 1:
-                refMerge = 1
-            refHeight = dendro_height[int(refMerge) - 1]
-            self.cutHeight_ = 0.99 * (np.max(dendro_height) - refHeight) + refHeight
+        #if self.cut_method == 'cutreeHybrid':
+        #    self.min_cluster_size_ = 1
+        #    dendro_height = dtc_utils.get_heights(self.linkage_matrix)
+        #    dendro_merge = dtc_utils.get_merges(self.linkage_matrix)
+        #    nMerge = len(dendro_height)
+        #    refQuantile = 0.05
+        #    refMerge = np.round(nMerge * refQuantile)
+        #    if refMerge < 1:
+        #        refMerge = 1
+        #    refHeight = dendro_height[int(refMerge) - 1]
+        #    self.cutHeight_ = 0.99 * (np.max(dendro_height) - refHeight) + refHeight
 
-            self._cutreeHybrid = dynamicTreeCut.cutreeHybrid(
-                self.linkage_matrix,
-                self.pairwise_distances,
-                minClusterSize=self.min_cluster_size_,
-                cutHeight=self.cutHeight_,
-                verbose=0,
-                deepSplit=1,
-                maxCoreScatter=None,
-                minGap=None,
-                maxAbsCoreScatter=None,
-                minAbsGap=None,
-                minSplitHeight=None,
-                minAbsSplitHeight=None,
-                externalBranchSplitFnc=None,
-                minExternalSplit=None,
-                externalSplitOptions=[],
-                externalSplitFncNeedsDistance=None,
-                assumeSimpleExternalSpecification=True,
-                pamStage=True,
-                pamRespectsDendro=True,
-                useMedoids=False,
-                maxPamDist=None,
-                respectSmallClusters=True,
-                indent=0,
-            )
-            self.labels_ = self._cutreeHybrid['labels']
-            self.cut_threshold_ = None
-        else:
-            self.cut_threshold_ = calc_cut_threshold(
-                self.linkage_matrix,
-                self.cut_threshold,
-                features=features
-            )
-            self.labels_ = hierarchy.cut_tree(
-                self.linkage_matrix,
-                n_clusters=self.n_clusters,
-                height=self.cut_threshold_
-            )
+            #self._cutreeHybrid = dynamicTreeCut.cutreeHybrid(
+                #self.linkage_matrix,
+                #self.pairwise_distances,
+                #minClusterSize=self.min_cluster_size_,
+                #cutHeight=self.cutHeight_,
+                #verbose=0,
+                #deepSplit=1,
+                #maxCoreScatter=None,
+                #minGap=None,
+                #maxAbsCoreScatter=None,
+                #minAbsGap=None,
+                #minSplitHeight=None,
+                #minAbsSplitHeight=None,
+                #externalBranchSplitFnc=None,
+                #minExternalSplit=None,
+                #externalSplitOptions=[],
+                #externalSplitFncNeedsDistance=None,
+                #assumeSimpleExternalSpecification=True,
+                #pamStage=True,
+                #pamRespectsDendro=True,
+                #useMedoids=False,
+                #maxPamDist=None,
+                #respectSmallClusters=True,
+                #indent=0,
+            #)
+            #self.labels_ = self._cutreeHybrid['labels']
+            #self.cut_threshold_ = None
+        #else:
+            #self.cut_threshold_ = calc_cut_threshold(
+                #self.linkage_matrix,
+                #self.cut_threshold,
+                #features=features
+            #)
+            #self.labels_ = hierarchy.cut_tree(
+                #self.linkage_matrix,
+                #n_clusters=self.n_clusters,
+                #height=self.cut_threshold_
+            #)
 
-        if self.labels_.ndim == 1:
-            self.labels_ = self.labels_.reshape(-1, 1)
+        #if self.labels_.ndim == 1:
+            #self.labels_ = self.labels_.reshape(-1, 1)
 
-        if self.compute_dendrogram:
-            self.dendrogram = hierarchy.dendrogram(self.linkage_matrix, no_plot=True)
+        #if self.compute_dendrogram:
+            #self.dendrogram = hierarchy.dendrogram(self.linkage_matrix, no_plot=True)
     
         return self
 
