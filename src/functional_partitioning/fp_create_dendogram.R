@@ -225,6 +225,7 @@ create_dendogram <- function(
     dend_labs <- dend_labs[,c("label","cluster")]
     write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
     # export the ggplot dendrogram
+    print("Saving dendrogram visualization")
     ggsave(
       paste0(out_dir,plot_file),
       plot = dendrogram,
@@ -236,6 +237,7 @@ create_dendogram <- function(
     
   } else {
     
+    print("Warning: to save dendrogram be sure to use --export in your command")  
     return(dendrogram)
     
   }

@@ -435,7 +435,6 @@ def main():
             compute_linkage_matrix=True
             #compute_dendrogram=True,
         )
-        print(X)
         mod.fit(X)
         #clusters = pd.DataFrame(mod.labels_, index=labels)
 #        threshold = mod.cut_threshold_
@@ -455,7 +454,6 @@ def main():
             dmat.to_csv(out_dissimilarity_matrix, sep='\t')
             LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
             # plot dendrogram
-            print('running fancy dendrogram')
             fd.fancy_dendrogram(
                 distances = out_dissimilarity_matrix,
                 clusters = args.clusters,
@@ -534,7 +532,6 @@ def main():
 #    elif args.fancy_dendrogram:
     elif args.distances is not None:         
         # run fancy dendrogram
-        print('running fancy dendrogram')
         fd.fancy_dendrogram(
             distances = args.distances,
             clusters = args.clusters,

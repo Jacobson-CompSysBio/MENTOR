@@ -31,7 +31,6 @@ def fancy_dendrogram(
     ):
 
     command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/fp_create_dendogram.R'
-    print('Running dendrogram command: ' + command)
     if distances is not None:
         command += f' --distances={distances}'
     if clusters is not None:
@@ -57,6 +56,7 @@ def fancy_dendrogram(
         command += f' --relwidths={relwidths}'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
-    print('running command: ' + command)
-    subprocess.run(command,shell = True,capture_output = False)
+    print('Running dendrogram command: ' + command)
+    result = subprocess.run(command,shell = True,capture_output = True)
+    return result
 
