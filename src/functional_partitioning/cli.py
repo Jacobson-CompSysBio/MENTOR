@@ -218,12 +218,6 @@ def parse_args(test=None):
         default=False,
         help='Print version and exit.'
     )
-#    parser.add_argument(
-#        '--fancy-dendrogram',
-#        action='store_true',
-#        default=False,
-#        help='Plot a fancy dendrogram.'
-#    )
     parser.add_argument(
         '--distances',
         action='store',
