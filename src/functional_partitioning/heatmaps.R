@@ -8,7 +8,7 @@
 heatmap <- function(heatmap,dend_labs,p_cutoff,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
-  heat_labs <- read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE)
+  heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
   # changing first column name to "label" to match dend_labs
   names(heat_labs) <- c("label","value","source")
   

@@ -17,14 +17,14 @@
 
 #################### Load libraries ##############################
 
-suppressPackageStartupMessages(require(tidyverse))
-suppressPackageStartupMessages(require(RColorBrewer))
-suppressPackageStartupMessages(require(dendextend))
+suppressWarnings(suppressPackageStartupMessages(require(tidyverse)))
+suppressWarnings(suppressPackageStartupMessages(require(RColorBrewer)))
+suppressWarnings(suppressPackageStartupMessages(require(dendextend)))
 # suppressPackageStartupMessages(require(grid))
-suppressPackageStartupMessages(require(cowplot))
-suppressPackageStartupMessages(require(optparse))
-suppressPackageStartupMessages(require(ggnewscale))
-suppressPackageStartupMessages(require(latex2exp))
+suppressWarnings(suppressPackageStartupMessages(require(cowplot)))
+suppressWarnings(suppressPackageStartupMessages(require(optparse)))
+suppressWarnings(suppressPackageStartupMessages(require(ggnewscale)))
+suppressWarnings(suppressPackageStartupMessages(require(latex2exp)))
 
 #################### Argument parser ##############################
 
@@ -145,7 +145,7 @@ create_dendogram <- function(
 ) {
   
   # import dissimilarity_matrix as dm
-  dm <- read_tsv(dis_mat, col_names = TRUE, show_col_types = FALSE)
+  dm <- suppressMessages(read_tsv(dis_mat, col_names = TRUE, show_col_types = FALSE))
   # make first column row names
   dm_matrix <- dm  %>%
     column_to_rownames(var = "...1")  %>%

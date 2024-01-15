@@ -24,6 +24,7 @@ import numpy as np
 import logging
 import warnings
 import pathlib
+import matplotlib.pyplot as plt
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 from functional_partitioning import _cluster as cluster
@@ -340,11 +341,13 @@ def main():
     if args.outdir is not None:
         out_dissimilarity_matrix = args.outdir / 'dissimilarity-matrix.tsv'
         out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
+        out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
     else:
 #        out_clusters = None
 #        out_dendrogram = None
         out_dissimilarity_matrix = None
         out_dissimilarity_stats = None
+        out_dissimilarity_distribution = None
 
 #    if args.no_plot:
 #        out_dendrogram = None
@@ -432,6 +435,7 @@ def main():
             compute_linkage_matrix=True
             #compute_dendrogram=True,
         )
+        print(X)
         mod.fit(X)
         #clusters = pd.DataFrame(mod.labels_, index=labels)
 #        threshold = mod.cut_threshold_
@@ -448,6 +452,8 @@ def main():
                 index=labels,
                 columns=labels
             )
+            dmat.to_csv(out_dissimilarity_matrix, sep='\t')
+            LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
             # plot dendrogram
             print('running fancy dendrogram')
             fd.fancy_dendrogram(
@@ -465,8 +471,6 @@ def main():
                 relwidths = args.relwidths,
                 plotwidth = args.plotwidth,
             )
-            dmat.to_csv(out_dissimilarity_matrix, sep='\t')
-            LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
         else:
             dmat = None
 
@@ -491,12 +495,12 @@ def main():
                 except:
                     pass
 
-        if out_dissimilarity_distribution is not None:
-            out_dissimilarity_distribution.parent.mkdir(parents=False, exist_ok=True)
-            plot.pairwise_distances_violin(
-                mod.pairwise_distances,
-                out_path=out_dissimilarity_distribution
-            )
+        #if out_dissimilarity_distribution is not None:
+        #    out_dissimilarity_distribution.parent.mkdir(parents=False, exist_ok=True)
+        #    plot.pairwise_distances_violin(
+        #        mod.pairwise_distances,
+        #        out_path=out_dissimilarity_distribution
+        #    )
 
 #        if out_dendrogram is not None:
 #            out_dendrogram.parent.mkdir(parents=False, exist_ok=True)

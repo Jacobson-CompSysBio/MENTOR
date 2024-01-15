@@ -31,6 +31,7 @@ def fancy_dendrogram(
     ):
 
     command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/fp_create_dendogram.R'
+    print('Running dendrogram command: ' + command)
     if distances is not None:
         command += f' --distances={distances}'
     if clusters is not None:
