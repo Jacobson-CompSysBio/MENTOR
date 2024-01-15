@@ -78,13 +78,13 @@ option_list <- list(
     help = "maximum size for clades if subclustering", 
     metavar = "character"
   ),
-  make_option(
-    c("-e","--export"), 
-    action = "store_true",
-    default = FALSE, 
-    help = "export the plot", 
-    metavar = "character"
-  ),
+#  make_option(
+#    c("-e","--export"), 
+#    action = "store_true",
+#    default = FALSE, 
+#    help = "export the plot", 
+#    metavar = "character"
+#  ),
   make_option(
     c("-z","--heatmaps"), 
     type = "character",
@@ -135,7 +135,7 @@ create_dendogram <- function(
   subcluster,
   k_increment,
   max_size,
-  export,
+  #export,
   heatmaps,
   p_cutoff,
   squish_bounds,
@@ -212,7 +212,7 @@ create_dendogram <- function(
     
   }
   
-  if(export) {
+  #if(export) {
     
     # export the clusters
     dend_labs$row_order <- 1:nrow(dend_labs)
@@ -235,12 +235,12 @@ create_dendogram <- function(
       limitsize = FALSE
     )
     
-  } else {
+  #} else {
     
-    print("Warning: to save dendrogram be sure to use --export in your command")  
-    return(dendrogram)
+  #  print("Warning: to save dendrogram be sure to use --export in your command")  
+  #  return(dendrogram)
     
-  }
+  #}
   
 }
 
@@ -255,7 +255,7 @@ create_dendogram(
   subcluster = opt$subcluster,
   k_increment = opt$increment,
   max_size = opt$maxsize,
-  export = opt$export,
+  #export = opt$export,
   heatmaps = opt$heatmaps,
   p_cutoff = opt$pcutoff,
   squish_bounds = opt$squish,

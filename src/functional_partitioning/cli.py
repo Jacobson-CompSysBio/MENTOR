@@ -256,12 +256,12 @@ def parse_args(test=None):
         type=int,
         help='Maximum size for clades if subclustering'
     )
-    parser.add_argument(
-        '--export',
-        action='store_true',
-        default=False,
-        help='Export the plot'
-    )
+#    parser.add_argument(
+#        '--export',
+#        action='store_true',
+#        default=False,
+#        help='Export the plot'
+#    )
     parser.add_argument(
         '--heatmaps',
         action='store',
@@ -462,7 +462,7 @@ def main():
                 subcluster = args.subcluster,
                 increment = args.increment,
                 maxsize = args.maxsize,
-                export = args.export,
+                #export = args.export,
                 heatmaps = args.heatmaps,
                 pcutoff = args.pcutoff,
                 squish = args.squish,
@@ -540,7 +540,7 @@ def main():
             subcluster = args.subcluster,
             increment = args.increment,
             maxsize = args.maxsize,
-            export = args.export,
+            #export = args.export,
             heatmaps = args.heatmaps,
             pcutoff = args.pcutoff,
             squish = args.squish,
