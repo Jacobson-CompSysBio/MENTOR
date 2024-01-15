@@ -46,8 +46,8 @@ def fancy_dendrogram(
         command += f' --increment={increment}'
     if maxsize is not None:
         command += f' --maxsize={maxsize}'
-    if export is True:
-        command += f' --export'
+    #if export is True:
+    #    command += f' --export'
     if heatmaps is not None:
         command += f' --heatmaps={heatmaps}'
     if squish is not None:
