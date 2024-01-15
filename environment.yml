@@ -5,7 +5,6 @@ channels:
   - defaults
 dependencies:
   - mamba
-  - matplotlib
   - numpy
   - pandas
   - pip
@@ -20,7 +19,6 @@ dependencies:
   - r-latex2exp
   - scikit-learn>=1.2
   - scipy
-  - seaborn
   - pytest
   - pip:
     - dynamicTreeCut
