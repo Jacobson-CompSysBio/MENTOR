@@ -85,11 +85,11 @@ class HierarchicalClustering(AgglomerativeClustering):
         linkage="average",
         #distance_threshold=None,
         compute_distances=False,
-        compute_linkage_matrix=True
+        compute_linkage_matrix=True,
         #compute_dendrogram=True,
         #cut_threshold=None,
         #cut_method='cutreeHybrid',
-        #optimal_ordering=False
+        optimal_ordering=False
     ):
 
         super_kwargs = dict(
@@ -101,7 +101,8 @@ class HierarchicalClustering(AgglomerativeClustering):
             connectivity = connectivity,
             #compute_full_tree = compute_full_tree,
             linkage = linkage,
-            compute_distances = compute_distances
+            compute_distances = compute_distances,
+            optimal_ordering = optimal_ordering
         )
         super().__init__(**super_kwargs)
         #self._cutreeHybrid = None
@@ -117,7 +118,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         #self.min_cluster_size_ = None
         self.linkage_method = None
         self.linkage_metric = None # use <linkage_metric> instead
-        #self.optimal_ordering = optimal_ordering
+        self.optimal_ordering = optimal_ordering
 
     # add <fit> and <fit_predict> method
     def _fit(self, X, **kwargs):
@@ -186,12 +187,12 @@ class HierarchicalClustering(AgglomerativeClustering):
         dmat = metrics.pairwise_distances(features, **pairwise_distances_kwargs)
         is_symmetric = check_symmetry(dmat)
         self.pairwise_distances = distance.squareform(dmat, checks=False)
-        #self.linkage_matrix = hierarchy.linkage(
-        #    self.pairwise_distances,
-        #    metric='precomputed',
-        #    method=self.linkage,
-        #    optimal_ordering=self.optimal_ordering
-        #)
+        self.linkage_matrix = hierarchy.linkage(
+            self.pairwise_distances,
+            metric='precomputed',
+            method=self.linkage,
+            optimal_ordering=self.optimal_ordering
+        )
         
         #if self.cut_method == 'cutreeHybrid':
         #    self.min_cluster_size_ = 1
