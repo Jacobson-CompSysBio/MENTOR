@@ -4,7 +4,7 @@ import string
 import joblib
 
 from sklearn import datasets, preprocessing
-from matplotlib import pyplot
+#from matplotlib import pyplot
 
 
 def make_nodetable():

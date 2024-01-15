@@ -89,7 +89,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         #compute_dendrogram=True,
         #cut_threshold=None,
         #cut_method='cutreeHybrid',
-        #optimal_ordering=False
+        optimal_ordering=False
     ):
 
         super_kwargs = dict(
@@ -117,7 +117,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         #self.min_cluster_size_ = None
         self.linkage_method = None
         self.linkage_metric = None # use <linkage_metric> instead
-        #self.optimal_ordering = optimal_ordering
+        self.optimal_ordering = optimal_ordering
 
     # add <fit> and <fit_predict> method
     def _fit(self, X, **kwargs):
