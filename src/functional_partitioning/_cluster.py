@@ -186,12 +186,12 @@ class HierarchicalClustering(AgglomerativeClustering):
         dmat = metrics.pairwise_distances(features, **pairwise_distances_kwargs)
         is_symmetric = check_symmetry(dmat)
         self.pairwise_distances = distance.squareform(dmat, checks=False)
-        self.linkage_matrix = hierarchy.linkage(
-            self.pairwise_distances,
-            metric='precomputed',
-            method=self.linkage,
-            optimal_ordering=self.optimal_ordering
-        )
+        #self.linkage_matrix = hierarchy.linkage(
+        #    self.pairwise_distances,
+        #    metric='precomputed',
+        #    method=self.linkage,
+        #    optimal_ordering=self.optimal_ordering
+        #)
         
         #if self.cut_method == 'cutreeHybrid':
         #    self.min_cluster_size_ = 1
