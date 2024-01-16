@@ -13,7 +13,9 @@ heatmap <- function(heatmap,dend_labs,p_cutoff,squish_bounds) {
   names(heat_labs) <- c("label","value","source")
   
   # do the rearrangement clustering
-  df <- spread(heat_labs, source, value)
+  na_rows <- heat_labs[is.na(heat_labs$source),]
+  heat_labs_no_dups <- heat_labs %>% group_by(label) %>% top_n(1,abs(value)) %>% bind_rows(.,na_rows) %>% distinct()
+  df <- spread(heat_labs_no_dups, source, value)
   df[is.na(df)] <- 0
   columnar_data <- t(df[, 2:ncol(df)])
   distance_mat <- dist(columnar_data, method = 'euclidean')
