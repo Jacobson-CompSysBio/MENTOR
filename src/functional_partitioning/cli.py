@@ -269,17 +269,12 @@ def main():
         )
 
         mod = cluster.HierarchicalClustering(
-            #n_clusters=None,
             metric=metrics.spearman_d,
-            #cut_method=cut_method,
-            #cut_threshold=cut_threshold,
             memory=None,
             connectivity=None,
-            #compute_full_tree="auto",
             linkage="average",
             compute_distances=False,
             compute_linkage_matrix=True
-            #compute_dendrogram=True,
         )
         mod.fit(X)
 
