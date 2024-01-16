@@ -20,7 +20,6 @@
 suppressWarnings(suppressPackageStartupMessages(require(tidyverse)))
 suppressWarnings(suppressPackageStartupMessages(require(RColorBrewer)))
 suppressWarnings(suppressPackageStartupMessages(require(dendextend)))
-# suppressPackageStartupMessages(require(grid))
 suppressWarnings(suppressPackageStartupMessages(require(cowplot)))
 suppressWarnings(suppressPackageStartupMessages(require(optparse)))
 suppressWarnings(suppressPackageStartupMessages(require(ggnewscale)))
@@ -78,13 +77,6 @@ option_list <- list(
     help = "maximum size for clades if subclustering", 
     metavar = "character"
   ),
-#  make_option(
-#    c("-e","--export"), 
-#    action = "store_true",
-#    default = FALSE, 
-#    help = "export the plot", 
-#    metavar = "character"
-#  ),
   make_option(
     c("-z","--heatmaps"), 
     type = "character",
@@ -135,7 +127,6 @@ create_dendogram <- function(
   subcluster,
   k_increment,
   max_size,
-  #export,
   heatmaps,
   p_cutoff,
   squish_bounds,
@@ -212,34 +203,25 @@ create_dendogram <- function(
     
   }
   
-  #if(export) {
-    
-    # export the clusters
-    dend_labs$row_order <- 1:nrow(dend_labs)
-    groups <- data.frame(
-      "col" = unique(dend_labs$col),
-      "cluster" = 0:(length(unique(dend_labs$col))-1)
-    )
-    dend_labs <- merge(dend_labs,groups,by = "col",all.x = TRUE)
-    dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
-    dend_labs <- dend_labs[,c("label","cluster")]
-    write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
-    # export the ggplot dendrogram
-    ggsave(
-      paste0(out_dir,plot_file),
-      plot = dendrogram,
-      width = plot_width,
-      height = nrow(dend_labs) * 0.6,
-      units = "cm",
-      limitsize = FALSE
-    )
-    
-  #} else {
-    
-  #  print("Warning: to save dendrogram be sure to use --export in your command")  
-  #  return(dendrogram)
-    
-  #}
+  # export the clusters
+  dend_labs$row_order <- 1:nrow(dend_labs)
+  groups <- data.frame(
+    "col" = unique(dend_labs$col),
+    "cluster" = 0:(length(unique(dend_labs$col))-1)
+  )
+  dend_labs <- merge(dend_labs,groups,by = "col",all.x = TRUE)
+  dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
+  dend_labs <- dend_labs[,c("label","cluster")]
+  write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
+  # export the ggplot dendrogram
+  ggsave(
+    paste0(out_dir,plot_file),
+    plot = dendrogram,
+    width = plot_width,
+    height = nrow(dend_labs) * 0.6,
+    units = "cm",
+    limitsize = FALSE
+  )
   
 }
 
@@ -254,7 +236,6 @@ create_dendogram(
   subcluster = opt$subcluster,
   k_increment = opt$increment,
   max_size = opt$maxsize,
-  #export = opt$export,
   heatmaps = opt$heatmaps,
   p_cutoff = opt$pcutoff,
   squish_bounds = opt$squish,
