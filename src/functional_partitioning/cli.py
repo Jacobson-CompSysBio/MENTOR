@@ -237,7 +237,7 @@ def main():
             numranked=args.numranked,
             outdir=args.outdir,
             modname=args.modname,
-            plot=args.plot,
+            #plot=args.plot,
             threads=args.threads,
             verbose=args.verbose
         )
