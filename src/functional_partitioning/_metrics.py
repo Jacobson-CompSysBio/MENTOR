@@ -2,7 +2,6 @@ import itertools
 import numpy as np
 import pandas as pd
 import logging
-
 from scipy import stats
 from scipy.spatial import distance
 from sklearn.metrics import mean_squared_error
@@ -13,7 +12,6 @@ LOGGER = logging.getLogger(__name__)
 
 def _spearman_distance(u, v):
     return 1 - stats.spearmanr(u, v).correlation
-
 
 def spearman_d(U, v=None, to_numpy=True):
     '''
@@ -40,14 +38,12 @@ def spearman_d(U, v=None, to_numpy=True):
     if v is None:
         if isinstance(U, np.ndarray):
             U = pd.DataFrame(U)
-
         if to_numpy:
             return (1 - U.T.corr(method='spearman')).to_numpy()
         else:
             return 1 - U.T.corr(method='spearman')
     else:
         return _spearman_distance(U, v)
-
 
 def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     '''
@@ -60,7 +56,6 @@ def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
     mse = mean_squared_error(y_true, y_pred, **kwargs)
     rmse = np.sqrt(mse)
     return rmse
-
 
 def _root_mean_squared_error_at_c(y_true, c, **kwargs):
     '''
@@ -80,7 +75,6 @@ def _root_mean_squared_error_at_c(y_true, c, **kwargs):
         ( (b-c)/(b-1) ) * _root_mean_squared_error(Rc, **kwargs)
     )
     return rmse_c
-
 
 def get_elbow(Y, min_size=3, **kwargs):
     r'''
@@ -103,18 +97,14 @@ def get_elbow(Y, min_size=3, **kwargs):
     >>> y = get_scores_vs_ranks_curve(scores_matrix)
     >>> max_rank = get_elbow(y)
     '''
-
     if isinstance(Y, pd.DataFrame):
         raise ValueError('Y must be a numpy array or pandas Series.')
     elif isinstance(Y, pd.Series):
         Y = Y.values
     else:
         pass
-
     b = len(Y)
-
     rmse_over_c = []
-
     for c in range(min_size, b-(min_size+1)):
         rmse_at_c = _root_mean_squared_error_at_c(Y, c, **kwargs)
         LOGGER.debug(f'rmse_at_c: {rmse_at_c}')
@@ -122,7 +112,6 @@ def get_elbow(Y, min_size=3, **kwargs):
 
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
     return idx_of_elbow
-
 
 def calc_chi(X_true, clusters):
     if isinstance(clusters, (pd.DataFrame, pd.Series)):
@@ -140,11 +129,9 @@ def calc_chi(X_true, clusters):
             chi_scores.append(np.nan)
             continue
         chi = calinski_harabasz_score(X_true, labels_pred)
-
         chi_scores.append(chi)
     chi_scores = np.array(chi_scores)
     return chi_scores
-
 
 def calinski_harabasz_score_(X, labels, **kwargs):
     if labels.ndim == 1:
@@ -154,9 +141,7 @@ def calinski_harabasz_score_(X, labels, **kwargs):
             labels = labels.ravel()
     else:
         raise ValueError(f'labels must be 1-D, you gave {labels.shape}')
-
     return calinski_harabasz_score(X, labels, **kwargs)
-
 
 def summarize_pairwise_dissimilarities(dissimilarities, labels):
     '''
@@ -173,7 +158,6 @@ def summarize_pairwise_dissimilarities(dissimilarities, labels):
     '''
     if dissimilarities.ndim > 1:
         raise ValueError(f'dissimilarities must be 1-D, you gave {dissimilarities.shape}')
-
     if labels.ndim == 1:
         pass
     elif labels.ndim == 2:
@@ -181,16 +165,13 @@ def summarize_pairwise_dissimilarities(dissimilarities, labels):
             labels = labels.ravel()
     else:
         raise ValueError(f'labels must be 1-D, you gave {labels.shape}')
-
     within_dissimilarity = []
     between_dissimilarity = []
-
     for i, pair in enumerate(itertools.combinations(labels, 2)):
         if pair[0] == pair[1]:
             within_dissimilarity.append(dissimilarities[i])
         else:
             between_dissimilarity.append(dissimilarities[i])
-
     result = {
         'pairwise_dissimilarity_mean': np.mean(dissimilarities),
         'pairwise_dissimilarity_median': np.median(dissimilarities),
@@ -199,9 +180,7 @@ def summarize_pairwise_dissimilarities(dissimilarities, labels):
         'within_cluster_dissimilarity_median': np.median(within_dissimilarity),
         'between_cluster_dissimilarity_median': np.median(between_dissimilarity)
     }
-
     return result
-
 
 def get_scores_vs_ranks_curve(scores, ranks=None):
     '''
