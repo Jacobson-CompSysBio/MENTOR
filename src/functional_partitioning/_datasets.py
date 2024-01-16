@@ -2,10 +2,7 @@ import pandas as pd
 import numpy as np
 import string
 import joblib
-
 from sklearn import datasets, preprocessing
-#from matplotlib import pyplot
-
 
 def make_nodetable():
     _index = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
@@ -18,7 +15,6 @@ def make_nodetable():
         columns=[_columns]
     )
     return nodetable
-
 
 def make_features(**kwargs):
     scaler = preprocessing.MinMaxScaler(feature_range=(0.01, 0.99))
