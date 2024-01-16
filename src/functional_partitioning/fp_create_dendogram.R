@@ -213,12 +213,18 @@ create_dendogram <- function(
   dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
   dend_labs <- dend_labs[,c("label","cluster")]
   write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
+  # adjust height based on number of genes to ensure labels are legible
+  if(nrow(dend_labs) <= 20){
+    height_ = nrow(dend_labs)
+  } else {
+    height_ = nrow(dend_labs) * 0.6
+  }
   # export the ggplot dendrogram
   ggsave(
     paste0(out_dir,plot_file),
     plot = dendrogram,
     width = plot_width,
-    height = nrow(dend_labs) * 0.6,
+    height = height_,
     units = "cm",
     limitsize = FALSE
   )
