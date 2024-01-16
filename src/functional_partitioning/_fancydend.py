@@ -38,7 +38,7 @@ def fancy_dendrogram(
     if map is not None:
         command += f' --map={map}'
     if outdir is not None:
-        command += f' --outdir={outdir}' # fix this later in either mine or izaaks code
+        command += f' --outdir={outdir}'
         command = command + '/'
     if subcluster is True:
         command += f' --subcluster'
@@ -46,8 +46,6 @@ def fancy_dendrogram(
         command += f' --increment={increment}'
     if maxsize is not None:
         command += f' --maxsize={maxsize}'
-    #if export is True:
-    #    command += f' --export'
     if heatmaps is not None:
         command += f' --heatmaps={heatmaps}'
     if squish is not None:
@@ -58,4 +56,3 @@ def fancy_dendrogram(
         command += f' --plotwidth={plotwidth}'
     print('Running dendrogram command: ' + command)
     subprocess.run(command,shell = True,capture_output = True)
-
