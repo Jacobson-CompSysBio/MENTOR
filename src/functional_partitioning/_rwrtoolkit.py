@@ -11,12 +11,9 @@ import pathlib
 import shlex
 import shutil
 import subprocess
-
 from functional_partitioning import _metrics as metrics
 
-
 LOGGER = logging.getLogger(__name__)
-
 
 if 'PATH_TO_RWRTOOLKIT' in os.environ:
     PATH_TO_RWRTOOLKIT = os.getenv('PATH_TO_RWRTOOLKIT')
@@ -28,13 +25,11 @@ if 'PATH_TO_CONDA_ENV' in os.environ:
 else:
     PATH_TO_CONDA_ENV = None
 
-
 def _activate_env(
     path_to_conda_env=PATH_TO_CONDA_ENV
 ):
     '''
     Return the command to activate conda environment.
-
     Parameters
     ----------
     path_to_conda_env : str, None
@@ -49,7 +44,6 @@ def _activate_env(
     '''
     path_to_conda_env = os.path.expanduser(path_to_conda_env)
     path_to_conda_env = os.path.realpath(path_to_conda_env)
-
     command = (
         'set +eu && '
         'PS1=dummy && '
@@ -57,7 +51,6 @@ def _activate_env(
         f'conda activate "{path_to_conda_env}" && '
         'echo "CONDA_PREFIX is $CONDA_PREFIX" '
     )
-
     return command
 
 def rwr_singletons(
@@ -78,12 +71,9 @@ def rwr_singletons(
     threads=None,
     verbose=None
 ):
-
     '''
     Return the command to run RWR-singletons.
-
     Usage: /Users/m8z/src/RWRtoolkit/inst/scripts/run_cv.R [options]
-
     Options:
         -d DATA, --data=DATA
             The path to the .Rdata file for your combo of underlying functional
@@ -132,22 +122,18 @@ def rwr_singletons(
             Verbose mode. [default FALSE]
         -h, --help
             Show this help message and exit
-
     Paramters
     ---------
     tau : list
         List of values will be converted to string for RWR_KFOLD.R
     '''
-
     if path_to_conda_env is not None:
         command = _activate_env(path_to_conda_env) + ' && Rscript'
     else:
         command = 'Rscript'
-
     if path_to_rwrtoolkit is not None:
         exe = os.path.join(path_to_rwrtoolkit, 'inst', 'scripts', 'run_cv.R')
         command += f' "{exe}"'
-
     if data is not None:
         command += f' --data "{data}"'
     if geneset is not None:
@@ -182,22 +168,17 @@ def rwr_singletons(
         command += f' --threads "{threads}"'
     if verbose is not None:
         command += f' --verbose'
-
     return command
-
-
 
 def run(commands, sep=' && ', dry_run=False, verbose=0):
     '''
     Run a shell command in a subprocess.
-
     Parameters
     ----------
     commands : str, list
         List of command elements to pass to subprocess.
     dry_run : bool
         If True, do nothing.
-
     Returns
     -------
     dict
@@ -210,7 +191,6 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         command = commands
     else:
         command = sep.join(commands)
-
     result = dict(
         command=command,
         dry_run=dry_run,
@@ -218,7 +198,6 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         stderr=None,
         stdout=None
     )
-
     if not dry_run:
         res = subprocess.run(command, shell=True, capture_output=True)
         if res.returncode == 0:
@@ -237,9 +216,7 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         )
     else:
         print('[DRY RUN]', command)
-
     return result
-
 
 def gzip(source, target=None, compresslevel=9, encoding=None, errors=None, newline=None, in_place=True):
     if isinstance(source, str):
@@ -252,22 +229,18 @@ def gzip(source, target=None, compresslevel=9, encoding=None, errors=None, newli
     if in_place and target.exists():
         os.remove(source)
 
-
 def compress_results(dirname, **kwargs):
     '''
     Gzip the RWR results.
     '''
     if isinstance(dirname, str):
         dirname = pathlib.Path(dirname)
-
     for f in dirname.glob('RWR*.tsv'):
         gzip(f, **kwargs)
-
 
 def fullranks_to_matrix(path_or_dataframe, to='scores', drop_missing=True):
     '''
     Convert RWR "fullranks" file to matrix.
-
     Parameters
     ----------
     path_or_dataframe : str, pd.DataFrame
@@ -278,7 +251,6 @@ def fullranks_to_matrix(path_or_dataframe, to='scores', drop_missing=True):
         determine max_rank.
     drop_missing : bool
         Drop genes that are labeled "missing" in the fullranks file.
-
     Returns
     -------
     X : pd.DataFrame
@@ -287,50 +259,37 @@ def fullranks_to_matrix(path_or_dataframe, to='scores', drop_missing=True):
         fullranks = path_or_dataframe
     else:
         fullranks = pd.read_table(path_or_dataframe)
-
     if drop_missing:
         fullranks = fullranks.query('seed!="missing"')
-
     if to.lower().startswith('score'):
         mat = fullranks.pivot(index='seed', columns='NodeNames', values='Score')
     elif to.lower().startswith('rank'):
         mat = fullranks.pivot(index='seed', columns='NodeNames', values='rank')
     else:
         raise ValueError(f'Invalid value for `to`: {to}')
-
     return mat
-
 
 def transform_fullranks(path_or_dataframe, drop_missing=True, max_rank='elbow'):
     if isinstance(path_or_dataframe, pd.DataFrame):
         fullranks = path_or_dataframe
     else:
         fullranks = pd.read_table(path_or_dataframe)
-
     if drop_missing:
         fullranks = fullranks.query('seed!="missing"')
-
     if max_rank == 'elbow':
         y = fullranks.groupby('rank')['Score'].mean()
         max_rank = metrics.get_elbow(y)
         LOGGER.info(f'Set max_rank to {max_rank}.')
-
     ranks = fullranks_to_matrix(fullranks, to='rank', drop_missing=drop_missing)
     scores = fullranks_to_matrix(fullranks, to='scores', drop_missing=drop_missing)
     labels = scores.index.to_list()
-
     assert (ranks.index == scores.index).all()
     assert (ranks.columns == scores.columns).all()
-
     mask = (ranks <= max_rank).fillna(False)
     col_mask = mask.any()
-
     features = scores.loc[:, col_mask]
-
     features = features.rank(axis=1, method='first', ascending=False)
-
     for i in labels:
         if ( i in features.columns.to_list() ) and np.isnan(features.loc[i, i]):
             features.loc[i, i] = 0
-
     return features, labels
