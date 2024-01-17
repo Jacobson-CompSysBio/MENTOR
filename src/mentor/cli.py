@@ -1,6 +1,6 @@
 '''
 Functional partitioning
-This module contains functions for functional partitioning of a network.
+This module contains functions for mentor of a network.
 [TODO] Refactor:
     1. Make `X` from 'fullranks'.
     2. Apply clustering method to `X`.
@@ -10,7 +10,7 @@ References
 [1] https://en.wikipedia.org/wiki/Elbow_method_(clustering)
 [2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
 '''
-from functional_partitioning._version import __version__
+from mentor._version import __version__
 import argparse
 import os
 import sys
@@ -22,11 +22,11 @@ import pathlib
 import matplotlib.pyplot as plt
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
-from functional_partitioning import _cluster as cluster
-from functional_partitioning import _metrics as metrics
-from functional_partitioning import _rwrtoolkit as rwrtoolkit
-from functional_partitioning import _plot as plot
-from functional_partitioning import _fancydend as fd
+from mentor import _cluster as cluster
+from mentor import _metrics as metrics
+from mentor import _rwrtoolkit as rwrtoolkit
+from mentor import _plot as plot
+from mentor import _fancydend as fd
 
 LOGGER = logging.getLogger(__name__)
 

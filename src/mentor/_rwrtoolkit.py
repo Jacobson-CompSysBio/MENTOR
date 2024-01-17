@@ -11,7 +11,7 @@ import pathlib
 import shlex
 import shutil
 import subprocess
-from functional_partitioning import _metrics as metrics
+from mentor import _metrics as metrics
 
 LOGGER = logging.getLogger(__name__)
 

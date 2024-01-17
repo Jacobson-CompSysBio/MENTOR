@@ -17,7 +17,7 @@ from dynamicTreeCut import dynamicTreeCut
 from dynamicTreeCut import R_func as dtc_utils
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
-from functional_partitioning import _metrics as metrics
+from mentor import _metrics as metrics
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.cluster import ( AgglomerativeClustering, KMeans )
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut

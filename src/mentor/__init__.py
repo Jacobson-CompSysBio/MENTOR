@@ -1,6 +1,6 @@
-from functional_partitioning._version import __version__
-from functional_partitioning import _cluster as cluster
-from functional_partitioning import _metrics as metrics
+from mentor._version import __version__
+from mentor import _cluster as cluster
+from mentor import _metrics as metrics
 
 # __version__ = get_version()
 __all__ = [
