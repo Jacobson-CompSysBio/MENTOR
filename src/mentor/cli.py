@@ -45,7 +45,7 @@ def parse_args(test=None):
         '--partition', '-p',
         action='store_true',
         default=False,
-        help='Perform functional partitioning on "seed genes" from RWR fullranks file. This is the default.'
+        help='Perform mentor on "seed genes" from RWR fullranks file. This is the default.'
     )
     parser.add_argument(
         '--outdir',
@@ -261,7 +261,7 @@ def main():
         path_to_fullranks = args.rwr_fullranks
 
     if args.partition:
-        # run functional partitioning
+        # run mentor
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing=True,
