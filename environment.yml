@@ -1,4 +1,4 @@
-name: jail-mentor
+name: mentor
 channels:
   - conda-forge
   - bioconda
