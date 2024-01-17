@@ -32,7 +32,7 @@ Or create a new environment called 'jail-mentor':
 $ git clone <link>
 $ cd MENTOR
 $ conda env create -f ./environment.yml
-$ conda activate jail-mentor
+$ conda activate mentor
 $ make
 ```
 
