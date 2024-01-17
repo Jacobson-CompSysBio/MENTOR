@@ -326,7 +326,7 @@ def main():
                 except:
                     pass
 
-    elif args.distances is not None:         
+    if args.distances is not None:         
         # run fancy dendrogram
         fd.fancy_dendrogram(
             distances = args.distances,
@@ -342,8 +342,5 @@ def main():
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,
         ) 
-            
-    else:
-        pass
-
+        
     return 0
