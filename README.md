@@ -18,8 +18,8 @@ Installation
 Standard installation:
 
 ```sh
-$ git clone https://github.com/izaakm/jail-functional-partitioning
-$ cd jail-functional-partitioning
+$ git clone <link>
+$ cd jail-MENTOR
 $ make
 ```
 
@@ -27,26 +27,26 @@ If you prefer to install dependencies with conda, you can use the provided
 `environment.yml` file:
 
 ```sh
-$ git clone https://github.com/izaakm/jail-functional-partitioning
-$ cd jail-functional-partitioning
+$ git clone <link>
+$ cd jail-MENTOR
 $ conda env update -f ./environment.yml
 $ make
 ```
 
-Or create a new environment for 'functional-partitioning':
+Or create a new environment called 'jail-mentor':
 
 ```sh
-$ git clone https://github.com/izaakm/jail-functional-partitioning
-$ cd jail-functional-partitioning
+$ git clone <link>
+$ cd jail-MENTOR
 $ conda env create -f ./environment.yml
-$ conda activate functional-partitioning
+$ conda activate jail-mentor
 $ make
 ```
 
 Verify the installation:
 
 ```sh
-$ functional_partitioning --help
+$ mentor --help
 ```
 
 
