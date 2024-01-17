@@ -1,39 +1,32 @@
-cff-version: 1.2.0
-title: >-
-  Functional Partitioning: A Software Package for RWR-based
-  Gene Cluster Identification
+cff-version: 1.3.0
+title: MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
 message: 'If you use this software, please cite it as below.'
 type: software
 authors:
   - family-names: Miller
     given-names: J. Izaak
-    orcid: 'https://orcid.org/0000-0002-6114-5401'
+    ORCiD: 'https://orcid.org/0000-0002-6114-5401'
   - family-names: Sullivan
     given-names: Kyle
+    ORCiD: 'https://orcid.org/0000-0002-4621-5598'
   - family-names: Townsend
     given-names: Alice
-  - family-names: McDevitt
-    given-names: Mikaela Cashman
   - family-names: Lane
     given-names: Matt
-  - family-names: Kainer
-    given-names: David
-  - family-names: Jones
-    given-names: Piet
-  - family-names: Lagergren
-    given-names: John
-  - family-names: Merlet
-    given-names: Jean
-  - family-names: O'Brien
-    given-names: Chris
   - family-names: Pavicic
     given-names: Mirko
+  - family-names: Morgan
+    given-names: Mallory
+  - family-names: Cashman
+    given-names: Mikaela
+  - family-names: Lagergren
+    given-names: John
   - family-names: Jacobson
     given-names: Daniel
 identifiers:
   - type: doi
     value: 10.5281/zenodo.8077553
-repository-code: 'https://github.com/izaakm/jail-functional-partitioning'
+repository-code: 'https://github.com/Jacobson-CompSysBio/MENTOR'
 license: MIT
-version: 0.6.3
-date-released: '2023-06-24'
+version: 0.7.1
+date-released: '2024-01-29'
