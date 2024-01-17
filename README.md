@@ -155,36 +155,7 @@ old shit
 Examples
 ========
 
-```sh
-mentor \
-    --distances </path/to/dissimilarity-matrix.tsv> \
-    --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
-    --map </path/to/map.txt> \
-    --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
-    --squish=<-1,1> \
-    --relwidths=<1,1> \
-    --plotwidth <35> \
-```
-
-```sh
-mentor \
-    --rwr-fullranks </path/to/rwr-fullranks.tsv> \
-    --partition \
-    --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
-    --map </path/to/map.txt> \
-    --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
-    --squish=<-1,1> \
-    --relwidths=<1,1> \
-    --plotwidth <35> \
-```
+To run RWRtoolkit on a gene set and multiplex network followed by mentor:
 
 ```sh
 mentor \
@@ -205,9 +176,47 @@ mentor \
     --plotwidth <35> \
 ```
 
+To run mentor on an RWRtoolkit full ranks file:
 
-If you have a gene set and a multiplex network, run RWR and partition the
-geneset:
+```sh
+mentor \
+    --rwr-fullranks </path/to/rwr-fullranks.tsv> \
+    --partition \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
+```
+
+To customize a dendrogram from a mentor dissimilarity-matrix: 
+
+```sh
+mentor \
+    --distances </path/to/dissimilarity-matrix.tsv> \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
+```
+
+
+
+
+old shit
+
+If you have a gene set and a multiplex network, run RWR and mentor the geneset:
 
 ```sh
 functional_partitioning \
