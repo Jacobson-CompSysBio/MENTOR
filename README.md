@@ -1,10 +1,3 @@
-% Functional Partitioning
-% J. Izaak Miller
-
-<!-- BADGES {{{ -->
-[![DOI](https://zenodo.org/badge/526587672.svg)](https://zenodo.org/badge/latestdoi/526587672)
-<!-- BADGES }}} -->
-
 MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
 =======================
 
