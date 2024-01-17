@@ -55,7 +55,7 @@ Usage
 
 ```
 
-usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--outdir OUTDIR] [--path-to-conda-env CONDA_ENV] [--path-to-rwrtoolkit RWRTOOLKIT] [--multiplex MULTIPLEX] [--geneset GENESET] [--method METHOD] [--folds FOLDS] [--restart RESTART] [--tau TAU] [--numranked NUMRANKED] [--modname MODNAME] [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS] [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS] [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
+usage: mentor [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--outdir OUTDIR] [--path-to-conda-env CONDA_ENV] [--path-to-rwrtoolkit RWRTOOLKIT] [--multiplex MULTIPLEX] [--geneset GENESET] [--method METHOD] [--folds FOLDS] [--restart RESTART] [--tau TAU] [--numranked NUMRANKED] [--modname MODNAME] [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS] [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS] [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
 
 arguments:
   -h, --help                           Show this help message and exit.
@@ -91,7 +91,9 @@ arguments:
                                        (default: 1,1).
   --plotwidth PLOTWIDTH                Width of the dendrogram visualization (default: 30).
 
-OLD
+
+
+old shit
   --cut-threshold CUT_THRESHOLD, -t CUT_THRESHOLD
                         Cut the dendrogram at this threshold. Only used if
                         `--cut-method=hard`. (default: 0.3)
