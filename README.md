@@ -55,41 +55,43 @@ Usage
 
 ```
 
-usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS]
-                               [--nodetable NODETABLE] [--partition]
-                               [--no-partition] [--cut-threshold CUT_THRESHOLD]
-                               [--cut-method {dynamic,hard,none}]
-                               [--dendrogram-style
-                               {rectangular,r,polar,p,none,n}]
-                               [--labels-use-clusters] [--labels-use-names
-                               [LABELS_USE_NAMES ...]] [--labels-use-locs
-                               [LABELS_USE_LOCS ...]] [--labels-sep LABELS_SEP]
-                               [--outdir OUTDIR] [--out-dendrogram
-                               OUT_DENDROGRAM] [--no-plot] [--out-clusters
-                               OUT_CLUSTERS] [--no-clusters]
-                               [--path-to-conda-env PATH_TO_CONDA_ENV]
-                               [--path-to-rwrtoolkit PATH_TO_RWRTOOLKIT]
-                               [--multiplex MULTIPLEX] [--geneset GENESET]
-                               [--method METHOD] [--folds FOLDS] [--restart
-                               RESTART] [--tau TAU] [--numranked NUMRANKED]
-                               [--modname MODNAME] [--plot PLOT] [--threads
-                               THREADS] [--init-test-fullranks
-                               INIT_TEST_FULLRANKS] [--verbose] [--version]
+usage: functional_partitioning [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--outdir OUTDIR] [--path-to-conda-env CONDA_ENV] [--path-to-rwrtoolkit RWRTOOLKIT] [--multiplex MULTIPLEX] [--geneset GENESET] [--method METHOD] [--folds FOLDS] [--restart RESTART] [--tau TAU] [--numranked NUMRANKED] [--modname MODNAME] [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS] [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS] [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
 
-Partition seeds from `RWR-CV --method=singletons ...` into clusters.
+arguments:
+  -h, --help                           Show this help message and exit.
+  --rwr-fullranks RWR_FULLRANKS        Path to "fullranks" file from `RWR-CV--method=singletons`
+                                       (default: None).
+  --partition, -p                      Perform functional partitioning on "seed genes" from RWR
+                                       fullranks file (default: False).
+  --outdir OUTDIR                      Save output to path (default: None).
+  --path-to-conda-env CONDA_ENV        Path to conda environment.
+  --path-to-rwrtoolkit RWRTOOLKIT      Path to RWRToolkit.
+  --multiplex MULTIPLEX                Path to multiplex network.
+  --geneset GENESET                    Path to gene set file. 
+  --method METHOD                      Method for RWR-CV (default: 'singletons').
+  --folds FOLDS                        Folds for RWR-CV.
+  --restart RESTART                    Restart for RWR-CV (default: 0.7). 
+  --tau TAU                            Tau for RWR-CV.
+  --numranked NUMRANKED                
+  --modname MODNAME
+  --threads THREADS
+  --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
+  --version                            Print version and exit (default: False).
+  --distances DISTANCES                Path to dissimilarity-matrix.tsv (default: None).
+  --clusters CLLUSTERS                 Number of clusters for dendrogram (default: 10).
+  --map                                Path to gene ensembl ID mapping file (default: None).
+  --subcluster                         Subcluster the dendrogram (default: False).   
+  --increment INCREMENT                If subclustering increment cluster size by (default: 5).
+  --maxsize MAXSIZE                    Maximum size of clusters for subclustering (default: 40).
+  --heatmaps HEATMAPS                  Path to heatmap file (default: None).
+  --pcutoff PCUTOFF                    Cutoff value for p-value if there is a p-value column in
+                                       the heatmap.
+  --squish LOWER,UPPER                 Squish the color scale to LOWER,UPPER bounds (default: None).
+  --relwidths DEND,HEAT                Set relative widths of dendrogram and heatmap to DEND,HEAT
+                                       (default: 1,1).
+  --plotwidth PLOTWIDTH                Width of the dendrogram visualization (default: 30).
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --rwr-fullranks RWR_FULLRANKS, -f RWR_FULLRANKS
-                        Path to "fullranks" file from `RWR-CV
-                        --method=singletons ...` (default: None)
-  --nodetable NODETABLE
-                        Path to "nodetable" file. This is a TSV file where the
-                        first column is the node name (i.e., the seed genes
-                        from RWR-fullranks). (default: None)
-  --partition, -p       Perform functional partitioning on "seed genes" from
-                        RWR fullranks file. This is the default. (default: True)
-  --no-partition        Do not perform functional partitioning. (default: True)
+OLD
   --cut-threshold CUT_THRESHOLD, -t CUT_THRESHOLD
                         Cut the dendrogram at this threshold. Only used if
                         `--cut-method=hard`. (default: 0.3)
