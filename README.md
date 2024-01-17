@@ -157,52 +157,52 @@ Examples
 
 ```sh
 mentor \
-    --distances /path/to/dissimilarity-matrix.tsv
-    --outdir /path/to/outdir/
-    --clusters CLUSTERS
-    --map /path/to/map.txt
-    --subcluster
-    --increment INCREMENT
-    --maxsize MAXSIZE
-    --heatmaps /path/to/map.txt
-    --squish=-1,1
-    --relwidths=1,1
-    --plotwidth 35
+    --distances </path/to/dissimilarity-matrix.tsv> \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
 ```
 
 ```sh
 mentor \
-    --rwr-fullranks /path/to/rwr-fullranks.tsv
-    --partition
-    --outdir /path/to/outdir/
-    --clusters CLUSTERS
-    --map /path/to/map.txt
-    --subcluster
-    --increment INCREMENT
-    --maxsize MAXSIZE
-    --heatmaps /path/to/map.txt
-    --squish=-1,1
-    --relwidths=1,1
-    --plotwidth 35
+    --rwr-fullranks </path/to/rwr-fullranks.tsv> \
+    --partition \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
 ```
 
 ```sh
 mentor \
-    --path-to-conda-env /path/to/conda/env
-    --path-to-rwrtoolkit /path/to/RWRtoolkit
-    --geneset /path/tp/geneset.txt
-    --multiplex /path/to/multiplex.RData
-    --partition
-    --outdir /path/to/outdir/
-    --clusters CLUSTERS
-    --map /path/to/map.txt
-    --subcluster
-    --increment INCREMENT
-    --maxsize MAXSIZE
-    --heatmaps /path/to/map.txt
-    --squish=-1,1
-    --relwidths=1,1
-    --plotwidth 35
+    --path-to-conda-env </path/to/conda/env> \
+    --path-to-rwrtoolkit </path/to/RWRtoolkit> \
+    --geneset </path/tp/geneset.txt> \
+    --multiplex </path/to/multiplex.RData> \
+    --partition \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
 ```
 
 
