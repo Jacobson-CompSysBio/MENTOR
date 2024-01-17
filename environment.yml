@@ -1,4 +1,4 @@
-name: functional-partitioning
+name: jail-mentor
 channels:
   - conda-forge
   - bioconda
