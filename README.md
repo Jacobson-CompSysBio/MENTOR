@@ -12,7 +12,7 @@ Standard installation:
 
 ```sh
 $ git clone <link>
-$ cd jail-MENTOR
+$ cd MENTOR
 $ make
 ```
 
@@ -21,7 +21,7 @@ If you prefer to install dependencies with conda, you can use the provided
 
 ```sh
 $ git clone <link>
-$ cd jail-MENTOR
+$ cd MENTOR
 $ conda env update -f ./environment.yml
 $ make
 ```
@@ -30,7 +30,7 @@ Or create a new environment called 'jail-mentor':
 
 ```sh
 $ git clone <link>
-$ cd jail-MENTOR
+$ cd MENTOR
 $ conda env create -f ./environment.yml
 $ conda activate jail-mentor
 $ make
