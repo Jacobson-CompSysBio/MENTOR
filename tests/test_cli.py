@@ -9,7 +9,7 @@ import pathlib
 
 from numpy import testing
 from sklearn import datasets, preprocessing
-from matplotlib import pyplot
+#from matplotlib import pyplot
 
 from mentor import _cluster as cluster
 from mentor import _datasets as datasets
@@ -23,7 +23,7 @@ from scipy.cluster import hierarchy
 # Fixtures.
 def _initialize_test_fullranks():
     path_to_fullranks = pathlib.Path(tempfile.mkdtemp()) / 'fullranks.tsv'
-    os.system(f'functional_partitioning --init-test-fullranks {path_to_fullranks} --no-partition')
+    os.system(f'mentor --init-test-fullranks {path_to_fullranks} --no-partition')
     return path_to_fullranks
 
 def _initialize_outdir():
@@ -33,22 +33,22 @@ def _initialize_outdir():
 
 # Test entry point
 def test_entrypoint():
-    exit_status = os.system('functional_partitioning --help')
+    exit_status = os.system('mentor --help')
     assert exit_status == 0
 
 def test_version():
-    exit_status = os.system('functional_partitioning --version')
+    exit_status = os.system('mentor --version')
     assert exit_status == 0
 
 # Test that the fullranks file is created.
 def test_init_fullranks_exit():
     path_to_fullranks = pathlib.Path(tempfile.mkdtemp()) / 'fullranks.tsv'
-    exit_status = os.system(f'functional_partitioning --init-test-fullranks {path_to_fullranks} --no-partition')
+    exit_status = os.system(f'mentor --init-test-fullranks {path_to_fullranks} --no-partition')
     assert exit_status == 0
 
 def test_init_fullranks_exists():
     path_to_fullranks = pathlib.Path(tempfile.mkdtemp()) / 'fullranks.tsv'
-    os.system(f'functional_partitioning --init-test-fullranks {path_to_fullranks} --no-partition')
+    os.system(f'mentor --init-test-fullranks {path_to_fullranks} --no-partition')
     assert path_to_fullranks.exists()
 
 # class TestInitFullranks(unittest.TestCase):
@@ -70,7 +70,7 @@ class TestFunctionalPartitioning(unittest.TestCase):
     def setUpClass(cls):
         cls._path_to_fullranks = _initialize_test_fullranks()
         cls._outdir = _initialize_outdir()
-        cls._exit_code = os.system(f'functional_partitioning --rwr-fullranks {cls._path_to_fullranks} --outdir {cls._outdir}')
+        cls._exit_code = os.system(f'mentor --rwr-fullranks {cls._path_to_fullranks} --outdir {cls._outdir}')
 
     @classmethod
     def tearDownClass(cls):
@@ -107,7 +107,7 @@ class TestOutClusters(unittest.TestCase):
         cls._path_to_fullranks = _initialize_test_fullranks()
         cls._outdir = _initialize_outdir()
         cls._out_clusters = cls._outdir / 'clusters-foo.tsv'
-        cls._exit_code = os.system(f'functional_partitioning --rwr-fullranks {cls._path_to_fullranks} --outdir {cls._outdir} --out-clusters {cls._out_clusters}')
+        cls._exit_code = os.system(f'mentor --rwr-fullranks {cls._path_to_fullranks} --outdir {cls._outdir} --out-clusters {cls._out_clusters}')
 
     @classmethod
     def tearDownClass(cls):
