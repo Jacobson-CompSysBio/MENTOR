@@ -19,13 +19,13 @@ import numpy as np
 import logging
 import warnings
 import pathlib
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.spatial import distance
 from scipy.cluster import hierarchy
 from mentor import _cluster as cluster
 from mentor import _metrics as metrics
 from mentor import _rwrtoolkit as rwrtoolkit
-from mentor import _plot as plot
+#from mentor import _plot as plot
 from mentor import _fancydend as fd
 
 LOGGER = logging.getLogger(__name__)
