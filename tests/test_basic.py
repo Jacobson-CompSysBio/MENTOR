@@ -7,7 +7,7 @@ import unittest
 
 from numpy import testing
 from sklearn import datasets, preprocessing
-from matplotlib import pyplot
+#from matplotlib import pyplot
 
 from mentor import _cluster as cluster
 from mentor import _datasets as datasets
