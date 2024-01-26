@@ -36,11 +36,11 @@ def parse_args(test=None):
         description='Partition seeds from `RWR-CV --method=singletons ...` into clusters.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument(
-        '--rwr-fullranks', '-f',
-        action='store',
-        help='Path to "fullranks" file from `RWR-CV --method=singletons ...`'
-    )
+    # parser.add_argument(
+    #     '--rwr-fullranks', '-f',
+    #     action='store',
+    #     help='Path to "fullranks" file from `RWR-CV --method=singletons ...`'
+    # )
     parser.add_argument(
         '--partition', '-p',
         action='store_true',
@@ -53,16 +53,16 @@ def parse_args(test=None):
         type=pathlib.Path,
         help='Save dendrogram and clusters to path.'
     )
-    parser.add_argument(
-        '--path-to-conda-env',
-        action='store',
-        help=''
-    )
-    parser.add_argument(
-        '--path-to-rwrtoolkit',
-        action='store',
-        help=''
-    )
+    # parser.add_argument(
+    #     '--path-to-conda-env',
+    #     action='store',
+    #     help=''
+    # )
+    # parser.add_argument(
+    #     '--path-to-rwrtoolkit',
+    #     action='store',
+    #     help=''
+    # )
     parser.add_argument(
         '--multiplex',
         action='store',
@@ -226,8 +226,8 @@ def main():
     if args.multiplex and args.geneset:
         # run rwr singletons
         command = rwrtoolkit.rwr_singletons(
-            path_to_conda_env=args.path_to_conda_env,
-            path_to_rwrtoolkit=args.path_to_rwrtoolkit,
+            # path_to_conda_env=args.path_to_conda_env,
+            # path_to_rwrtoolkit=args.path_to_rwrtoolkit,
             data=args.multiplex,
             geneset=args.geneset,
             method=args.method,
