@@ -371,7 +371,7 @@ RWR_CV <- function(data = NULL,
                    numranked = 1.0,
                    outdir = NULL,
                    modname = "default",
-                   plot = FALSE,
+                   #plot = FALSE,
                    out_full_ranks = NULL,
                    out_mean_ranks = NULL,
                    threads = 1,
@@ -460,10 +460,10 @@ RWR_CV <- function(data = NULL,
   if (write_to_file) {
     write_table(metrics$summary, out_path)
   }
-  if (plot) {
-    message("Saving plots ...")
-    save_plots_cv(metrics, geneset, folds, data, modname, outdir)
-  }
+  # if (plot) {
+  #   message("Saving plots ...")
+  #   save_plots_cv(metrics, geneset, folds, data, modname, outdir)
+  # }
   return(
     list(
       "fullranks" = res_combined,
