@@ -25,9 +25,9 @@ def rwr_singletons(
     # tau = None,
     # numranked = None,
     outdir = None,
-    #modname = None,
-    out_fullranks = None,
-    out_medianranks = None,
+    # modname = None,
+    # out_fullranks = None,
+    # out_medianranks = None,
     threads = None,
     verbose = None
 ):
@@ -56,10 +56,10 @@ def rwr_singletons(
     #     command += f' --numranked "{numranked}"'
     # if modname is not None:
     #     command += f' --modname "{modname}"'
-    if out_fullranks is not None:
-        command += f' --out-fullranks "{out_fullranks}"'
-    if out_medianranks is not None:
-        command += f' --out-medianranks "{out_medianranks}"'
+    # if out_fullranks is not None:
+    #     command += f' --out-fullranks "{out_fullranks}"'
+    # if out_medianranks is not None:
+    #     command += f' --out-medianranks "{out_medianranks}"'
     if outdir is not None:
         command += f' --outdir "{outdir}"'
     if threads is not None:
