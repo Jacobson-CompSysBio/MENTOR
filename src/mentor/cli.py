@@ -246,7 +246,7 @@ def main():
         if res['returncode'] != 0:
             LOGGER.error('RWR-singletons failed.')
             LOGGER.error(command)
-            LOGGER.error(res.stderr)
+            #LOGGER.error(res.stderr)
             sys.exit(1)
 
         rwrtoolkit.compress_results(args.outdir)
