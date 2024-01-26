@@ -4,123 +4,35 @@
 # - Input: Pre-computed multiplex network and a geneset
 # - Output: Table with the ranking of each gene in the gene set when left out,
 #           along with AUPRC and AUROC curves
-# Copyright (C) 2022  David Kainer
-#
-# This file is part of RWRtoolkit.
-#
-# RWRtoolkit is free software: you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation, either version 3 of the License, or (at your option) any later
-# version.
-#
-# RWRtoolkit is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# RWRtoolkit. If not, see <https://www.gnu.org/licenses/>.
-########################################################################
-
-#' @importFrom dplyr %>%
-#' @importFrom foreach %dopar%
-
 ########################################################################
 # Internal Functions
 ########################################################################
 
-update_folds_by_method <- function(
-  geneset,
-  method,
-  num_folds,
-  verbose = FALSE) {
+update_folds_by_method <- function(geneset,method,num_folds,verbose = FALSE) {
   chunks <- NULL
-  if (method %in% c("loo", "singletons")) {
-    folds <- nrow(geneset)
-    cat("\nCross-validation method is ",
-      method,
-      ", i.e, folds=",
-      folds,
-      "\n",
-      sep = "",
-      file = stderr()
-    )
-  } else if (method == "kfold") {
-    if ((nrow(geneset) / num_folds) < 1) {
-      folds <- nrow(geneset)
-      method <- "loo"
-      base_warning <- "\nWARNING: Cross-validation method was set to k-fold, but `k` is too large for this geneset: " # nolint
-      warning_message <- paste(base_warning,
-        num_folds,
-        "\n",
-        "\nCross-validation method is now set to LOO, i.e, folds=",
-        folds,
-        "\n",
-        sep = ""
-      )
-      warning(warning_message)
-    } else {
-      folds <- num_folds
-      # Randomly shuffle the geneset so that k-folds below is unbiased.
-      set.seed(42)
-      samples <- sample(nrow(geneset))
-      geneset <- geneset[samples, ]
-      message("Gene set was randomly shuffled")
-
-      if (verbose) {
-        message("Gene set:")
-        print(geneset)
-      }
-
-      # we shuffle the geneset to break up and pre-ordering
-      chunks <- chunk(sample(geneset$gene), folds)
-      cat("\nCross-validation method is k-fold; folds=",
-        folds,
-        "\n",
-        sep = "",
-        file = stderr()
-      )
-    }
-  } else {
-    stop("ERROR: CV method not recognised. must be one of loo, singletons or kfold. Stopping") # nolint message
-  }
+  folds <- nrow(geneset)
+  cat("\nCross-validation method is ",
+    method,
+    ", i.e, folds=",
+    folds,
+    "\n",
+    sep = "",
+    file = stderr()
+  )
   return(list(folds=folds, geneset=geneset, chunks=chunks, method=method))
 }
 
 extract_lo_and_seed_genes_cv <- function(geneset, method, r, chunks = NULL) {
-  if (method == "singletons") {
-    seed_genes <- geneset %>%
-      dplyr::slice(r) %>%
-      dplyr::pull(gene) # nolint       Get one seed gene.  
-    leftout <- geneset %>%
-      dplyr::filter(gene != seed_genes) %>%     #nolint
-      dplyr::pull(gene)
-  } else if (method == "loo") {
-    leftout <- geneset %>%
-      dplyr::slice(r) %>%
-      dplyr::pull(gene) # nolint        leave out one gene.
-    seed_genes <- geneset %>%
-      dplyr::filter(!gene %in% leftout) %>%  #nolint
-      dplyr::pull(gene)
-  } else {
-    leftout <- chunks[[r]] # get the r'th fold for CV
-    seed_genes <- geneset %>%
-      dplyr::filter(!gene %in% leftout) %>%  #nolint
-      dplyr::pull(gene)
-  }
-
+  seed_genes <- geneset %>%
+    dplyr::slice(r) %>%
+    dplyr::pull(gene) # nolint       Get one seed gene.  
+  leftout <- geneset %>%
+    dplyr::filter(gene != seed_genes) %>%     #nolint
+    dplyr::pull(gene)
   list(leftout, seed_genes)
 }
 
-create_rankings_cv <- function(rwr,
-                               networks,
-                               r,
-                               name,
-                               geneset,
-                               method,
-                               seed_genes,
-                               leftout,
-                               num_nodes_in_multiplex) {
+create_rankings_cv <- function(rwr,networks,r,name,geneset,method,seed_genes,leftout,num_nodes_in_multiplex) {
   ## turn Scores into Rankings
   # for any gene that scored 0, give it worst possible rank
   # highest score gets lowest rank
@@ -133,7 +45,6 @@ create_rankings_cv <- function(rwr,
       true = as.integer(num_nodes_in_multiplex),
       false = rank
     ))
-
   num_in_network <- nrow(geneset)
   num_seeds <- length(seed_genes)
   num_leftout <- length(leftout)
@@ -141,21 +52,8 @@ create_rankings_cv <- function(rwr,
   fold <- r
   modname <- name
   geneset <- geneset$setid[1]
-  seed <- if (method == "singletons") {
-    seed_genes
-  } else if (method == "loo") {
-    "AllBut1"
-  } else {
-    "many"
-  }
-  leftout <- if (method == "singletons") {
-    "AllBut1"
-  } else if (method == "loo") {
-    leftout
-  } else {
-    "many"
-  }
-
+  seed <- seed_genes
+  leftout <- "AllBut1"
   rwr$RWRM_Results <- rwr$RWRM_Results %>% # nolint rwrmh output
     dplyr::mutate(
       num_in_network = num_in_network,
@@ -169,7 +67,6 @@ create_rankings_cv <- function(rwr,
       leftout = leftout,
       method = method
     )
-
   rwr$RWRM_Results
 }
 
@@ -253,7 +150,7 @@ calc_metrics_cv <- function(res_combined, res_avg) {
   # n() no longer works if dplyr not attached #4062
   # https://github.com/tidyverse/dplyr/issues/4062
     # https://github.com/tidyverse/dplyr/blob/master/NEWS.md#breaking-changes
-    if(res_combined$method[1] %in% c("kfold","singletons")) {  # cannot use opt$method here since that can be overridden in RWR
+    #if(res_combined$method[1] %in% c("kfold","singletons")) {  # cannot use opt$method here since that can be overridden in RWR
 
         ### calculate ROC/PRC per-fold
         res_combined <- res_combined %>%
@@ -298,37 +195,37 @@ calc_metrics_cv <- function(res_combined, res_avg) {
         # 7. AUROC of mean ranks
         output <- rbind(output, res_avg %>%
                             dplyr::summarise(fold="meanrank", value = sum(REC)/dplyr::n(), measure="AUROC") )
-    }
+    #}
 
 
-    if(res_combined$method[1] == "loo") {
+    #if(res_combined$method[1] == "loo") {
         ### DON'T get metrics per fold since only 1 gene is left out per fold!!
 
         # 1. rank of each leftout gene
-        output <- res_combined %>%
-            dplyr::group_by(fold) %>%
-            dplyr::filter(InValset==1) %>%
-            dplyr::summarise(value = rank, measure="leftout.rank")
-        print("Rank of each left out gene: ")
-        print(output)
+    #    output <- res_combined %>%
+    #        dplyr::group_by(fold) %>%
+    #        dplyr::filter(InValset==1) %>%
+    #        dplyr::summarise(value = rank, measure="leftout.rank")
+    #    print("Rank of each left out gene: ")
+    #    print(output)
         # 2. number of left-out genes with rank < NumGeneset
-        output <- rbind(output, res_combined %>%
-                            dplyr::filter(InValset==1 & rank <= sum(InValset)) %>%
-                            dplyr::summarise(fold="all", value=dplyr::n(), measure="RankedBelowNumgeneset"))
+    #    output <- rbind(output, res_combined %>%
+    #                        dplyr::filter(InValset==1 & rank <= sum(InValset)) %>%
+    #                        dplyr::summarise(fold="all", value=dplyr::n(), measure="RankedBelowNumgeneset"))
 
         ### get metrics based on mean ranks
-        res_avg <- calc_ROCPRC(res_avg, scorescol = "rerank", labelscol = "InValset")
+    #    res_avg <- calc_ROCPRC(res_avg, scorescol = "rerank", labelscol = "InValset")
         # 3. AvgPrec of mean ranks (uses Average Precision, not interpolated avg precision)
-        output <- rbind(output, res_avg %>%
-                            dplyr::filter(TP==1) %>%
-                            dplyr::summarise(fold="meanrank", value = sum(PREC)/sum(InValset), measure="AvgPrec") )
+    #    output <- rbind(output, res_avg %>%
+    #                        dplyr::filter(TP==1) %>%
+    #                        dplyr::summarise(fold="meanrank", value = sum(PREC)/sum(InValset), measure="AvgPrec") )
         # 4. AUPRC of mean ranks (uses trapezoid method)
-        output <- rbind(output, res_avg %>%
-                            dplyr::summarise(fold="meanrank", value = area_under_curve(REC, PREC, method="trapezoid", ties="max"), measure="AUPRC"))
+    #    output <- rbind(output, res_avg %>%
+    #                        dplyr::summarise(fold="meanrank", value = area_under_curve(REC, PREC, method="trapezoid", ties="max"), measure="AUPRC"))
         # 5. AUROC of mean ranks
-        output <- rbind(output, res_avg %>%
-                            dplyr::summarise(fold="meanrank", value = sum(REC)/dplyr::n(), measure="AUROC") )
-    }
+    #    output <- rbind(output, res_avg %>%
+    #                        dplyr::summarise(fold="meanrank", value = sum(REC)/dplyr::n(), measure="AUROC") )
+    #}
 
     output$geneset <- res_combined$geneset[1]
     
@@ -355,8 +252,7 @@ calculate_max_precision <- function(pr, metrics) {
   maxprec
 }
 
-save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath)
-{
+save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath) {
     message("Generating plots...\n")
     ggplot2::theme_set(ggplot2::theme_classic())
     
@@ -376,22 +272,22 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
     
     ####### KFOLD (few folds) ########
 
-    if(metrics$res_combined$method[1] == "kfold")
-    {
+    #if(metrics$res_combined$method[1] == "kfold")
+    #{
         ### ROC
-        p1 <- ggplot2::ggplot() + 
-            ggplot2::geom_line(data=metrics$res_combined %>% dplyr::group_by(FPR) %>% dplyr::summarise(mean = mean(REC)), 
-                      ggplot2::aes(x=FPR, y=mean, col="mean of folds")) +
-            ggplot2::geom_abline(ggplot2::aes(intercept=0, slope=1), linetype="dashed", col="darkgrey") +
+    #    p1 <- ggplot2::ggplot() + 
+    #        ggplot2::geom_line(data=metrics$res_combined %>% dplyr::group_by(FPR) %>% dplyr::summarise(mean = mean(REC)), 
+    #                  ggplot2::aes(x=FPR, y=mean, col="mean of folds")) +
+    #        ggplot2::geom_abline(ggplot2::aes(intercept=0, slope=1), linetype="dashed", col="darkgrey") +
             #ggplot2::annotate("text", label=paste0("mean AUROC = ",thestats["AUROC",]), x = 0.75, y = 0.01, size = 4, colour = "darkorange3") + 
-            ggplot2::xlab("FPR") +
-            ggplot2::ylab("TPR (Recall)") + 
-            ggplot2::scale_color_manual(name = "ROC",
-                               breaks = c("mean of folds"),
-                               values = c("mean of folds" = "darkorange") ) +
-            ggplot2::labs(title=paste0(metrics$res_combined$geneset[1]), 
-                          caption = paste0("mean of folds AUROC = ", thestats["AUROC",])) +
-            ggplot2::theme(legend.position="top", legend.box = "horizontal")
+    #        ggplot2::xlab("FPR") +
+    #        ggplot2::ylab("TPR (Recall)") + 
+    #        ggplot2::scale_color_manual(name = "ROC",
+    #                           breaks = c("mean of folds"),
+    #                           values = c("mean of folds" = "darkorange") ) +
+    #        ggplot2::labs(title=paste0(metrics$res_combined$geneset[1]), 
+    #                      caption = paste0("mean of folds AUROC = ", thestats["AUROC",])) +
+    #        ggplot2::theme(legend.position="top", legend.box = "horizontal")
         
         ### PRC
         # p2 <- ggplot2::ggplot() + 
@@ -410,58 +306,58 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
         
         ### Interpolated PRC
         # for each fold, interpolating the PR values at specific recall (x-axis) positions
-        pr          <- expand.grid(fold=as.factor(seq(1,folds,by=1)), recall = seq(0,1,by=0.1))
-        pr$maxprec  <- foreach::foreach(f=pr$fold, r = pr$recall, .combine = c) %do%
-            {
-                prec <- metrics$res_combined  %>% dplyr::filter(fold==f, REC >= r) %>% dplyr::pull(PREC)
-                if(length(prec)>0)
-                    max(prec)
-                else
-                    return(0)
-            }
+    #    pr          <- expand.grid(fold=as.factor(seq(1,folds,by=1)), recall = seq(0,1,by=0.1))
+    #    pr$maxprec  <- foreach::foreach(f=pr$fold, r = pr$recall, .combine = c) %do%
+    #        {
+    #            prec <- metrics$res_combined  %>% dplyr::filter(fold==f, REC >= r) %>% dplyr::pull(PREC)
+    #            if(length(prec)>0)
+    #                max(prec)
+    #            else
+    #                return(0)
+    #        }
         # make it into a step curve for each fold (here we can show mean of folds line properly)
-        lag1 <- pr %>% dplyr::group_by(fold) %>% dplyr::mutate(maxprec = lag(maxprec,1)) %>% dplyr::slice(-1)
-        stepcurve <- rbind(pr, lag1) %>% dplyr::arrange(recall, dplyr::desc(maxprec))
+    #    lag1 <- pr %>% dplyr::group_by(fold) %>% dplyr::mutate(maxprec = lag(maxprec,1)) %>% dplyr::slice(-1)
+    #    stepcurve <- rbind(pr, lag1) %>% dplyr::arrange(recall, dplyr::desc(maxprec))
 
-        p3 <- ggplot2::ggplot(stepcurve) + 
+     #   p3 <- ggplot2::ggplot(stepcurve) + 
            # ggplot2::geom_line(ggplot2::aes(x=recall, y=maxprec, group=fold, col="folds"), alpha=0.5) + 
-            ggplot2::geom_line(data=stepcurve %>% dplyr::group_by(recall) %>% dplyr::summarise(meanprec=mean(maxprec)), 
-                      ggplot2::aes(x=recall, y=meanprec, col="mean of folds")) + 
-            ggplot2::geom_hline(yintercept=thestats["ExpectedAUPRC",], linetype="dotted", col="darkorange") +
-            ggplot2::scale_color_manual(name = "Interpolated PRC",
-                               breaks = c("mean of folds"),
-                               values = c("mean of folds" = "darkorange")) +
-            ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
-            ggplot2::expand_limits(x=c(0,1), y=c(0, 1)) + 
-            ggplot2::labs(title=paste0(metrics$res_combined$geneset[1]),
-                          caption = paste0("mean of folds AUPRC = ", thestats["AUPRC",]))
+     #       ggplot2::geom_line(data=stepcurve %>% dplyr::group_by(recall) %>% dplyr::summarise(meanprec=mean(maxprec)), 
+     #                 ggplot2::aes(x=recall, y=meanprec, col="mean of folds")) + 
+     #       ggplot2::geom_hline(yintercept=thestats["ExpectedAUPRC",], linetype="dotted", col="darkorange") +
+     #       ggplot2::scale_color_manual(name = "Interpolated PRC",
+     #                          breaks = c("mean of folds"),
+     #                          values = c("mean of folds" = "darkorange")) +
+     #       ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
+     #       ggplot2::expand_limits(x=c(0,1), y=c(0, 1)) + 
+     #       ggplot2::labs(title=paste0(metrics$res_combined$geneset[1]),
+     #                     caption = paste0("mean of folds AUPRC = ", thestats["AUPRC",]))
 
 
         # early recall (TPR)
-        p6 <- ggplot2::ggplot() + 
-            ggplot2::geom_line(data=metrics$res_combined %>% dplyr::filter(rank<=100) %>% 
-                          dplyr::group_by(rank) %>% dplyr::summarise(REC = mean(REC)), 
-                          ggplot2::aes(x=rank, y=REC, col="mean of folds")) + 
-            ggplot2::xlab("rank position") + 
-            ggplot2::ylab("TPR (Recall)") + 
-            ggplot2::scale_color_manual(name = "Early Recall",
-                               breaks = c("mean of folds"),
-                               values = c("mean of folds" = "darkorange") ) +
-            ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
-            ggplot2::expand_limits(y=c(0, 1))
+     #   p6 <- ggplot2::ggplot() + 
+     #       ggplot2::geom_line(data=metrics$res_combined %>% dplyr::filter(rank<=100) %>% 
+     #                     dplyr::group_by(rank) %>% dplyr::summarise(REC = mean(REC)), 
+     #                     ggplot2::aes(x=rank, y=REC, col="mean of folds")) + 
+     #       ggplot2::xlab("rank position") + 
+     #       ggplot2::ylab("TPR (Recall)") + 
+     #       ggplot2::scale_color_manual(name = "Early Recall",
+     #                          breaks = c("mean of folds"),
+     #                          values = c("mean of folds" = "darkorange") ) +
+     #       ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
+     #       ggplot2::expand_limits(y=c(0, 1))
         
         # rank distribution of true positive hits
-        p7 <- ggplot2::ggplot(metrics$res_combined %>% dplyr::filter(InValset==1)) + 
-          ggplot2::geom_density(ggplot2::aes(x=rank, group=fold), col="#AAAAAA1A") + 
-          ggplot2::geom_hline( ggplot2::aes(col="uniform dist", yintercept=1/nrow(metrics$res_avg)), linetype="dashed") + 
-          ggplot2::theme(legend.position="top", legend.box = "horizontal")
+     #   p7 <- ggplot2::ggplot(metrics$res_combined %>% dplyr::filter(InValset==1)) + 
+     #     ggplot2::geom_density(ggplot2::aes(x=rank, group=fold), col="#AAAAAA1A") + 
+     #     ggplot2::geom_hline( ggplot2::aes(col="uniform dist", yintercept=1/nrow(metrics$res_avg)), linetype="dashed") + 
+     #     ggplot2::theme(legend.position="top", legend.box = "horizontal")
           
-        plotcomp <- ggplot2::ggplot_build(p7)
-        meandensity <- plotcomp$data[[1]] %>% dplyr::group_by(x) %>% dplyr::summarise(hit_density = mean(ymax))
-        p7 <- p7 +  ggplot2::geom_line(data = meandensity, ggplot2::aes(x = x, y = hit_density, col="mean of folds")) + 
-          ggplot2::scale_color_manual(name = "Recall Density",
-                                      breaks = c("mean of folds", "uniform dist"),
-                                      values = c("mean of folds" = "darkorange", "uniform dist"="black") )
+    #    plotcomp <- ggplot2::ggplot_build(p7)
+    #    meandensity <- plotcomp$data[[1]] %>% dplyr::group_by(x) %>% dplyr::summarise(hit_density = mean(ymax))
+    #    p7 <- p7 +  ggplot2::geom_line(data = meandensity, ggplot2::aes(x = x, y = hit_density, col="mean of folds")) + 
+    #      ggplot2::scale_color_manual(name = "Recall Density",
+    #                                  breaks = c("mean of folds", "uniform dist"),
+    #                                  values = c("mean of folds" = "darkorange", "uniform dist"="black") )
           
         
         # p7 <- ggplot2::ggplot(metrics$res_combined %>% dplyr::filter(InValset==1)) + 
@@ -470,21 +366,21 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
         #     ggplot2::ylab("Geneset genes in bin")# ranking distribution of hits in bins of 100 for mean of folds
 
         
-        fname = paste("RWR-CV", metrics$res_combined$geneset[1], get_base_name(dataPath), modname, sep="_")
-        fname = paste(substr(fname, 1, 99), 'plots.png', sep='.')
-        out_path = file.path(outdirPath, fname)
+    #    fname = paste("RWR-CV", metrics$res_combined$geneset[1], get_base_name(dataPath), modname, sep="_")
+    #    fname = paste(substr(fname, 1, 99), 'plots.png', sep='.')
+    #    out_path = file.path(outdirPath, fname)
         
-        png(out_path, width = 1200, height=1000)
-        grid::pushViewport(grid::viewport(layout = grid::grid.layout(2, 2)))
+    #    png(out_path, width = 1200, height=1000)
+    #    grid::pushViewport(grid::viewport(layout = grid::grid.layout(2, 2)))
 
-        print(p1, vp = vplayout(1, 1))
-        print(p3, vp = vplayout(1, 2))
-        print(p6, vp = vplayout(2, 1))
-        print(p7, vp = vplayout(2, 2))
+    #    print(p1, vp = vplayout(1, 1))
+    #    print(p3, vp = vplayout(1, 2))
+    #    print(p6, vp = vplayout(2, 1))
+    #    print(p7, vp = vplayout(2, 2))
         
-        dev.off()
-        message('File saved:', out_path, "\n")
-    }
+    #    dev.off()
+    #    message('File saved:', out_path, "\n")
+    #}
     
     ######## SINGLETONS (many folds) #########
 
@@ -591,42 +487,42 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
 
     ####### LOO ############
 
-    if(metrics$res_combined$method[1] == "loo")
-    {
+    #if(metrics$res_combined$method[1] == "loo")
+    #{
         # early recall
-        p1 <- ggplot2::ggplot() + 
-          ggplot2::geom_line(data=metrics$res_avg %>% dplyr::filter(rerank <= 100) %>% 
-                               dplyr::group_by(rerank) %>% dplyr::summarise(REC = mean(REC)), 
-                             ggplot2::aes(x=rerank, y=REC, col="mean of folds")) + 
-          ggplot2::xlab("rank position") + 
-          ggplot2::ylab("TPR (Recall)") + 
-          ggplot2::scale_color_manual(name = "Early Recall",
-                                      breaks = c("mean of folds"),
-                                      values = c("mean of folds" = "darkorange") ) +
-          ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
-          ggplot2::expand_limits(y=c(0, 1))
+    #    p1 <- ggplot2::ggplot() + 
+    #      ggplot2::geom_line(data=metrics$res_avg %>% dplyr::filter(rerank <= 100) %>% 
+    #                           dplyr::group_by(rerank) %>% dplyr::summarise(REC = mean(REC)), 
+    #                         ggplot2::aes(x=rerank, y=REC, col="mean of folds")) + 
+    #      ggplot2::xlab("rank position") + 
+    #      ggplot2::ylab("TPR (Recall)") + 
+    #      ggplot2::scale_color_manual(name = "Early Recall",
+    #                                  breaks = c("mean of folds"),
+    #                                  values = c("mean of folds" = "darkorange") ) +
+    #      ggplot2::theme(legend.position="top", legend.box = "horizontal") + 
+    #      ggplot2::expand_limits(y=c(0, 1))
         
        
         # PRC  step curve
-        pr          <- expand.grid(fold="median", recall = seq(0,1,by=0.01))
-        pr$maxprec  <- foreach::foreach(f=pr$fold, r = pr$recall, .combine = c) %do%
-            {
-                prec <- metrics$res_avg  %>% dplyr::filter(REC >= r) %>% dplyr::pull(PREC)
-                if(length(prec)>0)
-                    max(prec)
-                else
-                    return(0)
-            }
+    #    pr          <- expand.grid(fold="median", recall = seq(0,1,by=0.01))
+    #    pr$maxprec  <- foreach::foreach(f=pr$fold, r = pr$recall, .combine = c) %do%
+    #        {
+    #            prec <- metrics$res_avg  %>% dplyr::filter(REC >= r) %>% dplyr::pull(PREC)
+    #            if(length(prec)>0)
+    #                max(prec)
+    #            else
+    #                return(0)
+    #        }
         
-        lag1 <- pr %>% dplyr::mutate(maxprec = lag(maxprec,1)) %>% dplyr::slice(-1)
-        stepcurve <- rbind(pr, lag1) %>% dplyr::arrange(recall, dplyr::desc(maxprec))
-        p2 <- ggplot2::ggplot(stepcurve) + 
-            ggplot2::geom_line(data=stepcurve %>% dplyr::group_by(recall) %>% dplyr::summarise(meanprec=mean(maxprec)), 
-                      ggplot2::aes(x=recall, y=meanprec, col="mean of folds")) + 
-            ggplot2::scale_color_manual(name = "Interpolated PRC",
-                               breaks = c("folds", "mean of folds"),
-                               values = c("folds"="grey", "mean of folds" = "darkorange") ) +
-            ggplot2::theme(legend.position="top", legend.box = "horizontal")
+    #    lag1 <- pr %>% dplyr::mutate(maxprec = lag(maxprec,1)) %>% dplyr::slice(-1)
+    #    stepcurve <- rbind(pr, lag1) %>% dplyr::arrange(recall, dplyr::desc(maxprec))
+    #    p2 <- ggplot2::ggplot(stepcurve) + 
+    #        ggplot2::geom_line(data=stepcurve %>% dplyr::group_by(recall) %>% dplyr::summarise(meanprec=mean(maxprec)), 
+    #                  ggplot2::aes(x=recall, y=meanprec, col="mean of folds")) + 
+    #        ggplot2::scale_color_manual(name = "Interpolated PRC",
+    #                           breaks = c("folds", "mean of folds"),
+    #                           values = c("folds"="grey", "mean of folds" = "darkorange") ) +
+    #        ggplot2::theme(legend.position="top", legend.box = "horizontal")
         
         # precision / recall
         # p2 <- ggplot(metrics$res_avg) + 
@@ -644,10 +540,10 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
 
         # ranking distribution of hits in bins of 100 
    # ranking distribution of hits in bins of 100 for meanof folds
-        p4 <- ggplot2::ggplot(metrics$res_combined %>% dplyr::filter(InValset==1)) + 
-            ggplot2::geom_histogram(ggplot2::aes(x=rank), binwidth=100, fill="darkred") + 
-            ggplot2::xlab("CV Mean Rank (binwidth=100)") + 
-            ggplot2::ylab("Geneset genes in bin")
+   #     p4 <- ggplot2::ggplot(metrics$res_combined %>% dplyr::filter(InValset==1)) + 
+   #         ggplot2::geom_histogram(ggplot2::aes(x=rank), binwidth=100, fill="darkred") + 
+   #         ggplot2::xlab("CV Mean Rank (binwidth=100)") + 
+   #         ggplot2::ylab("Geneset genes in bin")
 
         # p7 <- ggplot2::ggplot(in_valset_data) + 
         #   ggplot2::geom_density(ggplot2::aes(x=rank, group=fold),col="grey", alpha=0.5)
@@ -655,24 +551,24 @@ save_plots_cv <- function(metrics, geneset, folds, dataPath, modname, outdirPath
         # meandensity <- plotcomp$data[[1]] %>% dplyr::group_by(x) %>% dplyr::summarise(hit_density = mean(ymax))
         # p7 <- p7 +  ggplot2::geom_line(data = meandensity, ggplot2::aes(x = x, y = hit_density), col="darkorange")
         
-        fname <- paste("RWR-CV", metrics$res_combined$geneset[1], get_base_name(dataPath), modname, sep = "_")
-        fname = paste(substr(fname, 1, 99), 'plots.png', sep='.')
-        out_path = file.path(outdirPath, fname)
+   #     fname <- paste("RWR-CV", metrics$res_combined$geneset[1], get_base_name(dataPath), modname, sep = "_")
+   #     fname = paste(substr(fname, 1, 99), 'plots.png', sep='.')
+   #     out_path = file.path(outdirPath, fname)
         
-        png(out_path, width = 1200, height=1000)
+   #     png(out_path, width = 1200, height=1000)
         # print( (p1 + p2)/(p3 + p4) + plot_layout(heights=c(1,1)) )
         # dev.off()
         # cat('File saved:', out_path,"\n")
         
-        grid::pushViewport(grid::viewport(layout = grid::grid.layout(2, 2)))
+   #     grid::pushViewport(grid::viewport(layout = grid::grid.layout(2, 2)))
         
-        print(p1, vp = vplayout(1, 1))  # Top left
-        print(p2, vp = vplayout(1, 2))  # Top right 
-        print(p4, vp = vplayout(2, 1:2))  # Bottom 
-        dev.off()
-        message(paste('File saved:', out_path))
+   #     print(p1, vp = vplayout(1, 1))  # Top left
+   #     print(p2, vp = vplayout(1, 2))  # Top right 
+   #     print(p4, vp = vplayout(2, 1:2))  # Bottom 
+   #     dev.off()
+   #     message(paste('File saved:', out_path))
        
-    }
+    #}
 
 }
 
@@ -719,21 +615,21 @@ post_process_rwr_output_cv <- function(res, extras, folds, nw.mpo) {
   # combine results from the res list into one dataframe
   res_combined <- dplyr::bind_rows(res) %>% dplyr::arrange(rank)
 
-  if (extras_exist & res_method == "loo") {
-    res_combined <- rbind(res_combined, data.frame(
-      NodeNames = extras$gene, Score = 0,
-      rank = nw.mpo$Number_of_Nodes_Multiplex,
-      InValset = 1,
-      num_in_network = dplyr::first(res[[1]]$num_in_network),
-      num_seeds = dplyr::first(res[[1]]$num_seeds),
-      num_leftout = dplyr::first(res[[1]]$num_leftout),
-      networks = dplyr::first(res[[1]]$networks),
-      fold = seq(length(res) + 1, length(res) + nrow(extras)),
-      modname = dplyr::first(res[[1]]$modname),
-      geneset = dplyr::first(x = res[[1]]$geneset),
-      seed = "", leftout = extras$gene, method = dplyr::first(res[[1]]$method)
-    ))
-  }
+  #if (extras_exist & res_method == "loo") {
+  #  res_combined <- rbind(res_combined, data.frame(
+  #    NodeNames = extras$gene, Score = 0,
+  #    rank = nw.mpo$Number_of_Nodes_Multiplex,
+  #    InValset = 1,
+  #    num_in_network = dplyr::first(res[[1]]$num_in_network),
+  #    num_seeds = dplyr::first(res[[1]]$num_seeds),
+  #    num_leftout = dplyr::first(res[[1]]$num_leftout),
+  #    networks = dplyr::first(res[[1]]$networks),
+  #    fold = seq(length(res) + 1, length(res) + nrow(extras)),
+  #    modname = dplyr::first(res[[1]]$modname),
+  #    geneset = dplyr::first(x = res[[1]]$geneset),
+  #    seed = "", leftout = extras$gene, method = dplyr::first(res[[1]]$method)
+  #  ))
+  #}
 
   # print(head(res_combined))
 
