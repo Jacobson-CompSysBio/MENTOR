@@ -204,6 +204,7 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
     if not dry_run:
         print(command)
         res = subprocess.run(command, shell=True, capture_output=True)
+        print(res)
         if res.returncode == 0:
             if verbose > 0:
                 print('Success!')

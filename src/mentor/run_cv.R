@@ -5,6 +5,21 @@
 # Author: David Kainer
 ########################################################################
 
+library(igraph)
+library(tidyverse)
+library(data.table)
+library(BiocManager)
+library(doParallel)
+library(foreach)
+library(optparse)
+library(patchwork)
+library(iterators)
+library(RandomWalkRestartMH)
+library(IRkernel)
+library(stringr)
+library(Matrix)
+library(dplyr)
+
 parse_arguments <- function() {
   
   suppressPackageStartupMessages(require(optparse))
@@ -81,12 +96,6 @@ parse_arguments <- function() {
       help = "String to include in output filename. (--out-fullranks
                     and --out-meanranks override this.)"
     ),
-    # make_option(c("-p", "--plot"),
-    #   action = "store_true",
-    #   default = FALSE,
-    #   help = "Output plots of ROC, PRC,  etc.
-    #                 [default %default]"
-    # ),
     make_option(c("--out-fullranks"),
       action = "store",
       default = NULL,
@@ -149,8 +158,8 @@ main <- function(opt) {
   file.arg.name <- "--file="
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
-  utils_path = file.path(script.basename,'/utils.R')
-  rwr_path = file.path(script.basename,'/RWR_CV.R')
+  utils_path = file.path(script.basename,'rwr_utils.R')
+  rwr_path = file.path(script.basename,'RWR_CV.R')
   print(rwr_path)
   source(rwr_path)
   if (file.exists(utils_path)) {

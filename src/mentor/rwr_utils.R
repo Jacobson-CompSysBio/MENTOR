@@ -53,6 +53,7 @@ load_network <- function(path_to_edgelist,
 
 
 load_geneset <- function(path, nw.mpo = NULL, verbose = FALSE, select=NULL) {
+
   if (is.null(path)) {
     return(NULL)
   } else if (!file.exists(path)) {
@@ -84,6 +85,7 @@ load_geneset <- function(path, nw.mpo = NULL, verbose = FALSE, select=NULL) {
   # Filtering
   # Remove any duplicate genes
   geneset_orig <- geneset
+  print(head(geneset_orig))
   geneset <- geneset_orig %>% dplyr::distinct(gene, .keep_all = T)
   ngenes <- nrow(geneset)
   extras <- NULL
