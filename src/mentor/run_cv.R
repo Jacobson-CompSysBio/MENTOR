@@ -39,48 +39,48 @@ parse_arguments <- function() {
                     first two columns with no headers tab-delimited:
                     <setid> <gene> <weight>."
     ),
-    make_option(c("--method"),
-      action = "store",
-      default = "kfold",
-      type = "character",
-      help = "Cross-validation method. `kfold`, `loo`, or `singletons`.
-                    [default %default]"
-    ),
-    make_option(c("-f", "--folds"),
-      action = "store",
-      default = 5,
-      type = "numeric",
-      help = "Number (k) of folds to use in k-fold CV.
-                    [default %default]"
-    ),
-    make_option(c("-r", "--restart"),
-      action = "store",
-      default = 0.7,
-      type = "numeric",
-      help = "Set the restart parameter [0,1). Higher value means the
-                    walker will jump back to a seed node more often.
-                    [default %default]"
-    ),
-    make_option("--tau",
-      action = "store",
-      default = "1.0",
-      help = "comma-separated list of values between that MUST add
-              up to the number of network layers in the .Rdata file.
-              One value per network layer that determines the probability
-              that the random walker will restart in that layer. e.g.
-              if there are three layers (A,B,C) in your multiplex network,
-              then --tau '0.2,1.3,1.5' will mean that layer A is less likely
-              to be walked on after a restart than layers B or C.
-              [default %default]"
-    ),
-    make_option(c("-n", "--numranked"),
-      action = "store",
-      default = 1.0,
-      type = "numeric",
-      help = "proportion of ranked genes to return [0,1]. e.g. 0.1
-                    will return the top 10%.
-                    [default %default]"
-    ),
+    # make_option(c("--method"),
+    #   action = "store",
+    #   default = "kfold",
+    #   type = "character",
+    #   help = "Cross-validation method. `kfold`, `loo`, or `singletons`.
+    #                 [default %default]"
+    # ),
+    # make_option(c("-f", "--folds"),
+    #   action = "store",
+    #   default = 5,
+    #   type = "numeric",
+    #   help = "Number (k) of folds to use in k-fold CV.
+    #                 [default %default]"
+    # ),
+    # make_option(c("-r", "--restart"),
+    #   action = "store",
+    #   default = 0.7,
+    #   type = "numeric",
+    #   help = "Set the restart parameter [0,1). Higher value means the
+    #                 walker will jump back to a seed node more often.
+    #                 [default %default]"
+    # ),
+    # make_option("--tau",
+    #   action = "store",
+    #   default = "1.0",
+    #   help = "comma-separated list of values between that MUST add
+    #           up to the number of network layers in the .Rdata file.
+    #           One value per network layer that determines the probability
+    #           that the random walker will restart in that layer. e.g.
+    #           if there are three layers (A,B,C) in your multiplex network,
+    #           then --tau '0.2,1.3,1.5' will mean that layer A is less likely
+    #           to be walked on after a restart than layers B or C.
+    #           [default %default]"
+    # ),
+    # make_option(c("-n", "--numranked"),
+    #   action = "store",
+    #   default = 1.0,
+    #   type = "numeric",
+    #   help = "proportion of ranked genes to return [0,1]. e.g. 0.1
+    #                 will return the top 10%.
+    #                 [default %default]"
+    # ),
     make_option(c("-o", "--outdir"),
       action = "store",
       default = NULL,
@@ -173,11 +173,11 @@ main <- function(opt) {
   RWR_CV(
     data = opt$data,
     geneset_path = opt$geneset,
-    method = opt$method,
-    folds = opt$folds,
-    restart = opt$restart,
-    tau = opt$tau,
-    numranked = opt$numranked,
+    method = "singletons",
+    folds = 5,
+    restart = 0.7,
+    tau = 1,
+    numranked = 1,
     outdir = opt$outdir,
     #modname = opt$modname,
     #plot = opt$plot,
