@@ -207,9 +207,9 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
             if verbose > 0:
                 print('Success!')
         else:
-            print('[WARNING] Command exited with non-zero status: {}'.format(res.returncode), file=sys.stderr)
-            print(command, file=sys.stderr)
-            print(res.stderr.decode(), file=sys.stderr)
+            #print('[WARNING] Command exited with non-zero status: {}'.format(res.returncode), file=sys.stderr)
+            #print(command, file=sys.stderr)
+            #print(res.stderr.decode(), file=sys.stderr)
         result.update(
             stdout=res.stdout.decode(),
             stderr=res.stderr.decode(),
