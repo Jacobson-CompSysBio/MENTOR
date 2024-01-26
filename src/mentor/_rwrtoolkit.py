@@ -74,15 +74,15 @@ def run(commands,sep = ' && ',dry_run = False,verbose = 0):
     else:
         command = sep.join(commands)
     result = dict(
-        command=command,
-        dry_run=dry_run,
-        returncode=None,
-        stderr=None,
-        stdout=None
+        command = command,
+        dry_run = dry_run,
+        returncode = None,
+        stderr = None,
+        stdout = None
     )
     if not dry_run:
         print(command)
-        res = subprocess.run(command, shell=True, capture_output=True)
+        res = subprocess.run(command,shell = True,capture_output = True)
         print(res)
         if res.returncode == 0:
             if verbose > 0:
@@ -90,11 +90,11 @@ def run(commands,sep = ' && ',dry_run = False,verbose = 0):
         else:
             print('Failed')
         result.update(
-            stdout=res.stdout.decode(),
-            stderr=res.stderr.decode(),
-            returncode=res.returncode,
-            args=res.args,
-            dry_run=dry_run
+            stdout = res.stdout.decode(),
+            stderr = res.stderr.decode(),
+            returncode = res.returncode,
+            args = res.args,
+            dry_run = dry_run
         )
     else:
         print('[DRY RUN]', command)
