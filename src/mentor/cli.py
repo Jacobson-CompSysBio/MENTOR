@@ -56,37 +56,37 @@ def parse_args(test=None):
         action='store',
         help=''
     )
-    parser.add_argument(
-        '--method',
-        action='store',
-        default='singletons',
-        help=''
-    )
-    parser.add_argument(
-        '--folds',
-        action='store',
-        help=''
-    )
-    parser.add_argument(
-        '--restart',
-        action='store',
-        help=''
-    )
-    parser.add_argument(
-        '--tau',
-        action='store',
-        help=''
-    )
-    parser.add_argument(
-        '--numranked',
-        action='store',
-        help=''
-    )
-    parser.add_argument(
-        '--modname',
-        action='store',
-        help=''
-    )
+#    parser.add_argument(
+#        '--method',
+#        action='store',
+#        default='singletons',
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--folds',
+#        action='store',
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--restart',
+#        action='store',
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--tau',
+#        action='store',
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--numranked',
+#        action='store',
+#        help=''
+#    )
+#    parser.add_argument(
+#        '--modname',
+#        action='store',
+#        help=''
+#    )
     parser.add_argument(
         '--threads',
         action='store',
@@ -208,13 +208,13 @@ def main():
         command = rwrtoolkit.rwr_singletons(
             data = args.multiplex,
             geneset = args.geneset,
-            method = args.method,
-            folds = args.folds,
-            restart = args.restart,
-            tau = args.tau,
-            numranked = args.numranked,
+            #method = args.method,
+            #folds = args.folds,
+            #restart = args.restart,
+            #tau = args.tau,
+            #numranked = args.numranked,
             outdir = args.outdir,
-            modname = args.modname,
+            #modname = args.modname,
             threads = args.threads,
             verbose = args.verbose
         )
