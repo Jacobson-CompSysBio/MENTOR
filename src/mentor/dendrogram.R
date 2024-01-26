@@ -83,10 +83,10 @@ dendrogram <- function(dis_mat,k = 3,map) {
     names(dend_labs)[which(names(dend_labs) == "label")] <- "ensembl"
     map_genes <- suppressMessages(read_tsv(map, col_names = TRUE, show_col_types = FALSE))
     names(map_genes) <- c("ensembl","label")
-#    if(nrow(dend_labs) != nrow(map_genes)|!(all(dend_labs$ensembl %in% map_genes$ensembl))) {
-#    	print("ERROR: please ensure your mapping file has the same number of genes in your dissimilarity matrix")
-#	quit(save = "no")
-#    }
+    if(nrow(dend_labs) != nrow(map_genes)|!(all(dend_labs$ensembl %in% map_genes$ensembl))) {
+    	print("ERROR: please ensure your mapping file has the same number of genes in your dissimilarity matrix")
+	    quit(save = "no")
+    }
     dend_labs <- merge(dend_labs,map_genes,by = "ensembl",all.x = TRUE)
     dend_labs <- dend_labs %>% dplyr::select(label,x,y,col,cex)
     dend_labs <- dend_labs[order(dend_labs$x,decreasing = FALSE),]
