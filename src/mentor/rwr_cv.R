@@ -5,8 +5,6 @@
 # - Output: Table with the ranking of each gene in the gene set when left out,
 #           along with AUPRC and AUROC curves
 ########################################################################
-# Internal Functions
-########################################################################
 
 update_folds_by_method <- function(geneset,method,num_folds,verbose = FALSE) {
   
@@ -28,17 +26,16 @@ extract_lo_and_seed_genes_cv <- function(geneset,method,r,chunks = NULL) {
   
   seed_genes <- geneset %>%
     dplyr::slice(r) %>%
-    dplyr::pull(gene) # nolint       Get one seed gene.  
+    dplyr::pull(gene)
   leftout <- geneset %>%
-    dplyr::filter(gene != seed_genes) %>%     #nolint
+    dplyr::filter(gene != seed_genes) %>%
     dplyr::pull(gene)
   list(leftout, seed_genes)
   
 }
 
-create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,num_nodes_in_multiplex) { # ,name
-  
-  # turn scores into rankings: highest score gets lowest rank
+create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,num_nodes_in_multiplex) {
+
   rwr$RWRM_Results <- rwr$RWRM_Results %>%
     dplyr::mutate(
       rank = dplyr::row_number(-Score),
@@ -53,7 +50,6 @@ create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,
   num_leftout <- length(leftout)
   networks <- networks
   fold <- r
-  #modname <- name
   geneset <- geneset$setid[1]
   seed <- seed_genes
   leftout <- "AllBut1"
@@ -64,7 +60,6 @@ create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,
       num_leftout = num_leftout,
       networks = networks,
       fold = fold,
-      #modname = modname,
       geneset = geneset,
       seed = seed,
       leftout = leftout,
@@ -74,7 +69,6 @@ create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,
   
 }
 
-# For 'loo' and 'kfold', each gene is leftout once, so gets ranked once.
 RWR <- function(geneset,
                 adjnorm,
                 mpo,
@@ -83,7 +77,6 @@ RWR <- function(geneset,
                 chunks,
                 restart,
                 tau,
-                #name = "default",
                 threads,
                 verbose = FALSE) {
   
@@ -98,7 +91,6 @@ RWR <- function(geneset,
     )
     leftout <- lo_seed_genelist[[1]]
     seed_genes <- lo_seed_genelist[[2]]
-    ### run RWR on a fold
     rwr <- RandomWalkRestartMH::Random.Walk.Restart.Multiplex(
       x = adjnorm,
       MultiplexObject = mpo,
@@ -110,7 +102,6 @@ RWR <- function(geneset,
       rwr,
       networks,
       r,
-      #name,
       geneset,
       method,
       seed_genes,
@@ -196,7 +187,7 @@ post_process_rwr_output_cv <- function(res,extras,folds,nw.mpo) {
   if (extras_exist) {
     for (i in 0:(nrow(extras) - 1))
     {
-      res.tmp <- res[[(i %% folds) + 1]] # Get res[ i mod extras ]'th res
+      res.tmp <- res[[(i %% folds) + 1]]
       extra_ith_row <- data.frame(
         NodeNames = extras$gene[i + 1],
         Score = 0,
@@ -207,7 +198,6 @@ post_process_rwr_output_cv <- function(res,extras,folds,nw.mpo) {
         num_leftout = dplyr::first(res.tmp$num_leftout),
         networks = dplyr::first(res.tmp$networks),
         fold = dplyr::first(res.tmp$fold),
-        #modname = dplyr::first(res.tmp$modname),
         geneset = dplyr::first(res.tmp$geneset),
         seed = "missing",
         leftout = "missing",
@@ -230,14 +220,10 @@ calculate_average_rank_across_folds_cv <- function(res_combined){
       geneset=dplyr::first(geneset),
       num_in_network=dplyr::first(num_in_network)) %>%
     dplyr::arrange(meanrank) %>%
-    dplyr::mutate(rerank = rank(meanrank, ties.method = "min"),.after=meanrank) # here we rerank the mean ranks of the folds to go from 1:nrow again
+    dplyr::mutate(rerank = rank(meanrank, ties.method = "min"),.after=meanrank)
   res_avg
   
 }
-
-########################################################################
-# Main Function
-########################################################################
 
 RWR_CV <- function(data = NULL,
                    geneset_path = NULL,
@@ -247,9 +233,6 @@ RWR_CV <- function(data = NULL,
                    tau = 1.0,
                    numranked = 1.0,
                    outdir = NULL,
-                   #modname = "default",
-                   # out_full_ranks = NULL,
-                   # out_mean_ranks = NULL,
                    threads = 1,
                    verbose = FALSE,
                    write_to_file = FALSE) {
@@ -258,7 +241,7 @@ RWR_CV <- function(data = NULL,
   nw_mpo <- data_list$nw.mpo
   nw_adjnorm <- data_list$nw.adjnorm
   if ((!is.null(outdir)) & write_to_file == FALSE) {
-    warning(sprintf("write_to_file was set to false, however, an output file path was set. write_to_file has been updated to TRUE.\n")) #nolint warning
+    warning(sprintf("write_to_file was set to false, however, an output file path was set. write_to_file has been updated to TRUE.\n"))
     write_to_file <- TRUE
   }
   if (is.null(outdir)){
@@ -273,14 +256,13 @@ RWR_CV <- function(data = NULL,
   geneset <- updated_data_list$geneset
   chunks <- updated_data_list$chunks
   method <- updated_data_list$method
-  res <- RWR(geneset,nw_adjnorm,nw_mpo,method,folds,chunks,restart,tau,threads,verbose) # ,modname
+  res <- RWR(geneset,nw_adjnorm,nw_mpo,method,folds,chunks,restart,tau,threads,verbose)
   res_combined <- post_process_rwr_output_cv(res,extras,folds,nw_mpo)
   res_avg <- calculate_average_rank_across_folds_cv(res_combined)
   metrics <- calc_metrics_cv(res_combined, res_avg)
   out_path <- get_file_path("RWR-CV_",
     res_combined$geneset[1],
     get_base_name(data),
-    #modname,
     outdir = outdir,
     ext = ".fullranks.tsv"
   )
@@ -296,7 +278,6 @@ RWR_CV <- function(data = NULL,
   out_path <- get_file_path("RWR-CV_",
     res_avg$geneset[1],
     get_base_name(data),
-    #modname,
     outdir = outdir,
     ext = ".meanranks.tsv"
   )
@@ -310,7 +291,6 @@ RWR_CV <- function(data = NULL,
   out_path <- get_file_path("RWR-CV_",
     metrics$res_combined$geneset[1],
     get_base_name(data),
-    #modname,
     outdir = outdir,
     ext = ".metrics.tsv"
   )
@@ -320,7 +300,6 @@ RWR_CV <- function(data = NULL,
   out_path <- get_file_path("RWR-CV_",
     metrics$res_combined$geneset[1],
     get_base_name(data),
-    #modname,
     outdir = outdir,
     ext = ".summary.tsv"
   )
