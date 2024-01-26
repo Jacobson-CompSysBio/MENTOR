@@ -126,30 +126,6 @@ RWR <- function(geneset,
 
 calc_metrics_cv <- function(res_combined,res_avg) {
   
-  ### Singletons: each relevant gene (R) is ranked R-1 times.
-  ###             - There are R folds, with R-1 left out per fold
-  ### LOO:        each relevant gene (R) is ranked once.
-  ###             - There are R folds, with 1 left out per fold
-  ### KFOLD:      each relevant gene (R) is ranked once.
-  ###             - There are K folds, with expectation of R/K
-  ### .             left out per fold (but not necessarily!!)
-
-  ### For KFOLD and Singletons::
-  ### R-Precision is most appropriate metric for ranked retrieval where the
-  ### number of relevant results (R) is known. It is simply RPREC = r/R,
-  ### where r = number of hits, and R = number of leftout geneset genes.
-  ### It is the same as Precision@R.
-  ###
-  ### For LOO this doesn't really work because R = 1, so we are looking
-  ###  at Precision @ 1 (lol).
-
-  # PR example: 5 genes left out need to be detected from 10 rankings
-  # ranking:  1    2    3    4   5   6   7    8    9     10
-  # truth:    1    0    1    0   0   1   0    0    1     1
-  # recall:   0.2  0.2  0.4  0.4 0.4 0.6 0.6  0.6  0.8   1.0
-  # Prec:     1    0.5  0.67 0.5 0.4 0.5 0.43 0.38 0.44  0.5
-  # Avg Prec: 1 +  0  + 0.67 + 0 +0 +0.5 + 0 + 0 + 0.44 +0.5) / 5 = 0.62
-
   ### calculate ROC/PRC per-fold
   res_combined <- res_combined %>%
     dplyr::mutate(fold = as.factor(fold)) %>%
@@ -215,17 +191,6 @@ calculate_max_precision <- function(pr, metrics) {
 
 post_process_rwr_output_cv <- function(res,extras,folds,nw.mpo) {
   
-  ############# post process results  ########################################
-  ## How to deal with missing geneset genes:
-  # Way 1: Append all geneset genes that are missing from the multiplex (extras) to the end of folds, giving them worst rank.
-  # and ensure they are spread evenly amongst the folds.
-  # -- We do this so that metrics will be with respect to the full original geneset
-  # -- For LOO, though, we need to append them to the end of the combined results, NOT to each fold.
-  #
-  # Problem with this approach: it makes a massive assumption that all the extras would rank at the bottom.
-  # This ends up punishing the metrics very harshly (and gives whacky ROC plots!).
-  # In reality, if the extras are functionally not relevant to the seeds (the null hyp) then they would have a
-  # uniform distribution across the rankings. But this makes it's own assumptions. There is no best way to do this!
   res_method <- res[[1]]$method[1]
   extras_exist <- !is.null(extras)
   if (extras_exist) {
@@ -251,15 +216,13 @@ post_process_rwr_output_cv <- function(res,extras,folds,nw.mpo) {
       res[[(i %% folds) + 1]] <- rbind(res.tmp, extra_ith_row)
     }
   }
-  # combine results from the res list into one dataframe
   res_combined <- dplyr::bind_rows(res) %>% dplyr::arrange(rank)
   res_combined
   
 }
 
 calculate_average_rank_across_folds_cv <- function(res_combined){
-  
-  # get the average ranks across all CV folds/runs
+
   res_avg <- res_combined %>%
     dplyr::group_by(NodeNames) %>%
     dplyr::summarise(meanrank = mean(rank), 
@@ -276,92 +239,6 @@ calculate_average_rank_across_folds_cv <- function(res_combined){
 # Main Function
 ########################################################################
 
-#' RWR Cross Validation
-#'
-#' `RWR_CV` RWR Cross Validation performs K-fold cross validation on a single
-#'  gene set, finding the RWR rank of the left-out genes.  Can choose: (1)
-#'  leave-one-out (`loo`) to leave only one gene from the gene set out and find
-#'  its rank, (2) cross-validation (`kfold`) to run k-fold cross-validation for
-#'  a specified value of *k*, or (3) singletons (`singletons`) to use a single
-#'  gene as a seed and find the rank of all remaining genes.
-#'
-#' @param data The path to the .Rdata file containing your multiplexed
-#'                  functional networks. This file is produced by
-#'                  RWR_make_multiplex. Default NULL
-#' @param geneset_path The path to the gene set file. It must have the
-#'                    following first two columns with no headers
-#'                    tab-delimited: 
-#'                    {<}setid{>} {<}gene{>} {<}weight{>}.   Default NULL
-#' @param method Cross-validation method. Choice of: 'kfold', 'loo', or
-#'               'singletons'. Default 'kfold'
-#' @param folds Number (k) of folds to use in k-fold CV. Default 5
-#' @param restart Set the restart parameter \[0,1). Higher value means the
-#'                walker will jump back to seed node more often. Default 0.7
-#' @param tau Comma-separated list of values between that MUST add up to the
-#'            number of network layers in the .Rdata file. One value per 
-#'            network layer that determines the probability that the random
-#'            walker will restart in that layer. e.g. if there are three layers
-#'            (A,B,C) in your multiplex network, then --tau '0.2,1.3,1.5' will
-#'            mean that layer A is less likely to be walked on after a restart
-#'            than layers B or C.  Default 1.0
-#' @param numranked Proportion of ranked genes to return \[0,1\].  e.g. 0.1 will
-#'                  return the top 10%. Default 1.0
-#' @param outdir Path to the output directory. Both 'fullranks' and 
-#'                   'medianranks' will be saved with auto-generated filenames.
-#'                   Can be overridden by specifically setting 'out_full_ranks'
-#'                   and 'out_mean_ranks' parameters. No defined path will 
-#'                   output within the same directory from which the original
-#'                   code was run.
-#'                   Default NULL
-#' @param modname String to include in output file name.  Default "default"
-#' @param plot Output plots of ROC, PRC, etc. to file. Default FALSE
-#' @param out_full_ranks Specify the full path for the full results. Ignores
-#'                     outdir and modName, using this path instead.
-#'                     Default NULL
-#' @param out_mean_ranks Specify the full path for the mean results. Ignores
-#'                       outdir and modName, using this path instead. 
-#'                       Default NULL 
-#' @param threads Specify the number of threads to use. Default for your system
-#'                is all cores - 1.
-#' @param verbose Verbose mode. Default FALSE
-#' @param write_to_file Also write the result to a file. Default FALSE, however,
-#'                      if output paths are included, the boolean is switched
-#'                      to true.
-#' @return Returns a list of four data tables: fullranks, medianranks, metrics,
-#'         and summary.
-#' @examples
-#'
-#' # An example of Running RWR CV
-#' # Loads a 10 layer multiplex and does not write to file:
-#' extdata.dir <- system.file("example_data", package = "RWRtoolkit")
-#' multiplex_object_filepath <- paste(extdata.dir,
-#'                                   "/string_interactions.Rdata",
-#'                                   sep = "")
-#' geneset_filepath <- paste(extdata.dir, "/geneset1.tsv", sep = "")
-#' outdir <- "./rwr_cv"
-#'
-#'
-#' cv_examples <- RWR_CV(
-#'   data = multiplex_object_filepath,
-#'   tau = "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0",
-#'   geneset_path = geneset_filepath,
-#'   outdir = outdir,
-#'   method = "kfold",
-#'   folds = 3
-#' )
-#'
-#' # An example of Running RWR CV with non-default method and writing to file
-#' # Loads a 10 layer multiplex and does not write to file:
-#' cv_examples <- RWR_CV(
-#'   data = multiplex_object_filepath,
-#'   tau = "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0",
-#'   geneset_path = geneset_filepath,
-#'   outdir = outdir,
-#'   method = "singletons",
-#'   write_to_file = TRUE
-#' )
-#'
-#' @export
 RWR_CV <- function(data = NULL,
                    geneset_path = NULL,
                    method = "kfold",
@@ -371,7 +248,6 @@ RWR_CV <- function(data = NULL,
                    numranked = 1.0,
                    outdir = NULL,
                    modname = "default",
-                   #plot = FALSE,
                    out_full_ranks = NULL,
                    out_mean_ranks = NULL,
                    threads = 1,
@@ -460,10 +336,6 @@ RWR_CV <- function(data = NULL,
   if (write_to_file) {
     write_table(metrics$summary, out_path)
   }
-  # if (plot) {
-  #   message("Saving plots ...")
-  #   save_plots_cv(metrics, geneset, folds, data, modname, outdir)
-  # }
   return(
     list(
       "fullranks" = res_combined,
