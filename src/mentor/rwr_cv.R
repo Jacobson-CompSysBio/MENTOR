@@ -69,16 +69,7 @@ create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,
   
 }
 
-RWR <- function(geneset,
-                adjnorm,
-                mpo,
-                method,
-                num_folds,
-                chunks,
-                restart,
-                tau,
-                threads,
-                verbose = FALSE) {
+RWR <- function(geneset,adjnorm,mpo,method,num_folds,chunks,restart,tau,threads,verbose = FALSE) {
   
   networks <- paste(names(mpo)[1:mpo$Number_of_Layers], collapse = "_")
   doParallel::registerDoParallel(cores = threads)
