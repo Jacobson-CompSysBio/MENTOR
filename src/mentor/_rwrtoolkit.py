@@ -54,8 +54,8 @@ def _activate_env(
     return command
 
 def rwr_singletons(
-    path_to_conda_env=None,
-    path_to_rwrtoolkit=PATH_TO_RWRTOOLKIT,
+    # path_to_conda_env=None,
+    # path_to_rwrtoolkit=PATH_TO_RWRTOOLKIT,
     data=None,
     geneset=None,
     method='singletons',
@@ -127,10 +127,10 @@ def rwr_singletons(
     tau : list
         List of values will be converted to string for RWR_KFOLD.R
     '''
-    if path_to_conda_env is not None:
-        command = _activate_env(path_to_conda_env) + ' && Rscript'
-    else:
-        command = 'Rscript'
+    # if path_to_conda_env is not None:
+    #     command = _activate_env(path_to_conda_env) + ' && Rscript'
+    # else:
+    command = 'Rscript'
     if path_to_rwrtoolkit is not None:
         exe = os.path.join(path_to_rwrtoolkit, 'inst', 'scripts', 'run_cv.R')
         command += f' "{exe}"'
