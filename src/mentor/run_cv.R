@@ -6,8 +6,8 @@
 ########################################################################
 
 parse_arguments <- function() {
+  
   suppressPackageStartupMessages(require(optparse))
-
   option_list <- list(
     make_option(c("-d", "--data"),
       action = "store",
@@ -57,7 +57,7 @@ parse_arguments <- function() {
               then --tau '0.2,1.3,1.5' will mean that layer A is less likely
               to be walked on after a restart than layers B or C.
               [default %default]"
-),
+    ),
     make_option(c("-n", "--numranked"),
       action = "store",
       default = 1.0,
@@ -81,12 +81,12 @@ parse_arguments <- function() {
       help = "String to include in output filename. (--out-fullranks
                     and --out-meanranks override this.)"
     ),
-    make_option(c("-p", "--plot"),
-      action = "store_true",
-      default = FALSE,
-      help = "Output plots of ROC, PRC,  etc.
-                    [default %default]"
-    ),
+    # make_option(c("-p", "--plot"),
+    #   action = "store_true",
+    #   default = FALSE,
+    #   help = "Output plots of ROC, PRC,  etc.
+    #                 [default %default]"
+    # ),
     make_option(c("--out-fullranks"),
       action = "store",
       default = NULL,
@@ -114,11 +114,8 @@ parse_arguments <- function() {
       help = "Verbose mode. [default %default]"
     )
   )
-
-  opt <- parse_args(OptionParser(option_list = option_list), convert_hyphens_to_underscores = TRUE)
-
+  opt <- parse_args(OptionParser(option_list = option_list),convert_hyphens_to_underscores = TRUE)
   errors <- 0
-  # Check whether all necessary args have been set by the user.
   if (is.null(opt$data)) {
     message("ERROR:: --data is required.")
     errors <- errors + 1
@@ -135,17 +132,14 @@ parse_arguments <- function() {
     message("ERROR:: You must provide either --outdir or --out-meanranks")
     errors <- errors + 1
   }
-
   if (opt$verbose) {
-    # Do this before quitting for errors so the user can inspect args.
     print(opt)
   }
-
   if (errors > 0) {
     quit()
   }
-
   return(opt)
+  
 }
 
 
@@ -162,19 +156,7 @@ main <- function(opt) {
     message(sprintf('ERROR: Cannot find utils.R at path: %s', utils_path))
     return(1)
   }
-
   opt <- parse_arguments()
-
-  # suppressPackageStartupMessages({
-  #     library(RandomWalkRestartMH)
-  #     library(igraph)
-  #     library(patchwork)
-  #     library(dplyr)
-  #     library(ggplot2)
-  #     library(foreach)
-  # })
-  # options(dplyr.summarise.inform = FALSE)
-
   RWRtoolkit::RWR_CV(
     data = opt$data,
     geneset_path = opt$geneset,
@@ -185,15 +167,15 @@ main <- function(opt) {
     numranked = opt$numranked,
     outdir = opt$outdir,
     modname = opt$modname,
-    plot = opt$plot,
+    #plot = opt$plot,
     out_full_ranks = opt$out_fullranks,
     out_mean_ranks = opt$out_meanranks,
     threads = opt$threads,
     verbose = opt$verbose,
     write_to_file = TRUE
   )
-
   return(0)
+  
 }
 
 status <- main()
