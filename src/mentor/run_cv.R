@@ -5,20 +5,20 @@
 # Author: David Kainer
 ########################################################################
 
-library(igraph)
-library(tidyverse)
-library(data.table)
-library(BiocManager)
-library(doParallel)
-library(foreach)
-library(optparse)
-library(patchwork)
-library(iterators)
-library(RandomWalkRestartMH)
-library(IRkernel)
-library(stringr)
-library(Matrix)
-library(dplyr)
+suppressWarnings(suppressPackageStartupMessages(require(igraph)))
+suppressWarnings(suppressPackageStartupMessages(require(tidyverse)))
+suppressWarnings(suppressPackageStartupMessages(require(data.table)))
+suppressWarnings(suppressPackageStartupMessages(require(BiocManager)))
+suppressWarnings(suppressPackageStartupMessages(require(doParallel)))
+suppressWarnings(suppressPackageStartupMessages(require(foreach)))
+suppressWarnings(suppressPackageStartupMessages(require(optparse)))
+suppressWarnings(suppressPackageStartupMessages(require(patchwork)))
+suppressWarnings(suppressPackageStartupMessages(require(iterators)))
+suppressWarnings(suppressPackageStartupMessages(require(RandomWalkRestartMH)))
+suppressWarnings(suppressPackageStartupMessages(require(IRkernel)))
+suppressWarnings(suppressPackageStartupMessages(require(stringr)))
+suppressWarnings(suppressPackageStartupMessages(require(Matrix)))
+suppressWarnings(suppressPackageStartupMessages(require(dplyr)))
 
 parse_arguments <- function() {
   
