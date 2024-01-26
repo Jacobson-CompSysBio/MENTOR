@@ -39,48 +39,6 @@ parse_arguments <- function() {
                     first two columns with no headers tab-delimited:
                     <setid> <gene> <weight>."
     ),
-    # make_option(c("--method"),
-    #   action = "store",
-    #   default = "kfold",
-    #   type = "character",
-    #   help = "Cross-validation method. `kfold`, `loo`, or `singletons`.
-    #                 [default %default]"
-    # ),
-    # make_option(c("-f", "--folds"),
-    #   action = "store",
-    #   default = 5,
-    #   type = "numeric",
-    #   help = "Number (k) of folds to use in k-fold CV.
-    #                 [default %default]"
-    # ),
-    # make_option(c("-r", "--restart"),
-    #   action = "store",
-    #   default = 0.7,
-    #   type = "numeric",
-    #   help = "Set the restart parameter [0,1). Higher value means the
-    #                 walker will jump back to a seed node more often.
-    #                 [default %default]"
-    # ),
-    # make_option("--tau",
-    #   action = "store",
-    #   default = "1.0",
-    #   help = "comma-separated list of values between that MUST add
-    #           up to the number of network layers in the .Rdata file.
-    #           One value per network layer that determines the probability
-    #           that the random walker will restart in that layer. e.g.
-    #           if there are three layers (A,B,C) in your multiplex network,
-    #           then --tau '0.2,1.3,1.5' will mean that layer A is less likely
-    #           to be walked on after a restart than layers B or C.
-    #           [default %default]"
-    # ),
-    # make_option(c("-n", "--numranked"),
-    #   action = "store",
-    #   default = 1.0,
-    #   type = "numeric",
-    #   help = "proportion of ranked genes to return [0,1]. e.g. 0.1
-    #                 will return the top 10%.
-    #                 [default %default]"
-    # ),
     make_option(c("-o", "--outdir"),
       action = "store",
       default = NULL,
@@ -89,27 +47,6 @@ parse_arguments <- function() {
               'meanranks' will be saved here with auto-generated filenames.
               (--out-fullranks and --out-meanranks override this.)"
     ),
-    # make_option(c("-m", "--modname"),
-    #   action = "store",
-    #   default = "default",
-    #   type = "character",
-    #   help = "String to include in output filename. (--out-fullranks
-    #                 and --out-meanranks override this.)"
-    # ),
-    # make_option(c("--out-fullranks"),
-    #   action = "store",
-    #   default = NULL,
-    #   type = "character",
-    #   help = "Specify the full path for full results.
-    #                 Ignore --outdir and --modname and use this instead."
-    # ),
-    # make_option(c("--out-meanranks"),
-    #   action = "store",
-    #   default = NULL,
-    #   type = "character",
-    #   help = "Specify the full path for mean results.
-    #                 Ignore --outdir and --modname and use this instead."
-    # ),
     make_option(c("-t", "--threads"),
       action = "store",
       default = parallel::detectCores() - 1,
@@ -133,14 +70,6 @@ parse_arguments <- function() {
     message("ERROR:: --geneset is required.")
     errors <- errors + 1
   }
-  # if (is.null(opt$outdir) & is.null(opt$out_fullranks)) {
-  #   message("ERROR:: You must provide either --outdir or --out-fullranks.")
-  #   errors <- errors + 1
-  # }
-  # if (is.null(opt$outdir) & is.null(opt$out_meanranks)) {
-  #   message("ERROR:: You must provide either --outdir or --out-meanranks")
-  #   errors <- errors + 1
-  # }
   if (opt$verbose) {
     print(opt)
   }
@@ -177,10 +106,6 @@ main <- function(opt) {
     tau = 1.0,
     numranked = 1.0,
     outdir = opt$outdir,
-    #modname = opt$modname,
-    #plot = opt$plot,
-    # out_full_ranks = opt$out_fullranks,
-    # out_mean_ranks = opt$out_meanranks,
     threads = opt$threads,
     verbose = opt$verbose,
     write_to_file = TRUE
