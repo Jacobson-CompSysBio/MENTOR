@@ -81,10 +81,10 @@ RWR <- function(geneset,
                 method,
                 num_folds,
                 chunks,
-                restart = 0.7,
-                tau = c(1, 1),
+                restart,
+                tau,
                 #name = "default",
-                threads = 1,
+                threads,
                 verbose = FALSE) {
   
   networks <- paste(names(mpo)[1:mpo$Number_of_Layers], collapse = "_")
