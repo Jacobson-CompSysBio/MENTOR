@@ -286,7 +286,6 @@ RWR_CV <- function(data = NULL,
   )
   if (write_to_file) {
     if (!file.exists(outdir)) {
-      print("Creating directory")
       dir.create(outdir,recursive = TRUE)
     }
     combined <- res_combined %>%
