@@ -96,20 +96,20 @@ parse_arguments <- function() {
     #   help = "String to include in output filename. (--out-fullranks
     #                 and --out-meanranks override this.)"
     # ),
-    make_option(c("--out-fullranks"),
-      action = "store",
-      default = NULL,
-      type = "character",
-      help = "Specify the full path for full results.
-                    Ignore --outdir and --modname and use this instead."
-    ),
-    make_option(c("--out-meanranks"),
-      action = "store",
-      default = NULL,
-      type = "character",
-      help = "Specify the full path for mean results.
-                    Ignore --outdir and --modname and use this instead."
-    ),
+    # make_option(c("--out-fullranks"),
+    #   action = "store",
+    #   default = NULL,
+    #   type = "character",
+    #   help = "Specify the full path for full results.
+    #                 Ignore --outdir and --modname and use this instead."
+    # ),
+    # make_option(c("--out-meanranks"),
+    #   action = "store",
+    #   default = NULL,
+    #   type = "character",
+    #   help = "Specify the full path for mean results.
+    #                 Ignore --outdir and --modname and use this instead."
+    # ),
     make_option(c("-t", "--threads"),
       action = "store",
       default = parallel::detectCores() - 1,
@@ -133,14 +133,14 @@ parse_arguments <- function() {
     message("ERROR:: --geneset is required.")
     errors <- errors + 1
   }
-  if (is.null(opt$outdir) & is.null(opt$out_fullranks)) {
-    message("ERROR:: You must provide either --outdir or --out-fullranks.")
-    errors <- errors + 1
-  }
-  if (is.null(opt$outdir) & is.null(opt$out_meanranks)) {
-    message("ERROR:: You must provide either --outdir or --out-meanranks")
-    errors <- errors + 1
-  }
+  # if (is.null(opt$outdir) & is.null(opt$out_fullranks)) {
+  #   message("ERROR:: You must provide either --outdir or --out-fullranks.")
+  #   errors <- errors + 1
+  # }
+  # if (is.null(opt$outdir) & is.null(opt$out_meanranks)) {
+  #   message("ERROR:: You must provide either --outdir or --out-meanranks")
+  #   errors <- errors + 1
+  # }
   if (opt$verbose) {
     print(opt)
   }
@@ -181,8 +181,8 @@ main <- function(opt) {
     outdir = opt$outdir,
     #modname = opt$modname,
     #plot = opt$plot,
-    out_full_ranks = opt$out_fullranks,
-    out_mean_ranks = opt$out_meanranks,
+    # out_full_ranks = opt$out_fullranks,
+    # out_mean_ranks = opt$out_meanranks,
     threads = opt$threads,
     verbose = opt$verbose,
     write_to_file = TRUE
