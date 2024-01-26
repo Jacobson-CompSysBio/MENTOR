@@ -89,13 +89,13 @@ parse_arguments <- function() {
               'meanranks' will be saved here with auto-generated filenames.
               (--out-fullranks and --out-meanranks override this.)"
     ),
-    make_option(c("-m", "--modname"),
-      action = "store",
-      default = "default",
-      type = "character",
-      help = "String to include in output filename. (--out-fullranks
-                    and --out-meanranks override this.)"
-    ),
+    # make_option(c("-m", "--modname"),
+    #   action = "store",
+    #   default = "default",
+    #   type = "character",
+    #   help = "String to include in output filename. (--out-fullranks
+    #                 and --out-meanranks override this.)"
+    # ),
     make_option(c("--out-fullranks"),
       action = "store",
       default = NULL,
@@ -179,7 +179,7 @@ main <- function(opt) {
     tau = opt$tau,
     numranked = opt$numranked,
     outdir = opt$outdir,
-    modname = opt$modname,
+    #modname = opt$modname,
     #plot = opt$plot,
     out_full_ranks = opt$out_fullranks,
     out_mean_ranks = opt$out_meanranks,
