@@ -19,11 +19,11 @@ LOGGER = logging.getLogger(__name__)
 def rwr_singletons(
     data = None,
     geneset = None,
-    method = 'singletons',
-    folds = None,
-    restart = None,
-    tau = None,
-    numranked = None,
+    # method = 'singletons',
+    # folds = None,
+    # restart = None,
+    # tau = None,
+    # numranked = None,
     outdir = None,
     #modname = None,
     out_fullranks = None,
@@ -38,22 +38,22 @@ def rwr_singletons(
         command += f' --data "{data}"'
     if geneset is not None:
         command += f' --geneset "{geneset}"'
-    if method is not None:
-        command += f' --method "{method}"'
-    if folds is not None:
-        command += f' --folds "{folds}"'
-    if restart is not None:
-        command += f' --restart "{restart}"'
-    if tau is not None:
-        if isinstance(tau, (int, float)):
-            tau = str(tau)
-        elif isinstance(tau, str):
-            pass
-        else:
-            tau = ','.join(map(str, tau))
-        command += f' --tau "{tau}"'
-    if numranked is not None:
-        command += f' --numranked "{numranked}"'
+    # if method is not None:
+    #     command += f' --method "{method}"'
+    # if folds is not None:
+    #     command += f' --folds "{folds}"'
+    # if restart is not None:
+    #     command += f' --restart "{restart}"'
+    # if tau is not None:
+    #     if isinstance(tau, (int, float)):
+    #         tau = str(tau)
+    #     elif isinstance(tau, str):
+    #         pass
+    #     else:
+    #         tau = ','.join(map(str, tau))
+    #     command += f' --tau "{tau}"'
+    # if numranked is not None:
+    #     command += f' --numranked "{numranked}"'
     # if modname is not None:
     #     command += f' --modname "{modname}"'
     if out_fullranks is not None:
