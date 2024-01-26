@@ -248,8 +248,8 @@ RWR_CV <- function(data = NULL,
                    numranked = 1.0,
                    outdir = NULL,
                    #modname = "default",
-                   out_full_ranks = NULL,
-                   out_mean_ranks = NULL,
+                   # out_full_ranks = NULL,
+                   # out_mean_ranks = NULL,
                    threads = 1,
                    verbose = FALSE,
                    write_to_file = FALSE) {
@@ -257,7 +257,7 @@ RWR_CV <- function(data = NULL,
   data_list <- load_multiplex_data(data)
   nw_mpo <- data_list$nw.mpo
   nw_adjnorm <- data_list$nw.adjnorm
-  if ((!is.null(outdir)|!is.null(out_full_ranks)|!is.null(out_mean_ranks)) & write_to_file == FALSE) {
+  if ((!is.null(outdir)) & write_to_file == FALSE) {
     warning(sprintf("write_to_file was set to false, however, an output file path was set. write_to_file has been updated to TRUE.\n")) #nolint warning
     write_to_file <- TRUE
   }
@@ -277,17 +277,13 @@ RWR_CV <- function(data = NULL,
   res_combined <- post_process_rwr_output_cv(res,extras,folds,nw_mpo)
   res_avg <- calculate_average_rank_across_folds_cv(res_combined)
   metrics <- calc_metrics_cv(res_combined, res_avg)
-  if (!is.null(out_full_ranks)) {
-    out_path <- out_full_ranks
-  } else {
-    out_path <- get_file_path("RWR-CV_",
-      res_combined$geneset[1],
-      get_base_name(data),
-      #modname,
-      outdir = outdir,
-      ext = ".fullranks.tsv"
-    )
-  }
+  out_path <- get_file_path("RWR-CV_",
+    res_combined$geneset[1],
+    get_base_name(data),
+    #modname,
+    outdir = outdir,
+    ext = ".fullranks.tsv"
+  )
   if (write_to_file) {
     if (!file.exists(outdir)) {
       print("Creating directory")
@@ -298,17 +294,13 @@ RWR_CV <- function(data = NULL,
       dplyr::slice_head(prop = numranked)
     write_table(combined,out_path)
   }
-  if (!is.null(out_mean_ranks)) {
-    out_path <- out_mean_ranks
-  } else {
-    out_path <- get_file_path("RWR-CV_",
-      res_avg$geneset[1],
-      get_base_name(data),
-      #modname,
-      outdir = outdir,
-      ext = ".meanranks.tsv"
-    )
-  }
+  out_path <- get_file_path("RWR-CV_",
+    res_avg$geneset[1],
+    get_base_name(data),
+    #modname,
+    outdir = outdir,
+    ext = ".meanranks.tsv"
+  )
   if (write_to_file) {
     write_table(
       res_avg %>%
@@ -339,9 +331,9 @@ RWR_CV <- function(data = NULL,
   return(
     list(
       "fullranks" = res_combined,
-       "meanranks" = res_avg,
-       "metrics" = metrics$res_avg,
-       "summary" = metrics$summary
+      "meanranks" = res_avg,
+      "metrics" = metrics$res_avg,
+      "summary" = metrics$summary
     )
   )
   
