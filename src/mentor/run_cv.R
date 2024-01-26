@@ -159,7 +159,7 @@ main <- function(opt) {
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   utils_path = file.path(script.basename,'rwr_utils.R')
-  rwr_path = file.path(script.basename,'RWR_CV.R')
+  rwr_path = file.path(script.basename,'rwr_cv.R')
   print(rwr_path)
   source(rwr_path)
   if (file.exists(utils_path)) {
