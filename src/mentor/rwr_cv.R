@@ -241,7 +241,7 @@ calculate_average_rank_across_folds_cv <- function(res_combined){
 
 RWR_CV <- function(data = NULL,
                    geneset_path = NULL,
-                   method = "kfold",
+                   method = "singletons",
                    folds = 5,
                    restart = 0.7,
                    tau = 1.0,
