@@ -150,7 +150,9 @@ main <- function(opt) {
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   utils_path = file.path(script.basename,'/utils.R')
-  source(file.path(script.basename,'/RWR_CV.R'))
+  rwr_path = file.path(script.basename,'/RWR_CV.R')
+  print(rwr_path)
+  source(rwr_path)
   if (file.exists(utils_path)) {
     source(utils_path)
   } else {
@@ -158,6 +160,7 @@ main <- function(opt) {
     return(1)
   }
   opt <- parse_arguments()
+  print("running RWR_CV function...")
   RWR_CV(
     data = opt$data,
     geneset_path = opt$geneset,

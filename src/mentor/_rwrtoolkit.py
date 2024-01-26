@@ -194,7 +194,6 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         command = commands
     else:
         command = sep.join(commands)
-    print(command)
     result = dict(
         command=command,
         dry_run=dry_run,
@@ -203,6 +202,7 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         stdout=None
     )
     if not dry_run:
+        print(command)
         res = subprocess.run(command, shell=True, capture_output=True)
         if res.returncode == 0:
             if verbose > 0:
