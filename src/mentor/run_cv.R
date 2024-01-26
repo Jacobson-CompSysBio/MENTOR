@@ -150,24 +150,18 @@ parse_arguments <- function() {
 
 
 main <- function(opt) {
-  # # Try to use PATH_TO_RWRtoolkit; warn the user if it's set but doesn't exist.
-  # path_to_RWRtoolkit = Sys.getenv('PATH_TO_RWRtoolkit', unset=NA)
-  # if (is.na(path_to_RWRtoolkit)) {
-  #     path_to_RWRtoolkit = '.'
-  # } else if (!dir.exists(path_to_RWRtoolkit)) {
-  #     message(sprintf('WARNING: PATH_TO_RWRtoolkit is set but the directory does not exist: %s', path_to_RWRtoolkit))
-  #     message('WARNING: Defaulting to local directory.')
-  #     path_to_RWRtoolkit = '.'
-  # }
-  #
-  # # Source the utils.R file; exit with error if it does not exist.
-  # utils_path = file.path(path_to_RWRtoolkit, 'utils.R')
-  # if (file.exists(utils_path)) {
-  #     source(utils_path)
-  # } else {
-  #     message(sprintf('ERROR: Cannot find utils.R at path: %s', utils_path))
-  #     return(1)
-  # }
+
+  initial.options <- commandArgs(trailingOnly = FALSE)
+  file.arg.name <- "--file="
+  script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
+  script.basename <- dirname(script.name)
+  utils_path = file.path(script.basename,'/utils.R')
+  if (file.exists(utils_path)) {
+    source(utils_path)
+  } else {
+    message(sprintf('ERROR: Cannot find utils.R at path: %s', utils_path))
+    return(1)
+  }
 
   opt <- parse_arguments()
 
