@@ -133,7 +133,7 @@ def rwr_singletons(
     # else:
     command = 'Rscript'
     exe = os.path.dirname(os.path.realpath(__file__)) + '/run_cv.R'
-    command += f' "{exe}"'
+    command += f' {exe}'
     # if path_to_rwrtoolkit is not None:
     #     exe = os.path.join(path_to_rwrtoolkit, 'inst', 'scripts', 'run_cv.R')
     #     command += f' "{exe}"'
