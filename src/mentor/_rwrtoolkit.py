@@ -11,6 +11,7 @@ import pathlib
 import shlex
 import shutil
 import subprocess
+import sys
 from mentor import _metrics as metrics
 
 LOGGER = logging.getLogger(__name__)
