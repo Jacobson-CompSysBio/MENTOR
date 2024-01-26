@@ -194,6 +194,7 @@ def run(commands, sep=' && ', dry_run=False, verbose=0):
         command = commands
     else:
         command = sep.join(commands)
+    print(command)
     result = dict(
         command=command,
         dry_run=dry_run,
