@@ -1,6 +1,3 @@
-'''
-Wrapper functions for RWRtoolkit
-'''
 
 import gzip as gzip_module
 import logging
