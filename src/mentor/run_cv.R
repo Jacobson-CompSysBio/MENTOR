@@ -24,14 +24,14 @@ parse_arguments <- function() {
   
   suppressPackageStartupMessages(require(optparse))
   option_list <- list(
-    make_option(c("-d", "--data"),
+    make_option(c("-d","--data"),
       action = "store",
       default = NULL,
       type = "character",
       help = "The path to the .Rdata file for your combo of underlying
               functional networks. This file is produced by RWR_make_multiplex."
     ),
-    make_option(c("-g", "--geneset"),
+    make_option(c("-g","--geneset"),
       action = "store",
       default = NULL,
       type = "character",
@@ -39,7 +39,7 @@ parse_arguments <- function() {
                     first two columns with no headers tab-delimited:
                     <setid> <gene> <weight>."
     ),
-    make_option(c("-o", "--outdir"),
+    make_option(c("-o","--outdir"),
       action = "store",
       default = NULL,
       type = "character",
@@ -47,14 +47,14 @@ parse_arguments <- function() {
               'meanranks' will be saved here with auto-generated filenames.
               (--out-fullranks and --out-meanranks override this.)"
     ),
-    make_option(c("-t", "--threads"),
+    make_option(c("-t","--threads"),
       action = "store",
       default = parallel::detectCores() - 1,
       type = "numeric",
       help = "Number of threads to use. Default for your system is
                     all cores - 1. [default %default]"
     ),
-    make_option(c("-v", "--verbose"),
+    make_option(c("-v","--verbose"),
       action = "store_true",
       default = FALSE,
       help = "Verbose mode. [default %default]"
@@ -85,7 +85,7 @@ main <- function(opt) {
 
   initial.options <- commandArgs(trailingOnly = FALSE)
   file.arg.name <- "--file="
-  script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
+  script.name <- sub(file.arg.name,"",initial.options[grep(file.arg.name,initial.options)])
   script.basename <- dirname(script.name)
   utils_path = file.path(script.basename,'rwr_utils.R')
   rwr_path = file.path(script.basename,'rwr_cv.R')
@@ -93,7 +93,7 @@ main <- function(opt) {
   if (file.exists(utils_path)) {
     source(utils_path)
   } else {
-    message(sprintf('ERROR: Cannot find utils.R at path: %s', utils_path))
+    message(sprintf('ERROR: Cannot find utils.R at path: %s',utils_path))
     return(1)
   }
   opt <- parse_arguments()
@@ -115,4 +115,4 @@ main <- function(opt) {
 }
 
 status <- main()
-quit(save = "no", status = status)
+quit(save = "no",status = status)
