@@ -115,7 +115,7 @@ def transform_fullranks(path_or_dataframe,drop_missing = True,max_rank = 'elbow'
     assert (ranks.columns == scores.columns).all()
     mask = (ranks <= max_rank).fillna(False)
     col_mask = mask.any()
-    features = scores.loc[:, col_mask]
+    features = scores.loc[:,col_mask]
     features = features.rank(axis = 1,method = 'first',ascending = False)
     for i in labels:
         if (i in features.columns.to_list()) and np.isnan(features.loc[i,i]):
