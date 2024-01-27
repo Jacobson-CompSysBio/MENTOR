@@ -1,15 +1,4 @@
-'''
-MENTOR
-This module contains functions for mentor of a network.
-[TODO] Refactor:
-    1. Make `X` from 'fullranks'.
-    2. Apply clustering method to `X`.
-    3. Optional: plot dendrogram (only for HC).
-References
-----------
-[1] https://en.wikipedia.org/wiki/Elbow_method_(clustering)
-[2] https://en.wikipedia.org/wiki/Root-mean-square_deviation
-'''
+
 from mentor._version import __version__
 import argparse
 import os
