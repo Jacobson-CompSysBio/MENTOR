@@ -36,7 +36,7 @@ def rwr_singletons(
     return command
 
 def run(commands,sep = ' && ',dry_run = False,verbose = 0):
-    if isinstance(commands, str):
+    if isinstance(commands,str):
         command = commands
     else:
         command = sep.join(commands)
@@ -70,7 +70,7 @@ def gzip(source,target = None,compresslevel = 9,encoding = None,errors = None,ne
         source = pathlib.Path(source)
     if target is None:
         target = source.with_suffix(source.suffix + '.gz')
-    with open(source, 'rb') as f_in:
+    with open(source,'rb') as f_in:
         with gzip_module.open(target,'wb',compresslevel = compresslevel,encoding = encoding,errors = errors,newline = newline) as f_out:
             shutil.copyfileobj(f_in,f_out)
     if in_place and target.exists():
@@ -118,6 +118,6 @@ def transform_fullranks(path_or_dataframe,drop_missing = True,max_rank = 'elbow'
     features = scores.loc[:, col_mask]
     features = features.rank(axis = 1,method = 'first',ascending = False)
     for i in labels:
-        if (i in features.columns.to_list()) and np.isnan(features.loc[i, i]):
-            features.loc[i, i] = 0
-    return features, labels
+        if (i in features.columns.to_list()) and np.isnan(features.loc[i,i]):
+            features.loc[i,i] = 0
+    return features,labels
