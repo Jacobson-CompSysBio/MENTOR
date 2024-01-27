@@ -7,10 +7,10 @@ from dynamicTreeCut import R_func as dtc_utils
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 from mentor import _metrics as metrics
-from sklearn.base import BaseEstimator, ClusterMixin
+from sklearn.base import BaseEstimator,ClusterMixin
 from sklearn.cluster import ( AgglomerativeClustering, KMeans )
-from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-from sklearn.utils.validation import check_is_fitted, check_memory
+from sklearn.cluster._agglomerative import _TREE_BUILDERS,_hc_cut
+from sklearn.utils.validation import check_is_fitted,check_memory
 
 LOGGER = logging.getLogger(__name__)
 
