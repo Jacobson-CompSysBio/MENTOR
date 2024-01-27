@@ -21,7 +21,6 @@ def fancy_dendrogram(
         subcluster,
         increment,
         maxsize,
-        #export,
         heatmaps,
         pcutoff,
         squish,
