@@ -1,14 +1,3 @@
-'''
-Cluster module
-
-This file contains the HierarchicalClustering class, which is used to perform
-hierarchical clustering on a set of data points.
-
-The class is initialized with a matrix (samples in rows, features in columns)
-and a distance function. The distance function should take two vectors as
-input and return a scalar distance between them.
-'''
-
 import logging
 import numpy as np
 import pandas as pd
