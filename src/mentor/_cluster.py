@@ -25,7 +25,7 @@ from sklearn.utils.validation import check_is_fitted, check_memory
 
 LOGGER = logging.getLogger(__name__)
 
-def check_symmetry(dmat, atol=1e-6):
+def check_symmetry(dmat,atol = 1e-6):
     assert dmat.shape[0] == dmat.shape[1], f'The distance matrix is not square: {dmat.shape}'
     np.testing.assert_allclose(
         np.diag(dmat),
@@ -42,12 +42,6 @@ def check_symmetry(dmat, atol=1e-6):
     return True
 
 class HierarchicalClustering(AgglomerativeClustering):
-    # Notes:
-    # - `affinity` is deprecated in sklearn v1.2 and will be removed in v1.4.
-    # - `affinity` is passed to `pdist` as `metric`
-    # - `affinity` can be a callable, but it takes a single matrix `X` as
-    #   input, whereas `pdist` requires a callable takes two vectors `u` and
-    #   `v` as arguments.
     def __init__(
         self,
         *,
