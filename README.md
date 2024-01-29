@@ -120,8 +120,7 @@ mentor \
 
 
 
-
-old shit
+OLD SHIT (IGNORE BELOW)
 
 If you have a gene set and a multiplex network, run RWR and mentor the geneset:
 
