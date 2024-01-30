@@ -23,10 +23,11 @@ If you prefer to install dependencies with conda, you can use the provided
 $ git clone <link>
 $ cd MENTOR
 $ conda env update -f ./environment.yml
+$ conda activate mentor
 $ make
 ```
 
-Or create a new environment called 'jail-mentor':
+Or create a new environment called 'mentor':
 
 ```sh
 $ git clone <link>
