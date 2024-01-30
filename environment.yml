@@ -29,7 +29,7 @@ dependencies:
   - r-matrix
   - r-irkernel
   - bioconductor-randomwalkrestartmh
-  - scikit-learn>=1.2
+  - scikit-learn>=1.4
   - scipy
   - pytest
   - pip:
