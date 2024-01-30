@@ -163,6 +163,7 @@ def main():
         out_dissimilarity_stats = None
         out_dissimilarity_distribution = None
     if args.multiplex and args.geneset:
+        print("\nrunning RWRtoolkit singletons")
         command = rwrtoolkit.rwr_singletons(
             data = args.multiplex,
             geneset = args.geneset,
@@ -181,9 +182,8 @@ def main():
         except StopIteration:
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
-    else:
-        path_to_fullranks = args.rwr_fullranks
     if args.partition:
+        print("\nrunning MENTOR")
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing = True,
@@ -199,6 +199,7 @@ def main():
         )
         mod.fit(X)
         if out_dissimilarity_matrix is not None:
+            print("\nsaving dissimilarity matrix")
             out_dissimilarity_matrix.parent.mkdir(parents = False,exist_ok = True)
             dmat = pd.DataFrame(
                 distance.squareform(mod.pairwise_distances,checks = False),
@@ -206,7 +207,6 @@ def main():
                 columns = labels
             )
             dmat.to_csv(out_dissimilarity_matrix,sep = '\t')
-            LOGGER.info(f'dissimilarity matrix saved to {out_dissimilarity_matrix}')
             fd.fancy_dendrogram(
                 distances = out_dissimilarity_matrix,
                 clusters = args.clusters,
@@ -224,6 +224,7 @@ def main():
         else:
             dmat = None
         if out_dissimilarity_stats is not None:
+            print("\nsaving dissimilarity matrix statistics")
             out_dissimilarity_stats.parent.mkdir(parents = False,exist_ok = True)
             with open(out_dissimilarity_stats,'w') as f:
                 try:
@@ -237,7 +238,7 @@ def main():
                     print('calinski_harabasz_score',chi,sep = '\t',file = f)
                 except:
                     pass
-    if args.distances is not None:
+    elif args.distances is not None:
         fd.fancy_dendrogram(
             distances = args.distances,
             clusters = args.clusters,
@@ -252,4 +253,6 @@ def main():
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,
         )
+    else:
+        pass
     return 0

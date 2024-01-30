@@ -53,5 +53,7 @@ def fancy_dendrogram(
         command += f' --relwidths={relwidths}'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
-    print('Running dendrogram command: ' + command)
-    subprocess.run(command,shell = True,capture_output = True)
+    print('\nrunning dendrogram command: ' + command)
+    result = subprocess.run(command,shell = True,capture_output = True,text = True,check = False)
+    print(result.stdout)
+    print(result.stderr)

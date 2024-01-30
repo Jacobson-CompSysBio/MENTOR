@@ -134,7 +134,8 @@ create_dendogram <- function(
   plot_width
   
 ) {
-  
+ 
+  cat("\n\nreading dissimilarity matrix")     	
   # import dissimilarity_matrix as dm
   dm <- suppressMessages(read_tsv(dis_mat, col_names = TRUE, show_col_types = FALSE))
   # make first column row names
@@ -149,6 +150,7 @@ create_dendogram <- function(
   file.arg.name <- "--file="
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
+  cat("\n\nplotting dendrogram")
   
   if(!subcluster) {
    
@@ -164,6 +166,7 @@ create_dendogram <- function(
     
   } else {
 
+    cat("\n\nsubclustering")
     # create cluster file
     cluster_file <- paste0("clusters_sk",k,"_ki",k_increment,"_ms",max_size,".tsv")
     # create plot filename
@@ -182,6 +185,7 @@ create_dendogram <- function(
   
   if(!is.null(heatmaps)) {
     
+    cat("\n\nadding heatmap")
     # adjust plot filename
     plot_file <- gsub(".pdf","_logfc_heatmap.pdf",plot_file)
     # source the heatmaps.R file
@@ -212,6 +216,7 @@ create_dendogram <- function(
   dend_labs <- merge(dend_labs,groups,by = "col",all.x = TRUE)
   dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
   dend_labs <- dend_labs[,c("label","cluster")]
+  cat("\n\nexporting clusters")
   write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
   # adjust height based on number of genes to ensure labels are legible
   if(nrow(dend_labs) <= 20){
@@ -220,6 +225,7 @@ create_dendogram <- function(
     height_ = nrow(dend_labs) * 0.6
   }
   # export the ggplot dendrogram
+  cat("\n\nsaving visualization")
   ggsave(
     paste0(out_dir,plot_file),
     plot = dendrogram,
