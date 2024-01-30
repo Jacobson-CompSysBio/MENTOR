@@ -163,7 +163,6 @@ def main():
         out_dissimilarity_stats = None
         out_dissimilarity_distribution = None
     if args.multiplex and args.geneset:
-        print("\nrunning RWRtoolkit singletons")
         command = rwrtoolkit.rwr_singletons(
             data = args.multiplex,
             geneset = args.geneset,
@@ -171,6 +170,7 @@ def main():
             threads = args.threads,
             verbose = args.verbose
         )
+        print("\nrunning RWRtoolkit singletons command: " + command)
         res = rwrtoolkit.run(command)
         if res['returncode'] != 0:
             LOGGER.error('RWR-singletons failed.')
