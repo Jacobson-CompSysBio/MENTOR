@@ -23,11 +23,10 @@ If you prefer to install dependencies with conda, you can use the provided
 $ git clone <link>
 $ cd MENTOR
 $ conda env update -f ./environment.yml
-$ conda activate mentor
 $ make
 ```
 
-Or create a new environment called 'mentor':
+Or create a new environment called 'jail-mentor':
 
 ```sh
 $ git clone <link>
@@ -62,12 +61,6 @@ arguments:
   --path-to-rwrtoolkit RWRTOOLKIT      Path to RWRToolkit.
   --multiplex MULTIPLEX                Path to multiplex network.
   --geneset GENESET                    Path to gene set file. 
-  --method METHOD                      Method for RWR-CV (default: 'singletons').
-  --folds FOLDS                        Folds for RWR-CV.
-  --restart RESTART                    Restart for RWR-CV (default: 0.7). 
-  --tau TAU                            Tau for RWR-CV.
-  --numranked NUMRANKED                
-  --modname MODNAME
   --threads THREADS
   --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version                            Print version and exit (default: False).
@@ -127,8 +120,7 @@ mentor \
 
 
 
-
-old shit
+OLD SHIT (IGNORE BELOW)
 
 If you have a gene set and a multiplex network, run RWR and mentor the geneset:
 
