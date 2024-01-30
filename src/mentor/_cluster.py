@@ -42,7 +42,6 @@ class HierarchicalClustering(AgglomerativeClustering):
         compute_linkage_matrix = True
     ):
         super_kwargs = dict(
-            affinity = metric,
             metric = metric,
             memory = memory,
             connectivity = connectivity,
