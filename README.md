@@ -81,7 +81,7 @@ mentor \
     --plotwidth <35> \
 ```
 
-The geneset table should be a tab-separated text file with *no header*. Three columns should be present for the project name (string), ensembl IDs (string), and weights (numeric). The example below displays a geneset table with five genes. 
+The geneset table should be a tab-separated text file with **no header**. Three columns should be present for the **project name** *(string)*, **ensembl IDs** *(string)*, and **weights** *(numeric)*. The example below displays a geneset table with five genes. 
 
 |              |                 |   |
 | ------------ | --------------- | - |
@@ -91,7 +91,7 @@ The geneset table should be a tab-separated text file with *no header*. Three co
 | project_name | ENSG00000042980 | 1 |
 | project_name | ENSG00000198099 | 1 |
 
-The map table should also be a tab-separated text file with a header. Two columns should be present for the ensembl ID (string) and associated label (string) that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+The map table should also be a tab-separated text file with a header. Two columns should be present for the **ensembl** ID *(string)* and associated **label** (string) that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
 
 |     ensembl     |  label  |
 | --------------- | ------- |
