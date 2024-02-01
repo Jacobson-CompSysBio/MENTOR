@@ -24,7 +24,7 @@ Usage
 
 ```
 
-usage: mentor [-h] [--geneset GENESET] [--multiplex MULTIPLEX] [--partition] [--outdir OUTDIR]
+usage: mentor [-h] [--geneset GENESET] [--multiplex MULTIPLEX] [--outdir OUTDIR]
                    [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS]
                    [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS]
                    [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
@@ -33,7 +33,6 @@ arguments:
   -h, --help                           Show this help message and exit.
   --geneset GENESET                    Path to gene set file.
   --multiplex MULTIPLEX                Path to multiplex network.
-  --partition, -p                      Perform mentor on "seed genes" from RWR fullranks file (default: False).
   --outdir OUTDIR                      Save output to path (default: None).
   --threads THREADS
   --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
