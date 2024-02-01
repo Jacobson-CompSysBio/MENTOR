@@ -1,32 +1,12 @@
 MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
 =======================
 
-- Integrate multi-omics data using multiplex networks.
+- Integrate multi-omics data using multiplex networks
 - Identify functionally-related groups of genes using random walk with restart
-  on multiplex networks.
+  on multiplex networks
 
 Installation
 ============
-
-Standard installation:
-
-```sh
-$ git clone <link>
-$ cd MENTOR
-$ make
-```
-
-If you prefer to install dependencies with conda, you can use the provided
-`environment.yml` file:
-
-```sh
-$ git clone <link>
-$ cd MENTOR
-$ conda env update -f ./environment.yml
-$ make
-```
-
-Or create a new environment called 'jail-mentor':
 
 ```sh
 $ git clone <link>
@@ -118,89 +98,6 @@ mentor \
     --plotwidth <35> \
 ```
 
-
-
-OLD SHIT (IGNORE BELOW)
-
-If you have a gene set and a multiplex network, run RWR and mentor the geneset:
-
-```sh
-functional_partitioning \
-    --path-to-rwrtoolkit <path to RWRtoolkit directory> \
-    --multiplex <path to multiplex object> \
-    --geneset <path to your gene set> \
-    --outdir <path to output directory>
-```
-
-If you already have results from RWRtoolkit, you can pass in your 'fullranks'
-file:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --outdir <path to output directory>
-```
-
-The default cut method is to use `dynamicTreeCut`, explicitly:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --cut-method dynamic \
-    --outdir <path to output directory>
-```
-
-You can change this to use a hard threshold instead:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --cut-method hard \
-    --cut-threshold 0.3 \
-    --outdir <path to output directory>
-```
-
-You can change the labels on the leaves of the dendrogram. This requires that
-you have a nodetable file. The nodetable is a TSV file with the first column as
-the seed genes use for RWR-CV (singletons), e.g., something like this:
-
-```
-gene_id          gene_info
-Potri.001G377800 This is gene 001G377800.
-Potri.001G429430 This is gene 001G429430.
-Potri.003G099600 This is gene 003G099600.
-...
-```
-
-Then, provide the `--nodetable` and `--labels-use-{locs,names}` parameters to
-tell this script which columns to use as labels on the dendrogram. E.g., to use
-the column "gene_info" as the labels, you can either provide the column by name:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-names "gene_info"
-```
-
-Or provide the column by number:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-locs 1
-```
-
-If you want to keep the node ID in the label, provide that column as one of the
-labels in addition to any others:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-names "gene_id" "gene_info"
-```
 
 
 Acknowledgements
