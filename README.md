@@ -28,19 +28,18 @@ Usage
 
 ```
 
-usage: mentor [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--outdir OUTDIR] [--path-to-conda-env CONDA_ENV] [--path-to-rwrtoolkit RWRTOOLKIT] [--multiplex MULTIPLEX] [--geneset GENESET] [--method METHOD] [--folds FOLDS] [--restart RESTART] [--tau TAU] [--numranked NUMRANKED] [--modname MODNAME] [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS] [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS] [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
+usage: mentor [-h] [--geneset GENESET] [--multiplex MULTIPLEX] [--partition] [--outdir OUTDIR]
+                   [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS]
+                   [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS]
+                   [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
 
 arguments:
   -h, --help                           Show this help message and exit.
-  --rwr-fullranks RWR_FULLRANKS        Path to "fullranks" file from `RWR-CV--method=singletons`
-                                       (default: None).
+  --geneset GENESET                    Path to gene set file.
+  --multiplex MULTIPLEX                Path to multiplex network.
   --partition, -p                      Perform functional partitioning on "seed genes" from RWR
                                        fullranks file (default: False).
   --outdir OUTDIR                      Save output to path (default: None).
-  --path-to-conda-env CONDA_ENV        Path to conda environment.
-  --path-to-rwrtoolkit RWRTOOLKIT      Path to RWRToolkit.
-  --multiplex MULTIPLEX                Path to multiplex network.
-  --geneset GENESET                    Path to gene set file. 
   --threads THREADS
   --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version                            Print version and exit (default: False).
