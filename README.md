@@ -81,6 +81,23 @@ mentor \
     --plotwidth <35> \
 ```
 
+To customize a dendrogram from a mentor dissimilarity-matrix: 
+
+```sh
+mentor \
+    --distances </path/to/dissimilarity-matrix.tsv> \
+    --outdir </path/to/outdir/> \
+    --clusters <CLUSTERS> \
+    --map </path/to/map.txt> \
+    --subcluster \
+    --increment <INCREMEN> \
+    --maxsize <MAXSIZE> \
+    --heatmaps </path/to/map.txt> \
+    --squish=<-1,1> \
+    --relwidths=<1,1> \
+    --plotwidth <35> \
+```
+
 The geneset table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
 
 |              |                 |   |
@@ -101,7 +118,7 @@ The map table should also be a tab-separated text file with a **header**. Two co
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
 
-The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heamtap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
 
 |  label  |  value  |  source  |
 | ------- | ------- | -------- |
@@ -113,25 +130,6 @@ The heatmap table should also be a tab-separated text file with a **header**. Th
 |   AASS  |    1    |   GWAS   |
 |  ABCA8  |    1    |   GWAS   |
 |   ADH4  |    1    |   GWAS   |
-
-To customize a dendrogram from a mentor dissimilarity-matrix: 
-
-```sh
-mentor \
-    --distances </path/to/dissimilarity-matrix.tsv> \
-    --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
-    --map </path/to/map.txt> \
-    --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
-    --squish=<-1,1> \
-    --relwidths=<1,1> \
-    --plotwidth <35> \
-```
-
-
 
 Acknowledgements
 ================
