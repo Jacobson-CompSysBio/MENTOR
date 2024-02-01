@@ -81,6 +81,16 @@ mentor \
     --plotwidth <35> \
 ```
 
+The geneset.txt table should have the following format displayed below. Three columns should be present for the project name (string), ensembl ID (string), and weight (numeric). 
+
+|              |                 |
+| ------------ | --------------- |
+| project_name | ENSG00000008311 |
+| project_name | ENSG00000141338 |
+| project_name | ENSG00000172350 |
+| project_name | ENSG00000042980 |
+| project_name | ENSG00000198099 |
+
 To customize a dendrogram from a mentor dissimilarity-matrix: 
 
 ```sh
