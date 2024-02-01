@@ -81,15 +81,24 @@ mentor \
     --plotwidth <35> \
 ```
 
-The geneset.txt table should have the following format displayed below. Three columns should be present for the project name (string), ensembl ID (string), and weight (numeric). 
+The geneset table should be a tab-separated text file with no header. Three columns should be present for the project name (string), ensembl IDs (string), and weights (numeric). The example below displays a geneset table with five genes. 
 
-|              |                 |
-| ------------ | --------------- |
-| project_name | ENSG00000008311 |
-| project_name | ENSG00000141338 |
-| project_name | ENSG00000172350 |
-| project_name | ENSG00000042980 |
-| project_name | ENSG00000198099 |
+| ------------ | --------------- | - |
+| project_name | ENSG00000008311 | 1 |
+| project_name | ENSG00000141338 | 1 |
+| project_name | ENSG00000172350 | 1 |
+| project_name | ENSG00000042980 | 1 |
+| project_name | ENSG00000198099 | 1 |
+
+The map table should also be a tab-separated text file with a header. Two columns should be present for the ensembl ID (string) and associated label (string) that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+
+|     ensembl     |  label  |
+| --------------- | ------- |
+| ENSG00000008311 |   AASS  |
+| ENSG00000141338 |  ABCA8  |
+| ENSG00000172350 |  ABCG4  |
+| ENSG00000042980 | ADAM28  |
+| ENSG00000198099 |   ADH4  |
 
 To customize a dendrogram from a mentor dissimilarity-matrix: 
 
