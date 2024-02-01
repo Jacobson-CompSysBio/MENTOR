@@ -81,7 +81,7 @@ mentor \
     --plotwidth <35> \
 ```
 
-The geneset table should be a tab-separated text file with **no header**. Three columns should be present for the **project name** *(string)*, **ensembl IDs** *(string)*, and **weights** *(numeric)*. The example below displays a geneset table with five genes. 
+The geneset table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
 
 |              |                 |   |
 | ------------ | --------------- | - |
@@ -91,7 +91,7 @@ The geneset table should be a tab-separated text file with **no header**. Three 
 | project_name | ENSG00000042980 | 1 |
 | project_name | ENSG00000198099 | 1 |
 
-The map table should also be a tab-separated text file with a header. Two columns should be present for the **ensembl** ID *(string)* and associated **label** (string) that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+The map table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
 
 |     ensembl     |  label  |
 | --------------- | ------- |
@@ -100,6 +100,21 @@ The map table should also be a tab-separated text file with a header. Two column
 | ENSG00000172350 |  ABCG4  |
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
+
+The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heamtap table for the same five genes where we have bulk RNA-seq and GWAS data sources for these genes. 
+
+|  label  |  value  |  source  |
+| ------- | ------- | -------- |
+|   AASS  |         |  RNA-seq |
+|  ABCA8  |         |   GWAS   |
+|  ABCG4  |         |   GWAS   |
+| ADAM28  |         |   GWAS   |
+|   ADH4  |         |   GWAS   |
+|   AASS  |         |   GWAS   |
+|  ABCA8  |         |   GWAS   |
+|  ABCG4  |         |   GWAS   |
+| ADAM28  |         |   GWAS   |
+|   ADH4  |         |   GWAS   |
 
 To customize a dendrogram from a mentor dissimilarity-matrix: 
 
