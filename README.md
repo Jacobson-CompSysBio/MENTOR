@@ -55,6 +55,8 @@ arguments:
 Examples
 ========
 
+The `geneset.txt` and `multiplex.RData` are required to run `mentor` to obtain a dissimilarity matrix and dendrogram visualization. The `map.txt` and `heatmap.txt` are not required to run `mentor`.
+
 The `geneset.txt` table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
 
 |              |                 |   |
@@ -65,7 +67,7 @@ The `geneset.txt` table should be a tab-separated text file with **no header**. 
 | project_name | ENSG00000042980 | 1 |
 | project_name | ENSG00000198099 | 1 |
 
-The `map.txt` table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+The `map.txt` table can be used to assign different labels to the dendrogram branches. The table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
 
 |     ensembl     |  label  |
 | --------------- | ------- |
@@ -75,7 +77,7 @@ The `map.txt` table should also be a tab-separated text file with a **header**. 
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
 
-The `heatmap.txt` table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+The `heatmap.txt` table is required if the user would also like to display a heatmap next to the dendrogram. The table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
 
 |  label  |  value  |  source  |
 | ------- | ------- | -------- |
@@ -88,25 +90,37 @@ The `heatmap.txt` table should also be a tab-separated text file with a **header
 |  ABCA8  |    1    |   GWAS   |
 |   ADH4  |    1    |   GWAS   |
 
-To run RWRtoolkit on a gene set and multiplex network followed by mentor:
+To run `mentor` on a gene set and multiplex network:
+
+```sh
+mentor \
+    --geneset </path/tp/geneset.txt> \
+    --multiplex </path/to/multiplex.RData> \
+    --outdir </path/to/outdir/>
+```
+
+To run `mentor` on a gene set and multiplex and have custom dendrogram labels:
 
 ```sh
 mentor \
     --geneset </path/tp/geneset.txt> \
     --multiplex </path/to/multiplex.RData> \
     --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
-    --map </path/to/map.txt> \
-    --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/heatmap.txt> \
-    --squish=<-1,1> \
-    --relwidths=<1,1> \
-    --plotwidth <35> \
+    --map </path/to/map.txt/>
 ```
 
-To customize a dendrogram from a mentor dissimilarity-matrix: 
+To run `mentor` on a gene set and multiplex and have custom dendrogram labels and a heatmap:
+
+```sh
+mentor \
+    --geneset </path/tp/geneset.txt> \
+    --multiplex </path/to/multiplex.RData> \
+    --outdir </path/to/outdir/> \
+    --map </path/to/map.txt/> \
+    -heatmaps </path/to/heatmap.txt/>
+```
+
+To customize a dendrogram using a mentor dissimilarity-matrix: 
 
 ```sh
 mentor \
