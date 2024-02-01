@@ -1,10 +1,6 @@
 MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
 =======================
 
-- Integrate multi-omics data using multiplex networks
-- Identify functionally-related groups of genes using random walk with restart
-  on multiplex networks
-
 Installation
 ============
 
