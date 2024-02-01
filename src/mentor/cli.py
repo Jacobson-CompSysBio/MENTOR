@@ -24,12 +24,6 @@ def parse_args(test=None):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
-        '--partition', '-p',
-        action='store_true',
-        default=False,
-        help='Perform mentor on "seed genes" from RWR fullranks file. This is the default.'
-    )
-    parser.add_argument(
         '--outdir',
         action='store',
         type=pathlib.Path,
@@ -182,7 +176,6 @@ def main():
         except StopIteration:
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
-    if args.partition:
         print("\nrunning MENTOR")
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
