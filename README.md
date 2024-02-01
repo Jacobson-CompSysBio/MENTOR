@@ -81,8 +81,9 @@ mentor \
     --plotwidth <35> \
 ```
 
-The geneset table should be a tab-separated text file with no header. Three columns should be present for the project name (string), ensembl IDs (string), and weights (numeric). The example below displays a geneset table with five genes. 
+The geneset table should be a tab-separated text file with *no header*. Three columns should be present for the project name (string), ensembl IDs (string), and weights (numeric). The example below displays a geneset table with five genes. 
 
+|              |                 |   |
 | ------------ | --------------- | - |
 | project_name | ENSG00000008311 | 1 |
 | project_name | ENSG00000141338 | 1 |
