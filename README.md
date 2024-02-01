@@ -94,7 +94,6 @@ To run RWRtoolkit on a gene set and multiplex network followed by mentor:
 mentor \
     --geneset </path/tp/geneset.txt> \
     --multiplex </path/to/multiplex.RData> \
-    --partition \
     --outdir </path/to/outdir/> \
     --clusters <CLUSTERS> \
     --map </path/to/map.txt> \
