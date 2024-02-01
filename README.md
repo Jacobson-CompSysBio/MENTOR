@@ -101,20 +101,18 @@ The map table should also be a tab-separated text file with a **header**. Two co
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
 
-The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heamtap table for the same five genes where we have bulk RNA-seq and GWAS data sources for these genes. 
+The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heamtap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
 
 |  label  |  value  |  source  |
 | ------- | ------- | -------- |
-|   AASS  |         |  RNA-seq |
-|  ABCA8  |         |   GWAS   |
-|  ABCG4  |         |   GWAS   |
-| ADAM28  |         |   GWAS   |
-|   ADH4  |         |   GWAS   |
-|   AASS  |         |   GWAS   |
-|  ABCA8  |         |   GWAS   |
-|  ABCG4  |         |   GWAS   |
-| ADAM28  |         |   GWAS   |
-|   ADH4  |         |   GWAS   |
+|   AASS  |   1.5   |  RNA-seq |
+|  ABCA8  |   2.5   |  RNA-seq |
+|  ABCG4  |   0.3   |  RNA-seq |
+| ADAM28  |   -1.1  |  RNA-seq |
+|   ADH4  |   -0.8  |  RNA-seq |
+|   AASS  |    1    |   GWAS   |
+|  ABCA8  |    1    |   GWAS   |
+|   ADH4  |    1    |   GWAS   |
 
 To customize a dendrogram from a mentor dissimilarity-matrix: 
 
