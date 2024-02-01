@@ -57,7 +57,7 @@ arguments:
 Examples
 ========
 
-The gene set table should be a tab-separated text file with **no header** `geneset.txt`. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
+The `geneset.txt` table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
 
 |              |                 |   |
 | ------------ | --------------- | - |
@@ -67,7 +67,7 @@ The gene set table should be a tab-separated text file with **no header** `genes
 | project_name | ENSG00000042980 | 1 |
 | project_name | ENSG00000198099 | 1 |
 
-The map table should also be a tab-separated text file with a **header** `map.txt`. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+The `map.txt` table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
 
 |     ensembl     |  label  |
 | --------------- | ------- |
@@ -77,7 +77,7 @@ The map table should also be a tab-separated text file with a **header** `map.tx
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
 
-The heatmap table should also be a tab-separated text file with a **header** `heatmap.txt`. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+The `heatmap.txt` table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
 
 |  label  |  value  |  source  |
 | ------- | ------- | -------- |
@@ -103,7 +103,7 @@ mentor \
     --subcluster \
     --increment <INCREMEN> \
     --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
+    --heatmaps </path/to/heatmap.txt> \
     --squish=<-1,1> \
     --relwidths=<1,1> \
     --plotwidth <35> \
@@ -120,7 +120,7 @@ mentor \
     --subcluster \
     --increment <INCREMEN> \
     --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
+    --heatmaps </path/to/heatmap.txt> \
     --squish=<-1,1> \
     --relwidths=<1,1> \
     --plotwidth <35> \
