@@ -33,8 +33,7 @@ arguments:
   -h, --help                           Show this help message and exit.
   --geneset GENESET                    Path to gene set file.
   --multiplex MULTIPLEX                Path to multiplex network.
-  --partition, -p                      Perform functional partitioning on "seed genes" from RWR
-                                       fullranks file (default: False).
+  --partition, -p                      Perform mentor on "seed genes" from RWR fullranks file (default: False).
   --outdir OUTDIR                      Save output to path (default: None).
   --threads THREADS
   --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
