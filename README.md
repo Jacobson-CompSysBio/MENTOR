@@ -62,6 +62,39 @@ arguments:
 Examples
 ========
 
+The gene set table should be a tab-separated text file with **no header** called <geneset.txt>. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
+
+|              |                 |   |
+| ------------ | --------------- | - |
+| project_name | ENSG00000008311 | 1 |
+| project_name | ENSG00000141338 | 1 |
+| project_name | ENSG00000172350 | 1 |
+| project_name | ENSG00000042980 | 1 |
+| project_name | ENSG00000198099 | 1 |
+
+The map table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+
+|     ensembl     |  label  |
+| --------------- | ------- |
+| ENSG00000008311 |   AASS  |
+| ENSG00000141338 |  ABCA8  |
+| ENSG00000172350 |  ABCG4  |
+| ENSG00000042980 | ADAM28  |
+| ENSG00000198099 |   ADH4  |
+
+The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+
+|  label  |  value  |  source  |
+| ------- | ------- | -------- |
+|   AASS  |   1.5   |  RNA-seq |
+|  ABCA8  |   2.5   |  RNA-seq |
+|  ABCG4  |   0.3   |  RNA-seq |
+| ADAM28  |   -1.1  |  RNA-seq |
+|   ADH4  |   -0.8  |  RNA-seq |
+|   AASS  |    1    |   GWAS   |
+|  ABCA8  |    1    |   GWAS   |
+|   ADH4  |    1    |   GWAS   |
+
 To run RWRtoolkit on a gene set and multiplex network followed by mentor:
 
 ```sh
@@ -98,38 +131,7 @@ mentor \
     --plotwidth <35> \
 ```
 
-The geneset table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
 
-|              |                 |   |
-| ------------ | --------------- | - |
-| project_name | ENSG00000008311 | 1 |
-| project_name | ENSG00000141338 | 1 |
-| project_name | ENSG00000172350 | 1 |
-| project_name | ENSG00000042980 | 1 |
-| project_name | ENSG00000198099 | 1 |
-
-The map table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
-
-|     ensembl     |  label  |
-| --------------- | ------- |
-| ENSG00000008311 |   AASS  |
-| ENSG00000141338 |  ABCA8  |
-| ENSG00000172350 |  ABCG4  |
-| ENSG00000042980 | ADAM28  |
-| ENSG00000198099 |   ADH4  |
-
-The heatmap table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
-
-|  label  |  value  |  source  |
-| ------- | ------- | -------- |
-|   AASS  |   1.5   |  RNA-seq |
-|  ABCA8  |   2.5   |  RNA-seq |
-|  ABCG4  |   0.3   |  RNA-seq |
-| ADAM28  |   -1.1  |  RNA-seq |
-|   ADH4  |   -0.8  |  RNA-seq |
-|   AASS  |    1    |   GWAS   |
-|  ABCA8  |    1    |   GWAS   |
-|   ADH4  |    1    |   GWAS   |
 
 Acknowledgements
 ================
