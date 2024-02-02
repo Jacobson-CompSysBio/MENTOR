@@ -23,33 +23,32 @@ Usage
 =====
 
 ```
-
-usage: mentor [-h] [--geneset GENESET] [--multiplex MULTIPLEX] [--outdir OUTDIR]
-                   [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS]
-                   [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS]
-                   [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
+usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multiplex.RData] [--outdir /path/to/outdir]
+                   [--threads threads] [--verbose] [--version] [--distances /path/to/dissimilarity-matrix.tsv] [--clusters clusters]
+                   [--map /path/to/map.txt] [--subcluster] [--increment increment] [--maxsize maxsize] [--heatmaps /path/to/heatmap.txt]
+                   [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
 
 arguments:
-  -h, --help                           Show this help message and exit.
-  --geneset GENESET                    Path to gene set file.
-  --multiplex MULTIPLEX                Path to multiplex network.
-  --outdir OUTDIR                      Save output to path (default: None).
-  --threads THREADS
-  --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
-  --version                            Print version and exit (default: False).
-  --distances DISTANCES                Path to dissimilarity-matrix.tsv (default: None).
-  --clusters CLLUSTERS                 Number of clusters for dendrogram (default: 10).
-  --map                                Path to gene ensembl ID mapping file (default: None).
-  --subcluster                         Subcluster the dendrogram (default: False).   
-  --increment INCREMENT                If subclustering increment cluster size by (default: 5).
-  --maxsize MAXSIZE                    Maximum size of clusters for subclustering (default: 40).
-  --heatmaps HEATMAPS                  Path to heatmap file (default: None).
-  --pcutoff PCUTOFF                    Cutoff value for p-value if there is a p-value column in
-                                       the heatmap.
-  --squish LOWER,UPPER                 Squish the color scale to LOWER,UPPER bounds (default: None).
-  --relwidths DEND,HEAT                Set relative widths of dendrogram and heatmap to DEND,HEAT
-                                       (default: 1,1).
-  --plotwidth PLOTWIDTH                Width of the dendrogram visualization (default: 30).
+  -h, --help                                          Show this help message and exit.
+  --geneset /path/to/geneset.txt                      Path to gene set file.
+  --multiplex /path/to/multiplex.RData                Path to multiplex network.
+  --outdir /path/to/outdir                            Save output to path (default: None).
+  --threads threads                                    
+  --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
+  --version                                           Print version and exit (default: False).
+  --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None).
+  --clusters clusters                                 Number of clusters for dendrogram (default: 10).
+  --map /path/to/map.txt                              Path to gene ensembl ID mapping file (default: None).
+  --subcluster                                        Subcluster the dendrogram (default: False).   
+  --increment increment                               If subclustering increment cluster size by (default: 5).
+  --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40).
+  --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None).
+  --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
+                                                      the heatmap.
+  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None).
+  --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
+                                                      (default: 1,1).
+  --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30).
 ```
 
 Examples
