@@ -1,4 +1,4 @@
-MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
+**MENTOR**: **M**echanistic **E**xploration of **N**etworks for **T**eam-based **O**mics **R**esearch
 =======================
 
 Installation
