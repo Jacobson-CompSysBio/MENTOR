@@ -125,11 +125,11 @@ To customize a dendrogram using a `dissimilarity-matrix.tsv`:
 mentor \
     --distances </path/to/dissimilarity-matrix.tsv> \
     --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
+    --clusters <clusters> \
     --map </path/to/map.txt> \
     --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
+    --increment <increment> \
+    --maxsize <maxsize> \
     --heatmaps </path/to/heatmap.txt> \
     --squish=<-1,1> \
     --relwidths=<1,1> \
