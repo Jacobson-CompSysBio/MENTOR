@@ -6,7 +6,6 @@ Installation
 
 ```sh
 $ git clone <link>
-$ git checkout atown-dev
 $ cd MENTOR
 $ conda env create -f ./environment.yml
 $ conda activate mentor
