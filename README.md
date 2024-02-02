@@ -116,7 +116,7 @@ mentor \
     --multiplex </path/to/multiplex.RData> \
     --outdir </path/to/outdir/> \
     --map </path/to/map.txt/> \
-    -heatmaps </path/to/heatmap.txt/>
+    --heatmaps </path/to/heatmap.txt/>
 ```
 
 To customize a dendrogram using a `dissimilarity-matrix.tsv`: 
