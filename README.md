@@ -119,7 +119,7 @@ mentor \
     -heatmaps </path/to/heatmap.txt/>
 ```
 
-To customize a dendrogram using a mentor dissimilarity-matrix: 
+To customize a dendrogram using a mentor `dissimilarity-matrix.tsv`: 
 
 ```sh
 mentor \
