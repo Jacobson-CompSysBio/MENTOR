@@ -29,26 +29,26 @@ usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multip
                    [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
 
 arguments:
-  -h, --help                                          Show this help message and exit.
-  --geneset /path/to/geneset.txt                      Path to gene set file.
-  --multiplex /path/to/multiplex.RData                Path to multiplex network.
-  --outdir /path/to/outdir                            Save output to path (default: None).
+  -h, --help                                          Show this help message and exit
+  --geneset /path/to/geneset.txt                      Path to gene set file
+  --multiplex /path/to/multiplex.RData                Path to multiplex network
+  --outdir /path/to/outdir                            Save output to path (default: None)
   --threads threads                                    
   --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
-  --version                                           Print version and exit (default: False).
-  --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None).
-  --clusters clusters                                 Number of clusters for dendrogram (default: 10).
-  --map /path/to/map.txt                              Path to gene ensembl ID mapping file (default: None).
-  --subcluster                                        Subcluster the dendrogram (default: False).   
-  --increment increment                               If subclustering increment cluster size by (default: 5).
-  --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40).
-  --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None).
+  --version                                           Print version and exit (default: False)
+  --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None)
+  --clusters clusters                                 Number of clusters for dendrogram (default: 10)
+  --map /path/to/map.txt                              Path to ensembl ID mapping file (default: None)
+  --subcluster                                        Subcluster the dendrogram (default: False)   
+  --increment increment                               If subclustering increment cluster size by (default: 5)
+  --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40)
+  --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None)
   --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
-                                                      the heatmap.
-  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None).
+                                                      the heatmap
+  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
   --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
-                                                      (default: 1,1).
-  --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30).
+                                                      (default: 1,1)
+  --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30)
 ```
 
 Examples
@@ -119,7 +119,7 @@ mentor \
     -heatmaps </path/to/heatmap.txt/>
 ```
 
-To customize a dendrogram using a mentor `dissimilarity-matrix.tsv`: 
+To customize a dendrogram using a `dissimilarity-matrix.tsv`: 
 
 ```sh
 mentor \
