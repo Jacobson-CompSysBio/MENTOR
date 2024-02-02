@@ -30,6 +30,7 @@ usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multip
                    [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
 
 arguments:
+
   -h, --help                                          Show this help message and exit
   --geneset /path/to/geneset.txt                      Path to gene set file
   --multiplex /path/to/multiplex.RData                Path to multiplex network
@@ -136,8 +137,6 @@ mentor \
     --relwidths=<1,1> \
     --plotwidth <35> \
 ```
-
-
 
 Acknowledgements
 ================
