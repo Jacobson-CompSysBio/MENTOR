@@ -7,13 +7,13 @@ import unittest
 
 from numpy import testing
 from sklearn import datasets, preprocessing
-from matplotlib import pyplot
+#from matplotlib import pyplot
 
-from functional_partitioning import _cluster as cluster
-from functional_partitioning import _datasets as datasets
-from functional_partitioning import _metrics as metrics
-from functional_partitioning import _rwrtoolkit as rwrtoolkit
-from functional_partitioning import _plot as plot
+from mentor import _cluster as cluster
+from mentor import _datasets as datasets
+from mentor import _metrics as metrics
+from mentor import _rwrtoolkit as rwrtoolkit
+#from functional_partitioning import _plot as plot
 
 from scipy.spatial import distance
 from scipy.cluster import hierarchy

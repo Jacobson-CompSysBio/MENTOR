@@ -17,7 +17,19 @@ dependencies:
   - r-optparse
   - r-ggnewscale
   - r-latex2exp
-  - scikit-learn>=1.2
+  - r-igraph
+  - r-biocmanager
+  - r-data.table
+  - r-doparallel
+  - r-foreach
+  - r-patchwork
+  - r-iterators
+  - r-dplyr
+  - r-stringr
+  - r-matrix
+  - r-irkernel
+  - bioconductor-randomwalkrestartmh
+  - scikit-learn>=1.4
   - scipy
   - pytest
   - pip:

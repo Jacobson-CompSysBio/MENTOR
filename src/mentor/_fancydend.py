@@ -21,7 +21,6 @@ def fancy_dendrogram(
         subcluster,
         increment,
         maxsize,
-        #export,
         heatmaps,
         pcutoff,
         squish,
@@ -30,7 +29,7 @@ def fancy_dendrogram(
     
     ):
 
-    command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/fp_create_dendogram.R'
+    command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/create_dendogram.R'
     if distances is not None:
         command += f' --distances={distances}'
     if clusters is not None:
@@ -54,5 +53,7 @@ def fancy_dendrogram(
         command += f' --relwidths={relwidths}'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
-    print('Running dendrogram command: ' + command)
-    subprocess.run(command,shell = True,capture_output = True)
+    print('\nrunning dendrogram command: ' + command)
+    result = subprocess.run(command,shell = True,capture_output = True,text = True,check = False)
+    print(result.stdout)
+    print(result.stderr)

@@ -1,35 +1,12 @@
-MENTOR: Mechanistic Exploration of Networks for Team-based Omics Research
+**MENTOR**: **M**echanistic **E**xploration of **N**etworks for **T**eam-based **O**mics **R**esearch
 =======================
-
-- Integrate multi-omics data using multiplex networks.
-- Identify functionally-related groups of genes using random walk with restart
-  on multiplex networks.
 
 Installation
 ============
 
-Standard installation:
-
 ```sh
 $ git clone <link>
-$ cd MENTOR
-$ make
-```
-
-If you prefer to install dependencies with conda, you can use the provided
-`environment.yml` file:
-
-```sh
-$ git clone <link>
-$ cd MENTOR
-$ conda env update -f ./environment.yml
-$ make
-```
-
-Or create a new environment called 'jail-mentor':
-
-```sh
-$ git clone <link>
+$ git checkout atown-dev
 $ cd MENTOR
 $ conda env create -f ./environment.yml
 $ conda activate mentor
@@ -47,161 +24,119 @@ Usage
 =====
 
 ```
-
-usage: mentor [-h] [--rwr-fullranks RWR_FULLRANKS] [--partition] [--outdir OUTDIR] [--path-to-conda-env CONDA_ENV] [--path-to-rwrtoolkit RWRTOOLKIT] [--multiplex MULTIPLEX] [--geneset GENESET] [--method METHOD] [--folds FOLDS] [--restart RESTART] [--tau TAU] [--numranked NUMRANKED] [--modname MODNAME] [--threads THREADS] [--verbose] [--version] [--distances DISTANCES] [--clusters CLUSTERS] [--map MAP] [--subcluster] [--increment INCREMENT] [--maxsize MAXSIZE] [--heatmaps HEATMAPS] [--pcutoff PCUTOFF] [--squish LOWER,UPPER] [--relwidths DEND,HEAT] [--plotwidth PLOTWIDTH]
+usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multiplex.RData] [--outdir /path/to/outdir]
+                   [--threads threads] [--verbose] [--version] [--distances /path/to/dissimilarity-matrix.tsv] [--clusters clusters]
+                   [--map /path/to/map.txt] [--subcluster] [--increment increment] [--maxsize maxsize] [--heatmaps /path/to/heatmap.txt]
+                   [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
 
 arguments:
-  -h, --help                           Show this help message and exit.
-  --rwr-fullranks RWR_FULLRANKS        Path to "fullranks" file from `RWR-CV--method=singletons`
-                                       (default: None).
-  --partition, -p                      Perform functional partitioning on "seed genes" from RWR
-                                       fullranks file (default: False).
-  --outdir OUTDIR                      Save output to path (default: None).
-  --path-to-conda-env CONDA_ENV        Path to conda environment.
-  --path-to-rwrtoolkit RWRTOOLKIT      Path to RWRToolkit.
-  --multiplex MULTIPLEX                Path to multiplex network.
-  --geneset GENESET                    Path to gene set file. 
-  --threads THREADS
-  --verbose, -v                        Default: WARNING; once: INFO; twice: DEBUG (default: 0)
-  --version                            Print version and exit (default: False).
-  --distances DISTANCES                Path to dissimilarity-matrix.tsv (default: None).
-  --clusters CLLUSTERS                 Number of clusters for dendrogram (default: 10).
-  --map                                Path to gene ensembl ID mapping file (default: None).
-  --subcluster                         Subcluster the dendrogram (default: False).   
-  --increment INCREMENT                If subclustering increment cluster size by (default: 5).
-  --maxsize MAXSIZE                    Maximum size of clusters for subclustering (default: 40).
-  --heatmaps HEATMAPS                  Path to heatmap file (default: None).
-  --pcutoff PCUTOFF                    Cutoff value for p-value if there is a p-value column in
-                                       the heatmap.
-  --squish LOWER,UPPER                 Squish the color scale to LOWER,UPPER bounds (default: None).
-  --relwidths DEND,HEAT                Set relative widths of dendrogram and heatmap to DEND,HEAT
-                                       (default: 1,1).
-  --plotwidth PLOTWIDTH                Width of the dendrogram visualization (default: 30).
+
+  -h, --help                                          Show this help message and exit
+  --geneset /path/to/geneset.txt                      Path to gene set file
+  --multiplex /path/to/multiplex.RData                Path to multiplex network
+  --outdir /path/to/outdir                            Save output to path (default: None)
+  --threads threads                                    
+  --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
+  --version                                           Print version and exit (default: False)
+  --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None)
+  --clusters clusters                                 Number of clusters for dendrogram (default: 10)
+  --map /path/to/map.txt                              Path to ensembl ID mapping file (default: None)
+  --subcluster                                        Subcluster the dendrogram (default: False)   
+  --increment increment                               If subclustering increment cluster size by (default: 5)
+  --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40)
+  --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None)
+  --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
+                                                      the heatmap
+  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
+  --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
+                                                      (default: 1,1)
+  --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30)
 ```
 
 Examples
 ========
 
-To run RWRtoolkit on a gene set and multiplex network followed by mentor:
+The `geneset.txt` and `multiplex.RData` are required to run `mentor` to obtain a dissimilarity matrix and dendrogram visualization. The `map.txt` and `heatmap.txt` are not required to run `mentor`.
+
+The `geneset.txt` table should be a tab-separated text file with **no header**. Three columns should be present for the project name *(string)*, ensembl IDs *(string)*, and weights *(numeric)*. The example below displays a geneset table with five genes. 
+
+|              |                 |   |
+| ------------ | --------------- | - |
+| project_name | ENSG00000008311 | 1 |
+| project_name | ENSG00000141338 | 1 |
+| project_name | ENSG00000172350 | 1 |
+| project_name | ENSG00000042980 | 1 |
+| project_name | ENSG00000198099 | 1 |
+
+The `map.txt` table can be used to assign different labels to the dendrogram branches. The table should also be a tab-separated text file with a **header**. Two columns should be present for the ensembl ID *(string)* and associated label *(string)* that you would like to display in the dendrogram branch labels. The example below displays a mapping table for the same five genes. If you would like to include a heatmap in the visualization then you must ensure that the labels in the map table match the labels in the heatmap table.
+
+|     ensembl     |  label  |
+| --------------- | ------- |
+| ENSG00000008311 |   AASS  |
+| ENSG00000141338 |  ABCA8  |
+| ENSG00000172350 |  ABCG4  |
+| ENSG00000042980 | ADAM28  |
+| ENSG00000198099 |   ADH4  |
+
+The `heatmap.txt` table is required if the user would like to include a heatmap next to the dendrogram. The table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+
+|  label  |  value  |  source  |
+| ------- | ------- | -------- |
+|   AASS  |   1.5   |  RNA-seq |
+|  ABCA8  |   2.5   |  RNA-seq |
+|  ABCG4  |   0.3   |  RNA-seq |
+| ADAM28  |   -1.1  |  RNA-seq |
+|   ADH4  |   -0.8  |  RNA-seq |
+|   AASS  |    1    |   GWAS   |
+|  ABCA8  |    1    |   GWAS   |
+|   ADH4  |    1    |   GWAS   |
+
+To run `mentor` on a gene set and multiplex network:
 
 ```sh
 mentor \
     --geneset </path/tp/geneset.txt> \
     --multiplex </path/to/multiplex.RData> \
-    --partition \
-    --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
-    --map </path/to/map.txt> \
-    --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
-    --squish=<-1,1> \
-    --relwidths=<1,1> \
-    --plotwidth <35> \
+    --outdir </path/to/outdir/>
 ```
 
-To customize a dendrogram from a mentor dissimilarity-matrix: 
+To run `mentor` on a gene set and multiplex and have custom dendrogram labels:
+
+```sh
+mentor \
+    --geneset </path/tp/geneset.txt> \
+    --multiplex </path/to/multiplex.RData> \
+    --outdir </path/to/outdir/> \
+    --map </path/to/map.txt/>
+```
+
+To run `mentor` on a gene set and multiplex and have custom dendrogram labels and a heatmap:
+
+```sh
+mentor \
+    --geneset </path/tp/geneset.txt> \
+    --multiplex </path/to/multiplex.RData> \
+    --outdir </path/to/outdir/> \
+    --map </path/to/map.txt/> \
+    --heatmaps </path/to/heatmap.txt/>
+```
+
+To customize a dendrogram using a `dissimilarity-matrix.tsv`: 
 
 ```sh
 mentor \
     --distances </path/to/dissimilarity-matrix.tsv> \
     --outdir </path/to/outdir/> \
-    --clusters <CLUSTERS> \
+    --clusters <clusters> \
     --map </path/to/map.txt> \
     --subcluster \
-    --increment <INCREMEN> \
-    --maxsize <MAXSIZE> \
-    --heatmaps </path/to/map.txt> \
+    --increment <increment> \
+    --maxsize <maxsize> \
+    --heatmaps </path/to/heatmap.txt> \
     --squish=<-1,1> \
     --relwidths=<1,1> \
     --plotwidth <35> \
 ```
-
-
-
-OLD SHIT (IGNORE BELOW)
-
-If you have a gene set and a multiplex network, run RWR and mentor the geneset:
-
-```sh
-functional_partitioning \
-    --path-to-rwrtoolkit <path to RWRtoolkit directory> \
-    --multiplex <path to multiplex object> \
-    --geneset <path to your gene set> \
-    --outdir <path to output directory>
-```
-
-If you already have results from RWRtoolkit, you can pass in your 'fullranks'
-file:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --outdir <path to output directory>
-```
-
-The default cut method is to use `dynamicTreeCut`, explicitly:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --cut-method dynamic \
-    --outdir <path to output directory>
-```
-
-You can change this to use a hard threshold instead:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --cut-method hard \
-    --cut-threshold 0.3 \
-    --outdir <path to output directory>
-```
-
-You can change the labels on the leaves of the dendrogram. This requires that
-you have a nodetable file. The nodetable is a TSV file with the first column as
-the seed genes use for RWR-CV (singletons), e.g., something like this:
-
-```
-gene_id          gene_info
-Potri.001G377800 This is gene 001G377800.
-Potri.001G429430 This is gene 001G429430.
-Potri.003G099600 This is gene 003G099600.
-...
-```
-
-Then, provide the `--nodetable` and `--labels-use-{locs,names}` parameters to
-tell this script which columns to use as labels on the dendrogram. E.g., to use
-the column "gene_info" as the labels, you can either provide the column by name:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-names "gene_info"
-```
-
-Or provide the column by number:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-locs 1
-```
-
-If you want to keep the node ID in the label, provide that column as one of the
-labels in addition to any others:
-
-```sh
-functional_partitioning \
-    --rwr-fullranks <path to fullranks file> \
-    --nodetable <path to nodetable.tsv file> \
-    --labels-use-names "gene_id" "gene_info"
-```
-
 
 Acknowledgements
 ================
