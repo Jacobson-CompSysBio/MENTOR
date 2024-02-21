@@ -27,7 +27,7 @@ Usage
 usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multiplex.RData] [--outdir /path/to/outdir]
                    [--threads threads] [--verbose] [--version] [--distances /path/to/dissimilarity-matrix.tsv] [--clusters clusters]
                    [--map /path/to/map.txt] [--subcluster] [--increment increment] [--maxsize maxsize] [--heatmaps /path/to/heatmap.txt]
-                   [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
+                   [--reordercols] [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
 
 arguments:
 
@@ -45,6 +45,7 @@ arguments:
   --increment increment                               If subclustering increment cluster size by (default: 5)
   --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40)
   --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None)
+  --reordercols                                       Reorder columns of heatmap with clustering (default: False)
   --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
                                                       the heatmap
   --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
@@ -78,7 +79,7 @@ The `map.txt` table can be used to assign different labels to the dendrogram bra
 | ENSG00000042980 | ADAM28  |
 | ENSG00000198099 |   ADH4  |
 
-The `heatmap.txt` table is required if the user would like to include a heatmap next to the dendrogram. The table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
+The `heatmap.txt` table is required if the user would like to include a heatmap next to the dendrogram. The table should also be a tab-separated text file with a **header**. Three columns should be present for the label *(string)*, value *(numeric)*, and data source *(string)*. Each unique data source will be presented as a new column in the heatmap. The order of the columns from left to right will be the same order as their appearance in the table from top to bottom. If you would like to reorder the columns by similarity then specify `--reordercols`.The total number of columns is dependent on the type of information that you would like to present in the heatmap. The example below displays a heatmap table for the same five genes where we have bulk RNA-seq and GWAS data sources associated with these genes. You can see that all five genes were implicated in the RNA-seq data source but only three were implicated in the GWAS data source.
 
 |  label  |  value  |  source  |
 | ------- | ------- | -------- |
