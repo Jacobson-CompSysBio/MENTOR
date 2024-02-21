@@ -99,6 +99,12 @@ def parse_args(test=None):
         help='Full path to the heatmap file if you want to include a heatmap'
     )
     parser.add_argument(
+        '--reordercols',
+        action='store_true',
+        default=False,
+        help='Specify if you want to perform hierarchical clustering on the columns of the heatmap'
+    )
+    parser.add_argument(
         '--pcutoff',
         action='store',
         type=float,
@@ -209,6 +215,7 @@ def main():
                 increment = args.increment,
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
+                reordercols = args.reordercols,
                 pcutoff = args.pcutoff,
                 squish = args.squish,
                 relwidths = args.relwidths,
@@ -241,6 +248,7 @@ def main():
             increment = args.increment,
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
+            reordercols = args.reordercols,
             pcutoff = args.pcutoff,
             squish = args.squish,
             relwidths = args.relwidths,
