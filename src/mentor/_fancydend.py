@@ -48,7 +48,7 @@ def fancy_dendrogram(
         command += f' --maxsize={maxsize}'
     if heatmaps is not None:
         command += f' --heatmaps={heatmaps}'
-    if reordercols is not None:
+    if reordercols is True:
         command += f' --reordercols'
 # note: need to add pcutoff option as well
     if squish is not None:
