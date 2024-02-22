@@ -11,7 +11,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
   # changing first column name to "label" to match dend_labs
   names(heat_labs) <- c("label","value","source")
-  if(any(duplicated(heat_labs)) {
+  if(any(duplicated(heat_labs))) {
     print("WARNING: duplicated rows in heatmap table; make sure all rows are unique!"))
   }
   if(reordercols) { 
