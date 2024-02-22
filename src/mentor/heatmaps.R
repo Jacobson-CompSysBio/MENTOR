@@ -96,7 +96,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   # create heatmap
   heat <- ggplot(data = heat_labs,aes(x,y)) + 
     # set all tiles to be grey initially
-    geom_tile(aes(fill = !!sym("value")),colour = "grey65",fill = "grey65",show.legend = FALSE) + 
+    geom_tile(aes(fill = !!sym("value")),colour = "grey50",fill = "grey50",show.legend = FALSE) + 
     # set the labels for the x-axis
     scale_x_continuous(
       # labels for x-axis
@@ -152,7 +152,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
         # squish the scales
         oob = scales::squish,
         # set NA values to grey
-        na.value = "grey65"
+        na.value = "grey50"
       )
     } else {
       heat <- heat + scale_fill_gradient2(
@@ -167,7 +167,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
         # set midpoint to 0
         midpoint = 0,
         # set NA values to grey
-        na.value = "grey65"
+        na.value = "grey50"
       )
     }
     heat <- heat + theme(
@@ -192,7 +192,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
         guide = guide_legend(
             override.aes = list(
               # override the legend fills to grey and black 
-              fill = c("grey65","black")
+              fill = c("grey50","black")
             )
           )
       )
@@ -211,14 +211,14 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
         # set the p-value legend to adjusted p-value
         name = "p-value (adj)",
         # set "yes" to black "no" to grey and "na" to transparent
-        values = c("yes" = "black","no" = "grey65","na" = "transparent"), 
+        values = c("yes" = "black","no" = "grey50","na" = "transparent"), 
         # set labels of legend to "< 0.05" and ">= "0,05"
         labels = c(paste0("< ",p_cutoff),paste0(">= ",p_cutoff),""),
         # override the legend specs
         guide = guide_legend(
           override.aes = list(
             # override the legend fills to black grey and white (removes "na")
-            fill = c("black","grey65","white")))
+            fill = c("black","grey50","white")))
       )
   }
   
