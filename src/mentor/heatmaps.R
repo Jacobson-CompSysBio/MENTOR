@@ -12,7 +12,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   # changing first column name to "label" to match dend_labs
   names(heat_labs) <- c("label","value","source")
   if(any(duplicated(heat_labs))) {
-    print("WARNING: duplicated rows in heatmap table; make sure all rows are unique!"))
+    print("WARNING: duplicated rows in heatmap table; make sure all rows are unique!")
   }
   if(reordercols) { 
     # do the rearrangement clustering
