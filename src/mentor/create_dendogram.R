@@ -190,7 +190,7 @@ create_dendogram <- function(
   # grab the dendrogram and labels from result
   dendrogram <- dendo$dendrogram
   dend_labs <- dendo$dendrogram_labels
-  
+ 
   if(!is.null(heatmaps)) {
     
     cat("\n\nadding heatmap")
