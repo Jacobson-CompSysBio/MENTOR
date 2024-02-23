@@ -14,7 +14,8 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   if(any(duplicated(heat_labs))) {
     cat("\nWARNING: duplicated rows in heatmap table; make sure all rows are unique!")
   }
-  if(reordercols) { 
+  if(reordercols) {
+    cat("\n\nre-ordering the columns of the heatmap table by clustering")
     # do the rearrangement clustering
     heat_labs_no_dups <- heat_labs %>% group_by(source,label) %>% top_n(1,abs(value)) %>% distinct()
     df <- spread(heat_labs_no_dups, source, value)
