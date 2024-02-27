@@ -85,6 +85,13 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
+    c("-l","--reordercols"),
+    action = "store_true",
+    default = FALSE,
+    help = "specify if want to subcluster",
+    metavar = "character"
+  ),
+  make_option(
     c("-p","--pcutoff"),
     type = "double",
     default = NULL,
@@ -128,6 +135,7 @@ create_dendogram <- function(
   k_increment,
   max_size,
   heatmaps,
+  reordercols,
   p_cutoff,
   squish_bounds,
   relative_widths,
@@ -182,7 +190,7 @@ create_dendogram <- function(
   # grab the dendrogram and labels from result
   dendrogram <- dendo$dendrogram
   dend_labs <- dendo$dendrogram_labels
-  
+ 
   if(!is.null(heatmaps)) {
     
     cat("\n\nadding heatmap")
@@ -192,7 +200,7 @@ create_dendogram <- function(
     heatmaps.path <- file.path(script.basename, "/heatmaps.R")
     source(heatmaps.path)
     # create the heatmap to add to dendrogram
-    heat <- heatmap(heatmap = heatmaps,dend_labs,p_cutoff,squish_bounds)
+    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,p_cutoff,squish_bounds)
     # grab relative widths for final plot
     relative_widths <- do.call("c",strsplit(relative_widths,","))
     # add to dendrogram
@@ -249,6 +257,7 @@ create_dendogram(
   k_increment = opt$increment,
   max_size = opt$maxsize,
   heatmaps = opt$heatmaps,
+  reordercols = opt$reordercols,
   p_cutoff = opt$pcutoff,
   squish_bounds = opt$squish,
   relative_widths = opt$relwidths,

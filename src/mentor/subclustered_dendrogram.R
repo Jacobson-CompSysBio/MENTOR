@@ -251,8 +251,7 @@ subclustered_dendrogram <- function(
     ) +
     # reverse y axis and add axis limits
     # This is to visualize labels at the right
-    # side and to allow enough space for them
-    scale_y_reverse(limit = c(1, label_length)) +
+    scale_y_reverse(limit = c(max(dend_seg$y + 0.01), label_length)) +
     # remove plot borders with expand and set limits to max number of labels
     scale_x_continuous(expand = c(0, 0), limits = c(-1, n_labels + 1)) +
     # Add segment colors

@@ -125,7 +125,7 @@ dendrogram <- function(dis_mat,k = 3,map) {
       label.padding = unit(0.125, "lines")
     ) +
     # reverse y axis and add axis limits
-    scale_y_reverse(limit = c(1, label_length)) +
+    scale_y_reverse(limit = c(max(dend_seg$y + 0.01), label_length)) +
     # remove plot borders with expand and set limits to max labels
     scale_x_continuous(expand = c(0, 0),limits = c(-1,n_labels + 1)) +
     # pass segment colors

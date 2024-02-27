@@ -5,25 +5,28 @@
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,p_cutoff,squish_bounds) {
+heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
   # changing first column name to "label" to match dend_labs
   names(heat_labs) <- c("label","value","source")
-  
-  # do the rearrangement clustering
-  heat_labs_no_dups <- heat_labs %>% group_by(source,label) %>% top_n(1,abs(value)) %>% distinct()
-  df <- spread(heat_labs_no_dups, source, value)
-  df[is.na(df)] <- 0
-  columnar_data <- t(df[, 2:ncol(df)])
-  distance_mat <- dist(columnar_data, method = 'euclidean')
-  clusters <- hclust(distance_mat)
-  ordered_labels <- clusters$order
-  row_order <- row.names(columnar_data)[clusters$order]
-
-  heat_labs <- heat_labs %>% arrange(factor(source, levels=row_order))
-
+  if(any(duplicated(heat_labs))) {
+    cat("\nWARNING: duplicated rows in heatmap table; make sure all rows are unique!")
+  }
+  if(reordercols) {
+    cat("\n\nre-ordering the columns of the heatmap table by clustering")
+    # do the rearrangement clustering
+    heat_labs_no_dups <- heat_labs %>% group_by(source,label) %>% top_n(1,abs(value)) %>% distinct()
+    df <- spread(heat_labs_no_dups, source, value)
+    df[is.na(df)] <- 0
+    columnar_data <- t(df[, 2:ncol(df)])
+    distance_mat <- dist(columnar_data, method = 'euclidean')
+    clusters <- hclust(distance_mat)
+    ordered_labels <- clusters$order
+    row_order <- row.names(columnar_data)[clusters$order]
+    heat_labs <- heat_labs %>% arrange(factor(source, levels=row_order))
+  }
   # create order column on dend_labs
   dend_labs$row_order <- 1:nrow(dend_labs)
   # loop through different sources and create data frame for heatmap sources
