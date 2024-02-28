@@ -78,7 +78,7 @@ class HierarchicalClustering(AgglomerativeClustering):
         pairwise_distances_kwargs = dict(
             Y = kwargs.get('Y',None),
             metric = self.metric,
-            n_jobs = kwargs.get('n_jobs',None),
+            n_jobs = kwargs.get('n_jobs',-1),
             force_all_finite = kwargs.get('force_all_finite',True)
         )
         dmat = metrics.pairwise_distances(features,**pairwise_distances_kwargs)
