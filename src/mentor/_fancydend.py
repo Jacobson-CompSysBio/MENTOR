@@ -18,6 +18,7 @@ def fancy_dendrogram(
         clusters,
         map,
         outdir,
+        outfile,
         subcluster,
         increment,
         maxsize,
@@ -40,6 +41,8 @@ def fancy_dendrogram(
     if outdir is not None:
         command += f' --outdir={outdir}'
         command = command + '/'
+    if outfile is not None:
+        command += f' --outfile={outfile}'
     if subcluster is True:
         command += f' --subcluster'
     if increment is not None:

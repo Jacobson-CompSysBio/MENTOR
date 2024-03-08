@@ -57,6 +57,13 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
+    c("-f","--outfile"),
+    type = "character",
+    default = NULL,
+    help = "filename to append",
+    metavar = "character"
+  ),
+  make_option(
     c("-s","--subcluster"), 
     action = "store_true",
     default = FALSE, 
@@ -131,6 +138,7 @@ create_dendogram <- function(
   k,
   map,
   out_dir,
+  out_file,
   subcluster,
   k_increment,
   max_size,
@@ -215,7 +223,11 @@ create_dendogram <- function(
     
   }
   
-  # export the clusters
+  # export the clusters and dendrogram
+  if(!is.null(out_file)) {
+    cluster_file <- paste0(out_file,"_",cluster_file)
+    plot_file <- paste0(out_file,"_",plot_file)
+  }
   dend_labs$row_order <- 1:nrow(dend_labs)
   groups <- data.frame(
     "col" = unique(dend_labs$col),
@@ -253,6 +265,7 @@ create_dendogram(
   k = opt$clusters,
   map = opt$map,
   out_dir = opt$outdir,
+  out_file = opt$outfile,
   subcluster = opt$subcluster,
   k_increment = opt$increment,
   max_size = opt$maxsize,

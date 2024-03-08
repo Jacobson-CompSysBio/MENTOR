@@ -30,6 +30,11 @@ def parse_args(test=None):
         help='Save dendrogram and clusters to path.'
     )
     parser.add_argument(
+        '--outfile',
+        action='store',
+        help='File name to use.'
+    )
+    parser.add_argument(
         '--multiplex',
         action='store',
         help=''
@@ -154,10 +159,18 @@ def main():
         print(__version__)
         sys.exit(0)
     LOGGER.debug(args)
+    if args.outfile is not None:
+        diss_mat = args.outfile + '-dissimilarity-matrix.tsv'
+        diss_stats = args.outfile + '-dissimilarity-stats.tsv'
+        diss_dist = args.outfile + '-distribution-of-pairwise-dissimilarities.png'
+    else:
+        diss_mat = 'dissimilarity-matrix.tsv'
+        diss_stats = 'dissimilarity-stats.tsv'
+        diss_dist = 'distribution-of-pairwise-dissimilarities.png'
     if args.outdir is not None:
-        out_dissimilarity_matrix = args.outdir / 'dissimilarity-matrix.tsv'
-        out_dissimilarity_stats = args.outdir / 'dissimilarity-stats.tsv'
-        out_dissimilarity_distribution = args.outdir / 'distribution-of-pairwise-dissimilarities.png'
+        out_dissimilarity_matrix = args.outdir / diss_mat
+        out_dissimilarity_stats = args.outdir / diss_stats
+        out_dissimilarity_distribution = args.outdir / diss_dist
     else:
         out_dissimilarity_matrix = None
         out_dissimilarity_stats = None
@@ -211,6 +224,7 @@ def main():
                 clusters = args.clusters,
                 map = args.map,
                 outdir = args.outdir,
+                outfile = args.outfile,
                 subcluster = args.subcluster,
                 increment = args.increment,
                 maxsize = args.maxsize,
@@ -244,6 +258,7 @@ def main():
             clusters = args.clusters,
             map = args.map,
             outdir = args.outdir,
+            outfile = args.outfile,
             subcluster = args.subcluster,
             increment = args.increment,
             maxsize = args.maxsize,
