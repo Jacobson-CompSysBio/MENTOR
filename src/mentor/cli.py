@@ -133,6 +133,12 @@ def parse_args(test=None):
         type=int,
         help='Width of the dendrogram/heatmap visualization'
     )
+    parser.add_argument(
+        '--plotheight',
+        action='store',
+        type=int,
+        help='Height of the dendrogram/heatmap visualization'
+    )
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
         sys.exit(1)
@@ -234,6 +240,7 @@ def main():
                 squish = args.squish,
                 relwidths = args.relwidths,
                 plotwidth = args.plotwidth,
+                plotheight = args.plotheight
             )
         else:
             dmat = None
@@ -268,6 +275,7 @@ def main():
             squish = args.squish,
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,
+            plotheight = args.plotheight
         )
     else:
         pass

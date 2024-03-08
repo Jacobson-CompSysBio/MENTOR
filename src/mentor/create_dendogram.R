@@ -120,10 +120,17 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    c("-w","--plotwidth"),
+    c("-e","--plotwidth"),
     type = "integer",
     default = 30,
     help = "width of the final plot",
+    metavar = "character"
+  ),
+  make_option(
+    c("d","--plotheight"),
+    type = "integer",
+    default = NULL,
+    help = "height of the final plot",
     metavar = "character"
   )
 )
@@ -147,7 +154,8 @@ create_dendogram <- function(
   p_cutoff,
   squish_bounds,
   relative_widths,
-  plot_width
+  plot_width,
+  plot_height
   
 ) {
  
@@ -238,11 +246,9 @@ create_dendogram <- function(
   dend_labs <- dend_labs[,c("label","cluster")]
   cat("\n\nexporting clusters")
   write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
-  # adjust height based on number of genes to ensure labels are legible
-  if(nrow(dend_labs) <= 20){
-    height_ = nrow(dend_labs)
-  } else {
-    height_ = nrow(dend_labs) * 0.6
+  # adjust heigh of plot based on user input or by the number of genes
+  if(is.null(plot_height)) {
+    plot_height = nrow(dend_labs) * 0.6
   }
   # export the ggplot dendrogram
   cat("\n\nsaving visualization")
@@ -250,7 +256,7 @@ create_dendogram <- function(
     paste0(out_dir,plot_file),
     plot = dendrogram,
     width = plot_width,
-    height = height_,
+    height = plot_height,
     units = "cm",
     limitsize = FALSE
   )
@@ -274,7 +280,8 @@ create_dendogram(
   p_cutoff = opt$pcutoff,
   squish_bounds = opt$squish,
   relative_widths = opt$relwidths,
-  plot_width = opt$plotwidth
+  plot_width = opt$plotwidth,
+  plot_height = opt$plotheight
   
 )
 

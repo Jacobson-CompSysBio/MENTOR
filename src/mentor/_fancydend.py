@@ -27,7 +27,8 @@ def fancy_dendrogram(
         pcutoff,
         squish,
         relwidths,
-        plotwidth
+        plotwidth,
+        plotheight
     
     ):
 
@@ -60,6 +61,8 @@ def fancy_dendrogram(
         command += f' --relwidths={relwidths}'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
+    if plotheight is not None:
+        command += f' --plotheight={plotheight}'
     print('\nrunning dendrogram command: ' + command)
     result = subprocess.run(command,shell = True,capture_output = True,text = True,check = False)
     print(result.stdout)
