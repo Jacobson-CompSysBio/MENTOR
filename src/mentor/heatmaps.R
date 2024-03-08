@@ -1,11 +1,12 @@
 
+# note: need to add cutoff option as well
 # Usage:
 # heatmap: function name
 # log2fc: path to log2fc file
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
+heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) { #p_cutoff,
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
