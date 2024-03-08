@@ -76,24 +76,24 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
   # change levels of factor column to "absence" or "presence"
   heat_labs$factor <- factor(heat_labs$factor,levels = c(0,1),labels = c("absent","present"))
   # add a p-value column for sources where all values are between 0 and 1 inclusive
-  heat_labs$pvalue <- do.call("c",lapply(unique(heat_labs$x),function(column){
-    # filter to current source
-    heats <- heat_labs[heat_labs$x == column,]
-    # check if all values fall between 0 and 1 inclusive and that all values for factor are "absent"
-    if(all((heats$value >= 0 & heats$value <= 1)|is.na(heats$value)) & !any(heats$factor == "present")) {
-      # if all values fall between 0 and 1 inclusive and all values for factor are "absent"
-      x <- heats$value
-      # set yes p-values less than 0.05 as yes and greater than or equal to 0.05 as no
-      return(case_when(
-        is.na(x) ~ "na",
-        x < p_cutoff ~ "yes",
-        x >= p_cutoff ~ "no"
-      ))
-    } else {
-      # otherwise set all p-values to "na"
-      return(rep("na",length(heats$value)))
-    }
-  }))
+  #heat_labs$pvalue <- do.call("c",lapply(unique(heat_labs$x),function(column){
+  #  # filter to current source
+  #  heats <- heat_labs[heat_labs$x == column,]
+  #  # check if all values fall between 0 and 1 inclusive and that all values for factor are "absent"
+  #  if(all((heats$value >= 0 & heats$value <= 1)|is.na(heats$value)) & !any(heats$factor == "present")) {
+  #    # if all values fall between 0 and 1 inclusive and all values for factor are "absent"
+  #    x <- heats$value
+  #    # set yes p-values less than 0.05 as yes and greater than or equal to 0.05 as no
+  #    return(case_when(
+  #      is.na(x) ~ "na",
+  #      x < p_cutoff ~ "yes",
+  #      x >= p_cutoff ~ "no"
+  #    ))
+  #  } else {
+  #    # otherwise set all p-values to "na"
+  #    return(rep("na",length(heats$value)))
+  #  }
+  #}))
   # create heatmap
   heat <- ggplot(data = heat_labs,aes(x,y)) + 
     # set all tiles to be grey initially
@@ -125,7 +125,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
       # legend.title = element_text(size = 8,vjust = 2)
     )
   # if there are any values that contain a decimal and fall below 0 or greater than 1
-  if(any(grepl("\\.",as.character(heat_labs$value))) & any(abs(heat_labs$value) > 1|heat_labs$value < 0)) {
+  if(any(grepl("\\.",as.character(heat_labs$value))) & any(abs(heat_labs$value) >= 1|heat_labs$value < 0)) {
     # add new scale for log2fc values
     heat <- heat + 
       # add new scale
@@ -199,29 +199,29 @@ heatmap <- function(heatmap,dend_labs,reordercols,p_cutoff,squish_bounds) {
       )
   }
   # if there are any p-value values set to "yes"
-  if(any(heat_labs$pvalue == "yes")) {
-    # add new scale for p-values
-    heat <- heat +
-      # add new scale
-      new_scale_fill() +
-      # add geom_tile fills for p-values
-      geom_tile(aes(x,y,fill = pvalue)) +
-      # adjust legend title size and position
-      theme(legend.title = element_text(size = 8,vjust = 2)) +
-      scale_fill_manual(
-        # set the p-value legend to adjusted p-value
-        name = "p-value (adj)",
-        # set "yes" to black "no" to grey and "na" to transparent
-        values = c("yes" = "black","no" = "grey50","na" = "transparent"), 
-        # set labels of legend to "< 0.05" and ">= "0,05"
-        labels = c(paste0("< ",p_cutoff),paste0(">= ",p_cutoff),""),
-        # override the legend specs
-        guide = guide_legend(
-          override.aes = list(
-            # override the legend fills to black grey and white (removes "na")
-            fill = c("black","grey50","white")))
-      )
-  }
+  #if(any(heat_labs$pvalue == "yes")) {
+  #  # add new scale for p-values
+  #  heat <- heat +
+  #    # add new scale
+  #    new_scale_fill() +
+  #    # add geom_tile fills for p-values
+  #    geom_tile(aes(x,y,fill = pvalue)) +
+  #    # adjust legend title size and position
+  #    theme(legend.title = element_text(size = 8,vjust = 2)) +
+  #    scale_fill_manual(
+  #      # set the p-value legend to adjusted p-value
+  #      name = "p-value (adj)",
+  #      # set "yes" to black "no" to grey and "na" to transparent
+  #      values = c("yes" = "black","no" = "grey50","na" = "transparent"), 
+  #      # set labels of legend to "< 0.05" and ">= "0,05"
+  #      labels = c(paste0("< ",p_cutoff),paste0(">= ",p_cutoff),""),
+  #      # override the legend specs
+  #      guide = guide_legend(
+  #        override.aes = list(
+  #          # override the legend fills to black grey and white (removes "na")
+  #          fill = c("black","grey50","white")))
+  #    )
+  #}
   
   return(heat)
   
