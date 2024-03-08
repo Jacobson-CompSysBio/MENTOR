@@ -126,7 +126,8 @@ heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) { #p_cutoff,
       # legend.title = element_text(size = 8,vjust = 2)
     )
   # if there are any values that contain a decimal and fall below 0 or greater than 1
-  if(any(grepl("\\.",as.character(heat_labs$value))) & any(abs(heat_labs$value) >= 1|heat_labs$value < 0)) {
+  #if(any(grepl("\\.",as.character(heat_labs$value))) & any(abs(heat_labs$value) >= 1|heat_labs$value < 0)) {
+  if(any(grepl("\\.",as.character(heat_labs$value)))) {
     # add new scale for log2fc values
     heat <- heat + 
       # add new scale
