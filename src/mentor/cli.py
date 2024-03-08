@@ -109,12 +109,12 @@ def parse_args(test=None):
         default=False,
         help='Specify if you want to perform hierarchical clustering on the columns of the heatmap'
     )
-    parser.add_argument(
-        '--pcutoff',
-        action='store',
-        type=float,
-        help='Adjusted p-value cutoff to use if p-values present in the heatmap table'
-    )
+    #parser.add_argument(
+    #    '--pcutoff',
+    #    action='store',
+    #    type=float,
+    #    help='Adjusted p-value cutoff to use if p-values present in the heatmap table'
+    #)
     parser.add_argument(
         '--squish',
         action='store',
@@ -236,7 +236,7 @@ def main():
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
                 reordercols = args.reordercols,
-                pcutoff = args.pcutoff,
+                #pcutoff = args.pcutoff,
                 squish = args.squish,
                 relwidths = args.relwidths,
                 plotwidth = args.plotwidth,
@@ -271,7 +271,7 @@ def main():
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
             reordercols = args.reordercols,
-            pcutoff = args.pcutoff,
+            #pcutoff = args.pcutoff,
             squish = args.squish,
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,
