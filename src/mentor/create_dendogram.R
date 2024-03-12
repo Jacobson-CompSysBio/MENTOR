@@ -98,13 +98,6 @@ option_list <- list(
     help = "specify if want to subcluster",
     metavar = "character"
   ),
-  #make_option(
-  #  c("-p","--pcutoff"),
-  #  type = "double",
-  #  default = NULL,
-  #  help = "adjusted p-value cutoff to use if p-values present in the heatmap table",
-  #  metavar = "character"
-  #),
   make_option(
     c("-q","--squish"),
     type = "character",
@@ -151,7 +144,6 @@ create_dendogram <- function(
   max_size,
   heatmaps,
   reordercols,
-  p_cutoff,
   squish_bounds,
   relative_widths,
   plot_width,
@@ -216,7 +208,7 @@ create_dendogram <- function(
     heatmaps.path <- file.path(script.basename, "/heatmaps.R")
     source(heatmaps.path)
     # create the heatmap to add to dendrogram
-    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,p_cutoff,squish_bounds)
+    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,squish_bounds)
     # grab relative widths for final plot
     relative_widths <- do.call("c",strsplit(relative_widths,","))
     # add to dendrogram
@@ -277,7 +269,6 @@ create_dendogram(
   max_size = opt$maxsize,
   heatmaps = opt$heatmaps,
   reordercols = opt$reordercols,
-  #p_cutoff = opt$pcutoff,
   squish_bounds = opt$squish,
   relative_widths = opt$relwidths,
   plot_width = opt$plotwidth,

@@ -24,7 +24,6 @@ def fancy_dendrogram(
         maxsize,
         heatmaps,
         reordercols,
-        #pcutoff,
         squish,
         relwidths,
         plotwidth,
