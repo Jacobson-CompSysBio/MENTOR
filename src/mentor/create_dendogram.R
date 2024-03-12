@@ -158,6 +158,11 @@ create_dendogram <- function(
   dm_matrix <- dm  %>%
     column_to_rownames(var = "...1")  %>%
     as.matrix()
+  # check if k > number of genes
+  if(k > ncol(dm_matrix)) {
+    cat("\n\nerror: number of clusters specified (k) is greater than the number of genes in geneset")
+    quit(save = "no")
+  }
   # convert to distance matrix
   dm_dist <- dm_matrix  %>% as.dist()
   
