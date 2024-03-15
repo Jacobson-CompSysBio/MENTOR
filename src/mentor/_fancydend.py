@@ -55,7 +55,7 @@ def fancy_dendrogram(
     if reordercols is True:
         command += f' --reordercols'
     if legend is not None:
-        command += f' --legend={legend}'
+        command += f' --legend="{legend}"'
     if squish is not None:
         command += f' --squish={squish}'
     if relwidths is not None:

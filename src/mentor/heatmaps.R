@@ -123,7 +123,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,legend,squish_bounds) {
       squish_bounds <- as.numeric(do.call("c",strsplit(squish_bounds,",")))
       # draw new scale with squish bounds parameters
       heat <- heat + scale_fill_gradient2(
-        # set the value legend to log2fc (assume these values represent log2fc?)
+        # set the value legend to log2fc (assume these values represent log2fc)
         name = legend_title,
         # set low value to blue
         low = '#0017FF',
@@ -158,7 +158,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,legend,squish_bounds) {
     }
     heat <- heat + theme(
         # adjust legend title size and position
-        legend.title = element_text(size = 8,vjust = 2)
+        legend.title = element_text(size = 12,vjust = 2)
       )
   }
   # if there are any factor values set to "present" (when p-values not present)
