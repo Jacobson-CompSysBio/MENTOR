@@ -32,7 +32,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--outfile',
         action='store',
-        help='File name to use.'
+        help='Description to append to filenames.'
     )
     parser.add_argument(
         '--multiplex',
@@ -108,6 +108,11 @@ def parse_args(test=None):
         action='store_true',
         default=False,
         help='Specify if you want to perform hierarchical clustering on the columns of the heatmap'
+    )
+    parser.add_argument(
+        '--legend',
+        action='store',
+        help='Title to give to continuous legend (default: log2FC)'
     )
     parser.add_argument(
         '--squish',
@@ -230,6 +235,7 @@ def main():
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
                 reordercols = args.reordercols,
+                legend = args.legend,
                 squish = args.squish,
                 relwidths = args.relwidths,
                 plotwidth = args.plotwidth,
@@ -264,6 +270,7 @@ def main():
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
             reordercols = args.reordercols,
+            legend = args.legend,
             squish = args.squish,
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,

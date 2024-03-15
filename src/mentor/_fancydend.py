@@ -24,6 +24,7 @@ def fancy_dendrogram(
         maxsize,
         heatmaps,
         reordercols,
+        legend,
         squish,
         relwidths,
         plotwidth,
@@ -53,6 +54,8 @@ def fancy_dendrogram(
         command += f' --heatmaps={heatmaps}'
     if reordercols is True:
         command += f' --reordercols'
+    if legend is not None:
+        command += f' --legend={legend}'
     if squish is not None:
         command += f' --squish={squish}'
     if relwidths is not None:
