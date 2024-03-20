@@ -6,7 +6,7 @@
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) {
+heatmap <- function(heatmap,dend_labs,reordercols,legend,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
@@ -102,12 +102,15 @@ heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) {
       # change angle of x-axis title
       axis.text.x = element_text(angle = 90,vjust = 0.15,hjust = 1,size = 14),
       # removing background panel
-      panel.background = element_blank(),
-      # adjust legend title size and position
-      # legend.title = element_text(size = 8,vjust = 2)
+      panel.background = element_blank()
     )
   # if there are any values that contain a decimal
   if(any(grepl("\\.",as.character(heat_labs$value)))) {
+    if(!is.null(legend)) {
+      legend_title <- legend
+    } else {
+      legend_title <- TeX("$\\log_{2}(FC)$")
+    }
     # add new scale for log2fc values
     heat <- heat + 
       # add new scale
@@ -120,8 +123,8 @@ heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) {
       squish_bounds <- as.numeric(do.call("c",strsplit(squish_bounds,",")))
       # draw new scale with squish bounds parameters
       heat <- heat + scale_fill_gradient2(
-        # set the value legend to log2fc (assume these values represent log2fc?)
-        name = TeX("$\\log_{2}(FC)$"),
+        # set the value legend to log2fc (assume these values represent log2fc)
+        name = legend_title,
         # set low value to blue
         low = '#0017FF',
         # set 0 to white
@@ -140,7 +143,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) {
     } else {
       heat <- heat + scale_fill_gradient2(
         # set the value legend to log2fc (assume these values represent log2fc?)
-        name = TeX("$\\log_{2}(FC)$"),
+        name = legend_title,
         # set low value to blue
         low = '#0017FF',
         # set 0 to white
@@ -155,7 +158,7 @@ heatmap <- function(heatmap,dend_labs,reordercols,squish_bounds) {
     }
     heat <- heat + theme(
         # adjust legend title size and position
-        legend.title = element_text(size = 8,vjust = 2)
+        legend.title = element_text(size = 12,vjust = 2)
       )
   }
   # if there are any factor values set to "present" (when p-values not present)
