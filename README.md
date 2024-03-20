@@ -35,6 +35,7 @@ arguments:
   --geneset /path/to/geneset.txt                      Path to gene set file
   --multiplex /path/to/multiplex.RData                Path to multiplex network
   --outdir /path/to/outdir                            Save output to path (default: None)
+  --outfile outfile                                   Description to append to filenames.
   --threads threads                                    
   --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version                                           Print version and exit (default: False)
@@ -45,6 +46,7 @@ arguments:
   --increment increment                               If subclustering increment cluster size by (default: 5)
   --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40)
   --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None)
+  --legendtitle legendtitle                           Title to give to continuous legend (default: log2FC)
   --reordercols                                       Reorder columns of heatmap with clustering (default: False)
   --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
                                                       the heatmap
@@ -52,6 +54,7 @@ arguments:
   --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
                                                       (default: 1,1)
   --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30)
+  --plotheight plotheight                             Height of the dendrogram/heatmap visualization (default: None)
 ```
 
 Examples

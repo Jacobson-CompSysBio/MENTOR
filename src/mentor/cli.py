@@ -135,6 +135,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--plotheight',
         action='store',
+        default=None,
         type=int,
         help='Height of the dendrogram/heatmap visualization'
     )
