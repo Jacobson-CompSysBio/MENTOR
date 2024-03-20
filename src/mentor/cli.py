@@ -110,7 +110,7 @@ def parse_args(test=None):
         help='Specify if you want to perform hierarchical clustering on the columns of the heatmap'
     )
     parser.add_argument(
-        '--legend',
+        '--legendtitle',
         action='store',
         help='Title to give to continuous legend (default: log2FC)'
     )
