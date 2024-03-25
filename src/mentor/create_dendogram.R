@@ -151,7 +151,7 @@ create_dendogram <- function(
   max_size,
   heatmaps,
   reordercols,
-  legend,
+  legendtitle,
   squish_bounds,
   relative_widths,
   plot_width,
@@ -221,7 +221,7 @@ create_dendogram <- function(
     heatmaps.path <- file.path(script.basename, "/heatmaps.R")
     source(heatmaps.path)
     # create the heatmap to add to dendrogram
-    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,legend,squish_bounds)
+    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,legendtitle,squish_bounds)
     # grab relative widths for final plot
     relative_widths <- do.call("c",strsplit(relative_widths,","))
     # add to dendrogram
@@ -282,7 +282,7 @@ create_dendogram(
   max_size = opt$maxsize,
   heatmaps = opt$heatmaps,
   reordercols = opt$reordercols,
-  legend = opt$legend,
+  legendtitle = opt$legendtitle,
   squish_bounds = opt$squish,
   relative_widths = opt$relwidths,
   plot_width = opt$plotwidth,

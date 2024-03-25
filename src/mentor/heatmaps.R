@@ -6,7 +6,7 @@
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,reordercols,legend,squish_bounds) {
+heatmap <- function(heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
@@ -106,8 +106,8 @@ heatmap <- function(heatmap,dend_labs,reordercols,legend,squish_bounds) {
     )
   # if there are any values that contain a decimal
   if(any(grepl("\\.",as.character(heat_labs$value)))) {
-    if(!is.null(legend)) {
-      legend_title <- legend
+    if(!is.null(legendtitle)) {
+      legend_title <- legendtitle
     } else {
       legend_title <- TeX("$\\log_{2}(FC)$")
     }
