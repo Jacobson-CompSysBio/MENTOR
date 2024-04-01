@@ -55,9 +55,16 @@ def run(commands,sep = ' && ',dry_run = False,verbose = 0):
                 print('Success!')
         else:
             print('Failed')
+        #result.update(
+        #    stdout = res.stdout.decode(),
+        #    stderr = res.stderr.decode(),
+        #    returncode = res.returncode,
+        #    args = res.args,
+        #    dry_run = dry_run
+        #)
         result.update(
-            stdout = res.stdout.decode(),
-            stderr = res.stderr.decode(),
+            stdout = res.stdout,
+            stderr = res.stderr,
             returncode = res.returncode,
             args = res.args,
             dry_run = dry_run

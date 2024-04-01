@@ -71,7 +71,7 @@ parse_arguments <- function() {
     errors <- errors + 1
   }
   if (opt$verbose) {
-    print(opt)
+    #print(opt)
   }
   if (errors > 0) {
     quit()
