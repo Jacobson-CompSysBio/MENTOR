@@ -75,10 +75,7 @@ load_geneset <- function(path,nw.mpo = NULL,verbose = FALSE,select=NULL) {
       cat('\nAll ',nrow(geneset),' genes in the geneset are present in the multiplex')
     }
   } else {
-    cat('\nGeneset ',path,' was not filtered (nw.mpo not passed to load_geneset utility function)')
-  }
-  if (verbose) {
-    cat('\nLoaded geneset (',nrow(geneset),' genes)')
+    cat('\nGeneset ',path,' was not filtered')
   }
   return(list("geneset" = geneset,"extras" = extras))
   
