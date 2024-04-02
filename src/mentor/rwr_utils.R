@@ -67,15 +67,15 @@ load_geneset <- function(path,nw.mpo = NULL,verbose = FALSE,select=NULL) {
     geneset <- geneset %>% dplyr::filter(gene %in% nw.mpo$Pool_of_Nodes)
     # Warn user if some genes in the seed geneset are not in the multiplex
     if (nrow(geneset) < ngenes) {
-      cat('\n',nrow(geneset),' genes from geneset are present in the multiplex')
+      cat(paste0('\n',nrow(geneset),' genes from geneset are present in the multiplex'))
       extras <- geneset_orig %>% dplyr::slice(which(!geneset_orig$gene %in% nw.mpo$Pool_of_Nodes))
-      cat('\n\nWARNING: ',nrow(extras),' genes from geneset were not found in multiplex\n')
+      cat(paste0('\n\nWARNING: ',nrow(extras),' genes from geneset were not found in multiplex\n'))
       print(extras)
     } else {
-      cat('\nAll ',nrow(geneset),' genes in the geneset are present in the multiplex')
+      cat(paste0('\nAll ',nrow(geneset),' genes in the geneset are present in the multiplex'))
     }
   } else {
-    cat('\nGeneset ',path,' was not filtered')
+    cat(paste0('\nGeneset ',path,' was not filtered'))
   }
   return(list("geneset" = geneset,"extras" = extras))
   
