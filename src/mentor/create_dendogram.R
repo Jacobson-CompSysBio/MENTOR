@@ -99,7 +99,7 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    c("-l","--legendtitle"),
+    c("-p","--legendtitle"),
     type = "character",
     default = NULL,
     help = "title to give to continuous legend",
