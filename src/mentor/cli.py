@@ -110,7 +110,7 @@ def parse_args(test=None):
         help='Specify if you want to perform hierarchical clustering on the columns of the heatmap'
     )
     parser.add_argument(
-        '--legend',
+        '--legendtitle',
         action='store',
         help='Title to give to continuous legend (default: log2FC)'
     )
@@ -135,6 +135,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--plotheight',
         action='store',
+        default=None,
         type=int,
         help='Height of the dendrogram/heatmap visualization'
     )
@@ -235,7 +236,7 @@ def main():
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
                 reordercols = args.reordercols,
-                legend = args.legend,
+                legendtitle = args.legendtitle,
                 squish = args.squish,
                 relwidths = args.relwidths,
                 plotwidth = args.plotwidth,
@@ -270,7 +271,7 @@ def main():
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
             reordercols = args.reordercols,
-            legend = args.legend,
+            legendtitle = args.legendtitle,
             squish = args.squish,
             relwidths = args.relwidths,
             plotwidth = args.plotwidth,
