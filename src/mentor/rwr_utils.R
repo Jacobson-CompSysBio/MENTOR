@@ -69,8 +69,8 @@ load_geneset <- function(path,nw.mpo = NULL,verbose = FALSE,select=NULL) {
     if (nrow(geneset) < ngenes) {
       cat(paste0('\n',nrow(geneset),' genes from geneset are present in the multiplex'))
       extras <- geneset_orig %>% dplyr::slice(which(!geneset_orig$gene %in% nw.mpo$Pool_of_Nodes))
-      cat(paste0('\n\nWARNING: ',nrow(extras),' genes from geneset were not found in multiplex'))
-      print(extras)
+      cat(paste0('\n\n',nrow(extras),' genes from geneset were not found in multiplex:\n'))
+      print(paste0(extras$gene))
     } else {
       cat(paste0('\nAll ',nrow(geneset),' genes in the geneset are present in the multiplex'))
     }
