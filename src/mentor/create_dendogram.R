@@ -129,7 +129,7 @@ option_list <- list(
   make_option(
     c("d","--plotheight"),
     type = "integer",
-    default = None,
+    default = NULL,
     help = "height of the final plot",
     metavar = "character"
   )
