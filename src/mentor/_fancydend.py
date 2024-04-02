@@ -54,7 +54,7 @@ def fancy_dendrogram(
         command += f' --heatmaps={heatmaps}'
     if reordercols is True:
         command += f' --reordercols'
-    if legend is not None:
+    if legendtitle is not None:
         command += f' --legendtitle="{legendtitle}"'
     if squish is not None:
         command += f' --squish={squish}'
