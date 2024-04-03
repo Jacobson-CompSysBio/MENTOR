@@ -59,7 +59,6 @@ load_geneset <- function(path,nw.mpo = NULL,verbose = FALSE,select=NULL) {
     }
   }
   geneset_orig <- geneset
-  print(head(geneset_orig))
   geneset <- geneset_orig %>% dplyr::distinct(gene,.keep_all = T)
   ngenes <- nrow(geneset)
   extras <- NULL
@@ -68,19 +67,15 @@ load_geneset <- function(path,nw.mpo = NULL,verbose = FALSE,select=NULL) {
     geneset <- geneset %>% dplyr::filter(gene %in% nw.mpo$Pool_of_Nodes)
     # Warn user if some genes in the seed geneset are not in the multiplex
     if (nrow(geneset) < ngenes) {
-      message(sprintf("%s genes from geneset (%s) are present in the multiplex \n",nrow(geneset),path))
+      cat(paste0('\n',nrow(geneset),' genes from geneset are present in the multiplex'))
       extras <- geneset_orig %>% dplyr::slice(which(!geneset_orig$gene %in% nw.mpo$Pool_of_Nodes))
-      warning(sprintf("WARNING:: %s genes from geneset (%s) were not found in multiplex: %s\n ",nrow(extras),path,list(extras)))
-      warning(sprintf("Please ensure your geneset files are formated: [ setids | genes | weights (if weights exist) ]\n"))
+      cat(paste0('\n\n',nrow(extras),' genes from geneset were not found in multiplex:\n'))
+      cat(paste0(extras$gene,collapse = "\n"))
     } else {
-      message(sprintf("All %s genes in the geneset (%s) are present in the multiplex\n",nrow(geneset),path))
+      cat(paste0('\nAll ',nrow(geneset),' genes in the geneset are present in the multiplex'))
     }
   } else {
-    message(sprintf("Geneset %s was not filtered (nw.mpo not passed to load_geneset utility function)\n",path))
-  }
-  if (verbose) {
-    message(sprintf("Loaded gene set (%s genes):\n",nrow(geneset)))
-    print(head(geneset))
+    cat(paste0('\nGeneset ',path,' was not filtered'))
   }
   return(list("geneset" = geneset,"extras" = extras))
   
@@ -250,10 +245,6 @@ dump_nodes <- function(mpo,outdir = NULL) {
   df <- as.data.frame(mpoNodes)
   if (length(df) == 0) stop("Pool of Nodes to be saved has 0 nodes")
   file_path <- get_file_path("pool-of-nodes",outdir = outdir)
-  print("File path")
-  print(file_path)
-  print("actualdf")
-  print(df)
   write_table(df, file_path)
   message(sprintf("Saved pool of nodes: %s\n",file_path))
   

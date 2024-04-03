@@ -48,15 +48,23 @@ def run(commands,sep = ' && ',dry_run = False,verbose = 0):
         stdout = None
     )
     if not dry_run:
-        res = subprocess.run(command,shell = True,capture_output = True)
+        res = subprocess.run(command,shell = True,capture_output = True,text = True,check = False)
+        print(res.stdout)
         if res.returncode == 0:
             if verbose > 0:
                 print('Success!')
         else:
             print('Failed')
+        #result.update(
+        #    stdout = res.stdout.decode(),
+        #    stderr = res.stderr.decode(),
+        #    returncode = res.returncode,
+        #    args = res.args,
+        #    dry_run = dry_run
+        #)
         result.update(
-            stdout = res.stdout.decode(),
-            stderr = res.stderr.decode(),
+            stdout = res.stdout,
+            stderr = res.stderr,
             returncode = res.returncode,
             args = res.args,
             dry_run = dry_run
