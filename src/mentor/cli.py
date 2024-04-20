@@ -202,7 +202,6 @@ def main():
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
         print("\nrunning MENTOR")
-        print("\ntransforming ranks")
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing = True,
