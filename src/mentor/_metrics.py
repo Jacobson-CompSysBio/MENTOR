@@ -7,6 +7,7 @@ from scipy.spatial import distance
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import calinski_harabasz_score
 from sklearn.metrics import pairwise_distances
+import concurrent.futures
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,36 +46,41 @@ def spearman_d(U, v=None, to_numpy=True):
     else:
         return _spearman_distance(U, v)
 
-def _root_mean_squared_error(y_true, y_pred=None, **kwargs):
+def _root_mean_squared_error(Y, y_pred=None, **kwargs):
     '''
     y_true, y_pred, *, sample_weight=None, multioutput='uniform_average', squared=True
     '''
     if y_pred is None:
-        y_pred = np.linspace(y_true[0], y_true[-1], len(y_true))
-    if len(y_true) != len(y_pred):
+        y_pred = np.linspace(Y[0], Y[-1], len(Y))
+    if len(Y) != len(y_pred):
         raise ValueError('y_true and y_pred must be the same length.')
-    mse = mean_squared_error(y_true, y_pred, **kwargs)
+    mse = mean_squared_error(Y, y_pred, **kwargs)
     rmse = np.sqrt(mse)
     return rmse
 
-def _root_mean_squared_error_at_c(y_true, c, **kwargs):
+def _root_mean_squared_error_at_c(c, **kwargs):
     '''
     Root mean squared error at c
     '''
-    b = len(y_true)
+    b = len(Y)
     l_start = 0
     l_stop = c+1
     r_start = c
     r_stop = b+1
-    Lc = y_true[l_start:l_stop]
-    Rc = y_true[r_start:r_stop]
-    LOGGER.debug(rf'c={c}; Lc=[{l_start}:{l_stop}] ({len(Lc)}); Rc=[{r_start}:{r_stop}] ({len(Rc)})')
+    Lc = Y[l_start:l_stop]
+    Rc = Y[r_start:r_stop]
     rmse_c = (
-        ( (c-1)/(b-1) ) * _root_mean_squared_error(Lc, **kwargs)
+        ( (c-1)/(b-1) ) * _root_mean_squared_error(Lc,**kwargs)
     ) + (
-        ( (b-c)/(b-1) ) * _root_mean_squared_error(Rc, **kwargs)
+        ( (b-c)/(b-1) ) * _root_mean_squared_error(Rc,**kwargs)
     )
     return rmse_c
+
+def parallel_rmse_over_c(min_size,b,**kwargs):
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        c_values = range(min_size,b - (min_size + 1))
+        rmse_over_c = list(executor.map(_root_mean_squared_error_at_c,c_values))
+    return rmse_over_c
 
 def get_elbow(Y, min_size=3, **kwargs):
     r'''
@@ -104,12 +110,7 @@ def get_elbow(Y, min_size=3, **kwargs):
     else:
         pass
     b = len(Y)
-    rmse_over_c = []
-    for c in range(min_size, b-(min_size+1)):
-        rmse_at_c = _root_mean_squared_error_at_c(Y, c, **kwargs)
-        LOGGER.debug(f'rmse_at_c: {rmse_at_c}')
-        rmse_over_c.append(rmse_at_c)
-
+    rmse_over_c = parallel_rmse_over_c(min_size,b,**kwargs)
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
     return idx_of_elbow
 
