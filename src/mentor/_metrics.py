@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import calinski_harabasz_score
 from sklearn.metrics import pairwise_distances
 import concurrent.futures
+from functools import partial
 
 LOGGER = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ def _root_mean_squared_error(Y, y_pred=None, **kwargs):
     rmse = np.sqrt(mse)
     return rmse
 
-def _root_mean_squared_error_at_c(c, **kwargs):
+def _root_mean_squared_error_at_c(c,Y, **kwargs):
     '''
     Root mean squared error at c
     '''
@@ -76,10 +77,11 @@ def _root_mean_squared_error_at_c(c, **kwargs):
     )
     return rmse_c
 
-def parallel_rmse_over_c(min_size,b,**kwargs):
+def parallel_rmse_over_c(Y,min_size,b,**kwargs):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         c_values = range(min_size,b - (min_size + 1))
-        rmse_over_c = list(executor.map(_root_mean_squared_error_at_c,c_values))
+        worker = partial(_root_mean_squared_error_at_c,Y=Y)
+        rmse_over_c = list(executor.map(worker,c_values))
     return rmse_over_c
 
 def get_elbow(Y, min_size=3, **kwargs):
@@ -110,7 +112,7 @@ def get_elbow(Y, min_size=3, **kwargs):
     else:
         pass
     b = len(Y)
-    rmse_over_c = parallel_rmse_over_c(min_size,b,**kwargs)
+    rmse_over_c = parallel_rmse_over_c(Y,min_size,b,**kwargs)
     idx_of_elbow = int(np.argmin(rmse_over_c) + min_size)
     return idx_of_elbow
 
