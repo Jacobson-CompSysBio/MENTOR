@@ -113,8 +113,8 @@ def transform_fullranks(path_or_dataframe,drop_missing = True,max_rank = 'elbow'
     if drop_missing:
         fullranks = fullranks[fullranks['seed'] != 'missing']
     if max_rank == 'elbow':
-        y = fullranks.groupby('rank')['Score'].mean()
-        max_rank = metrics.get_elbow(y)
+        Y = fullranks.groupby('rank')['Score'].mean()
+        max_rank = metrics.get_elbow(Y)
         LOGGER.info(f'Set max_rank to {max_rank}.')
     ranks = fullranks_to_matrix(fullranks,to = 'rank',drop_missing = drop_missing)
     scores = fullranks_to_matrix(fullranks,to = 'scores',drop_missing = drop_missing)
