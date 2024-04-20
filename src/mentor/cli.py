@@ -202,11 +202,13 @@ def main():
             LOGGER.error('Cannot find fullranks file.')
             sys.exit(1)
         print("\nrunning MENTOR")
+        print("\ntransforming ranks")
         X, labels = rwrtoolkit.transform_fullranks(
             path_to_fullranks,
             drop_missing = True,
             max_rank = 'elbow',
         )
+        print("\nrunning clustering")
         mod = cluster.HierarchicalClustering(
             metric = metrics.spearman_d,
             memory = None,

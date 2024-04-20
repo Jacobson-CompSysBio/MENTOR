@@ -75,12 +75,14 @@ class HierarchicalClustering(AgglomerativeClustering):
         else:
             features = X
         self._n_samples = features.shape[0]
+        print("\ncalculating distances")
         pairwise_distances_kwargs = dict(
             Y = kwargs.get('Y',None),
             metric = self.metric,
             n_jobs = kwargs.get('n_jobs',-2),
             force_all_finite = kwargs.get('force_all_finite',True)
         )
+        print("\nfinished calculating distances")
         dmat = metrics.pairwise_distances(features,**pairwise_distances_kwargs)
         is_symmetric = check_symmetry(dmat)
         self.pairwise_distances = distance.squareform(dmat,checks = False)
