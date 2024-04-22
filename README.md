@@ -39,7 +39,7 @@ arguments:
   --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version                                           Print version and exit (default: False)
   --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None)
-  --clusters clusters                                 Number of clusters for dendrogram (default: 10)
+  --clusters clusters                                 Number of clusters for dendrogram (default: 3)
   --map /path/to/map.txt                              Path to ensembl ID mapping file (default: None)
   --subcluster                                        Subcluster the dendrogram (default: False)   
   --increment increment                               If subclustering increment cluster size by (default: 5)
