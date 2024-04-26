@@ -145,6 +145,12 @@ def parse_args(test=None):
         help='size of the labels associated with the heatmap rows (typically gene names)'
     )
     parser.add_argument(
+        '--groupcolors',
+        action='store',
+        default=None,
+        help='Colors for the group blocks in circos plot'
+    )
+    parser.add_argument(
         '--trackheight',
         action='store',
         default='0.2,0.2,0.2',
@@ -280,6 +286,7 @@ def main():
                 relwidths = args.relwidths,
                 clusterlabelsize = args.clusterlabelsize,
                 heatmaplabelsize = args.heatmaplabelsize,
+                groupcolors = args.groupcolors,
                 trackheight = args.trackheight,
                 highlightindex = args.highlightindex,
                 highlightcolor = args.highlightcolor,
@@ -321,6 +328,7 @@ def main():
             relwidths = args.relwidths,
             clusterlabelsize = args.clusterlabelsize,
             heatmaplabelsize = args.heatmaplabelsize,
+            groupcolors = args.groupcolors,
             trackheight = args.trackheight,
             highlightindex = args.highlightindex,
             highlightcolor = args.highlightcolor,

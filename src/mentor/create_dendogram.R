@@ -161,6 +161,14 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
+    # c("-e","--plotwidth"),
+    "--groupcolors",
+    type = "character",
+    default = NULL,
+    help = "colors for group blocks in circos plot",
+    metavar = "character"
+  ),
+  make_option(
     # c("-r","--relwidths"),
     "--trackheight",
     type = "character",
@@ -225,6 +233,7 @@ create_dendogram <- function(
   relative_widths,
   cluster_label_size,
   labels_size,
+  group_colors,
   track_height,
   highlight_index,
   highlight_color,
@@ -349,6 +358,7 @@ create_dendogram <- function(
       squish_bounds,
       cluster_label_size,
       labels_size,
+      group_colors,
       track_height,
       highlight_index,
       highlight_color,
@@ -402,6 +412,7 @@ create_dendogram(
   relative_widths = opt$relwidths, # only for rectangular dendrogram 
   cluster_label_size = opt$clusterlabelsize,
   labels_size = opt$heatmaplabelsize,
+  group_colors = opt$groupcolors,
   track_height = opt$trackheight,
   highlight_index = opt$highlightindex,
   highlight_color = opt$highlightcolor,

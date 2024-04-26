@@ -128,7 +128,7 @@ circlize <- function(heatmap,heatmap_factors,clusters,cluster_label_size,split,l
 }
 
 # function to prepare data for polar dendrogram
-polar_dendrogram <- function(dend_labs,dend_2,heatmap,squish_bounds,cluster_label_size,labels_size,track_height,highlight_index,highlight_color,legend_title,plot_file,height = 20,width = 20) {
+polar_dendrogram <- function(dend_labs,dend_2,heatmap,squish_bounds,cluster_label_size,labels_size,group_colors,track_height,highlight_index,highlight_color,legend_title,plot_file,height = 20,width = 20) {
   
     # create data frame with dendrogram labels and heatmap
     heatmap <- merge(dend_labs,heatmap,all.y = TRUE,by = "label")

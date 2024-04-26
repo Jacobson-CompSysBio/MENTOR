@@ -30,6 +30,7 @@ def fancy_dendrogram(
         relwidths,
         clusterlabelsize,
         heatmaplabelsize,
+        groupcolors,
         trackheight,
         highlightindex,
         highlightcolor,
@@ -74,6 +75,8 @@ def fancy_dendrogram(
         command += f' --heatmaplabelsize={heatmaplabelsize}'
     if trackheight is not None:
         command += f' --trackheight={trackheight}'
+    if groupcolors is not None:
+        command += f' --groupcolors={groupcolors}'
     if highlightindex is not None:
         command += f' --highlightindex={highlightindex}'
     if highlightcolor is not None:
