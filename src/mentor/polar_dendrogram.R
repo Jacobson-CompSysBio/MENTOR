@@ -209,7 +209,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         max_height = max_height,
         track_height = track_height, # track_height = "0.2,0.2,0.2"
         highlight_index = highlight_index,
-        highlight_color = hightlight_color # highlight_color = "#34EBDC"
+        highlight_color = highlight_color # highlight_color = "#34EBDC"
     )
     if(!is.null(heatmap)) {
         cont_legend <- Legend(
