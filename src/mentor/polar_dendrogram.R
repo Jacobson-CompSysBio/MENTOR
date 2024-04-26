@@ -243,7 +243,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
             x = 1.25,y = -0.35,
             legend = c("absent","present"),
             fill = c("grey","black"),
-            title = legend_title[3],
+            title = "",
             xjust = 0,
             bty = "n",
             cex = 1.5,

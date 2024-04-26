@@ -118,7 +118,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--legendtitle',
         action='store',
-        default="Value,Group,' '",
+        default="Value,Group",
         help='Title to give to continuous legend (default: log2FC)'
     )
     parser.add_argument(

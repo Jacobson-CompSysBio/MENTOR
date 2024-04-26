@@ -20,6 +20,7 @@
 suppressWarnings(suppressPackageStartupMessages(require(tidyverse)))
 suppressWarnings(suppressPackageStartupMessages(require(RColorBrewer)))
 suppressWarnings(suppressPackageStartupMessages(require(dendextend)))
+suppressWarnings(suppressPackageStartupMessages(require(ComplexHeatmap)))
 suppressWarnings(suppressPackageStartupMessages(require(cowplot)))
 suppressWarnings(suppressPackageStartupMessages(require(optparse)))
 suppressWarnings(suppressPackageStartupMessages(require(ggnewscale)))
