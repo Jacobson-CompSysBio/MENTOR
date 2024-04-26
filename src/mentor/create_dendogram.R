@@ -23,111 +23,178 @@ suppressWarnings(suppressPackageStartupMessages(require(dendextend)))
 suppressWarnings(suppressPackageStartupMessages(require(cowplot)))
 suppressWarnings(suppressPackageStartupMessages(require(optparse)))
 suppressWarnings(suppressPackageStartupMessages(require(ggnewscale)))
-suppressWarnings(suppressPackageStartupMessages(require(latex2exp)))
+suppressWarnings(suppressPackageStartupMessages(require(reshape2)))
+suppressWarnings(suppressPackageStartupMessages(require(circlize)))
+suppressWarnings(suppressPackageStartupMessages(require(gridBase)))
+suppressWarnings(suppressPackageStartupMessages(require(grid)))
+# library(colorRamps)
 
 #################### Argument parser ##############################
 
 option_list <- list(
   make_option(
-    c("-d","--distances"), 
+    # c("-d","--distances"), 
+    "--distances",
     type = "character",
     default = NULL, 
     help = "full path to the distance matrix file", 
     metavar = "character"
   ),
   make_option(
-    c("-k","--clusters"),
+    # c("-k","--clusters"),
+    "--clusters",
     type = "integer",
     default = 3,
     help = "the number of clusters desired in the dendrogram", 
     metavar = "character"
   ),
   make_option(
-    c("-x","--map"), 
+    # c("-x","--map"), 
+    "--map",
     type = "character",
     default = NULL, 
     help = "full path to the gene symbol mapping file", 
     metavar = "character"
   ),
   make_option(
-    c("-o","--outdir"), 
+    # c("-o","--outdir"), 
+    "--outdir",
     type = "character",
     default = NULL, 
     help = "full path to output the dendrogram", 
     metavar = "character"
   ),
   make_option(
-    c("-f","--outfile"),
+    # c("-f","--outfile"),
+    "--outfile",
     type = "character",
     default = NULL,
     help = "filename to append",
     metavar = "character"
   ),
   make_option(
-    c("-s","--subcluster"), 
+    # c("-s","--subcluster"), 
+    "--subcluster",
     action = "store_true",
     default = FALSE, 
     help = "specify if want to subcluster", 
     metavar = "character"
   ),
   make_option(
-    c("-i","--increment"), 
+    # c("-i","--increment"), 
+    "--increment",
     type = "integer",
     default = 5, 
     help = "increment to use in subclustering", 
     metavar = "character"
   ),
   make_option(
-    c("-m","--maxsize"), 
+    # c("-m","--maxsize"), 
+    "--maxsize",
     type = "integer",
     default = 40, 
     help = "maximum size for clades if subclustering", 
     metavar = "character"
   ),
   make_option(
-    c("-z","--heatmaps"), 
+    # c("-z","--heatmaps"), 
+    "--heatmaps",
     type = "character",
     default = NULL, 
     help = "full path to the heatmap file if you want to include a heatmap", 
     metavar = "character"
   ),
   make_option(
-    c("-l","--reordercols"),
+    # c("-z","--heatmaps"), 
+    "--plottype",
+    type = "character",
+    default = "rectangular", 
+    help = "either rectangular or polar", 
+    metavar = "character"
+  ),
+  make_option(
+    # c("-l","--reordercols"),
+    "--reordercols",
     action = "store_true",
     default = FALSE,
     help = "specify if want to subcluster",
     metavar = "character"
   ),
   make_option(
-    c("-p","--legendtitle"),
+    # c("-p","--legendtitle"),
+    "--legendtitle",
     type = "character",
-    default = NULL,
-    help = "title to give to continuous legend",
+    default = "Value,Group,' '",
+    help = "rectangular plot type: title to give to continuous legend\n polar plot type: titles to give to continuous heatmap legend, factor heatmap legend and factor color block legend ('legend1','legend2','legend3')",
     metavar = "character"
   ),
   make_option(
-    c("-q","--squish"),
+    # c("-q","--squish"),
+    "--squish",
     type = "character",
     default = NULL,
     help = "if you have FC values squish the upper and lower bounds to two numbers formatted as 'lower_bound,upper_bound'",
     metavar = "character"
   ),
   make_option(
-    c("-r","--relwidths"),
+    # c("-r","--relwidths"),
+    "--relwidths",
     type = "character",
     default = "1,1",
     help = "if you have heatmap then provide two numbers 'x,y' for the relative widths in the combined plot",
     metavar = "character"
   ),
   make_option(
-    c("-e","--plotwidth"),
+    # c("-e","--plotwidth"),
+    "--clusterlabelsize",
+    type = "double",
+    default = 3,
+    help = "size of cluster labels associated with circos plot",
+    metavar = "character"
+  ),
+  make_option(
+    # c("-e","--plotwidth"),
+    "--heatmaplabelsize",
+    type = "double",
+    default = 0.75,
+    help = "size of the labels associated with the circos heatmaps (e.g. gene names)",
+    metavar = "character"
+  ),
+  make_option(
+    # c("-r","--relwidths"),
+    "--trackheight",
+    type = "character",
+    default = "0.2,0.2,0.2",
+    help = "width of the tracks in the circos plot (heatmap1,heatmap2,dendrogram)",
+    metavar = "character"
+  ),
+  make_option(
+    # c("-e","--plotwidth"),
+    "--highlightindex",
+    type = "integer",
+    default = NULL,
+    help = "sector to highlight on circos plot",
+    metavar = "character"
+  ),
+  make_option(
+    # c("-e","--plotwidth"),
+    "--highlightcolor",
+    type = "character",
+    default = "#34EBDC",
+    help = "color of highlighted sector",
+    metavar = "character"
+  ),
+  make_option(
+    # c("-e","--plotwidth"),
+    "--plotwidth",
     type = "integer",
     default = 30,
     help = "width of the final plot",
     metavar = "character"
   ),
   make_option(
-    c("d","--plotheight"),
+    # c("d","--plotheight"),
+    "--plotheight",
     type = "integer",
     default = NULL,
     help = "height of the final plot",
@@ -138,6 +205,11 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser,positional_arguments = FALSE)
 
 #################### Create dendogram ##############################
+
+# track_height = opt$trackheight,
+# highlight_index = opt$highlightindex,
+# highlight_color = opt$highlightcolor,
+
 
 create_dendogram <- function(
     
@@ -154,6 +226,11 @@ create_dendogram <- function(
   legendtitle,
   squish_bounds,
   relative_widths,
+  cluster_label_size,
+  labels_size,
+  track_height,
+  highlight_index,
+  highlight_color,
   plot_width,
   plot_height
   
@@ -209,67 +286,107 @@ create_dendogram <- function(
   }
   
   # grab the dendrogram and labels from result
-  dendrogram <- dendo$dendrogram
+  dendrogram <- dendo$plot
+  dend2 <- dendo$dendrogram
   dend_labs <- dendo$dendrogram_labels
+  
+  # get legend title collapse into vector
+  legendtitle <- do.call("c",strsplit(legendtitle,","))
  
   if(!is.null(heatmaps)) {
     
     cat("\n\nadding heatmap")
     # adjust plot filename
-    plot_file <- gsub(".pdf","_logfc_heatmap.pdf",plot_file)
+    plot_file <- gsub(".pdf","_heatmap.pdf",plot_file)
     # source the heatmaps.R file
     heatmaps.path <- file.path(script.basename, "/heatmaps.R")
     source(heatmaps.path)
     # create the heatmap to add to dendrogram
-    heat <- heatmap(heatmap = heatmaps,dend_labs,reordercols,legendtitle,squish_bounds)
-    # grab relative widths for final plot
-    relative_widths <- do.call("c",strsplit(relative_widths,","))
-    # add to dendrogram
-    dendrogram <- plot_grid(
-      dendrogram,
-      heat,
-      nrow = 1,
-      align = "h",
-      axis = "l",
-      rel_widths = as.numeric(relative_widths)
-    )
+    heat <- heatmap(plot_type = plot_type,heatmap = heatmaps,dend_labs,reordercols,legendtitle,squish_bounds)
+    if(plot_type == "rectangular") {
+      # grab relative widths for final plot
+      relative_widths <- do.call("c",strsplit(relative_widths,","))
+      # grab heatmap labels
+      heatmaps <- heat$heat_labs
+      # add to dendrogram
+      dendrogram <- plot_grid(
+        dendrogram,
+        heat$heat,
+        nrow = 1,
+        align = "h",
+        axis = "l",
+        rel_widths = as.numeric(relative_widths)
+      )  
+    }
     
   }
   
   # export the clusters and dendrogram
   if(!is.null(out_file)) {
+    
     cluster_file <- paste0(out_file,"_",cluster_file)
     plot_file <- paste0(out_file,"_",plot_file)
+    
   }
+  
   dend_labs$row_order <- 1:nrow(dend_labs)
   groups <- data.frame(
     "col" = unique(dend_labs$col),
-    "cluster" = 0:(length(unique(dend_labs$col))-1)
+    "cluster" = 0:(length(unique(dend_labs$col)) - 1)
   )
   dend_labs <- merge(dend_labs,groups,by = "col",all.x = TRUE)
   dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
-  dend_labs <- dend_labs[,c("label","cluster")]
+  dend_labs <- dend_labs[,c("label","cluster","col","row_order")]
   cat("\n\nexporting clusters")
-  write.table(dend_labs,paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
-  # adjust heigh of plot based on user input or by the number of genes
-  if(is.null(plot_height)) {
-    plot_height = nrow(dend_labs) * 0.6
+  write.table(dend_labs[,c("label","cluster")],paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
+  
+  if(plot_type == "polar") {
+    
+    if(is.null(plot_height)) {
+      plot_height = 20
+    }
+    polar_dendrogram(
+      dend_labs,
+      dend2,
+      heatmap = heat,
+      squish_bounds,
+      cluster_label_size,
+      labels_size,
+      track_height,
+      highlight_index,
+      highlight_color,
+      legend_title = legendtitle,
+      plot_file = paste0(out_dir,plot_file),
+      height = plot_height,
+      width = plot_width
+    )
+    
+  } else {
+    
+    # adjust height of plot based on user input or by the number of genes
+    if(is.null(plot_height)) {
+      plot_height = nrow(dend_labs) * 0.6
+    }
+    # export the ggplot dendrogram
+    cat("\n\nsaving visualization")
+    ggsave(
+      paste0(out_dir,plot_file),
+      plot = dendrogram,
+      width = plot_width,
+      height = plot_height,
+      units = "cm",
+      limitsize = FALSE
+    )
+    
   }
-  # export the ggplot dendrogram
-  cat("\n\nsaving visualization")
-  ggsave(
-    paste0(out_dir,plot_file),
-    plot = dendrogram,
-    width = plot_width,
-    height = plot_height,
-    units = "cm",
-    limitsize = FALSE
-  )
   
 }
 
 #################### Parse & apply ##############################
 
+
+# need to add
+# cluster_label_size,rownames_size,track_height,highlight_index,highlight_color
 create_dendogram(
     
   dis_mat = opt$distances,
@@ -281,10 +398,16 @@ create_dendogram(
   k_increment = opt$increment,
   max_size = opt$maxsize,
   heatmaps = opt$heatmaps,
+  plot_type = opt$plottype,
   reordercols = opt$reordercols,
-  legendtitle = opt$legendtitle,
+  legendtitle = opt$legendtitle, # change to legend titles (3 elements for polar 1 for rectangular)
   squish_bounds = opt$squish,
-  relative_widths = opt$relwidths,
+  relative_widths = opt$relwidths, # only for rectangular dendrogram 
+  cluster_label_size = opt$clusterlabelsize,
+  labels_size = opt$heatmaplabelsize,
+  track_height = opt$trackheight,
+  highlight_index = opt$highlightindex,
+  highlight_color = opt$highlightcolor,
   plot_width = opt$plotwidth,
   plot_height = opt$plotheight
   

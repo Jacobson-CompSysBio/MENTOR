@@ -27,6 +27,11 @@ def fancy_dendrogram(
         legendtitle,
         squish,
         relwidths,
+        clusterlabelsize,
+        heatmaplabelsize,
+        trackheight,
+        highlightindex,
+        highlightcolor,
         plotwidth,
         plotheight
     
@@ -60,6 +65,16 @@ def fancy_dendrogram(
         command += f' --squish={squish}'
     if relwidths is not None:
         command += f' --relwidths={relwidths}'
+    if clusterlabelsize is not None:
+        command += f' --clusterlabelsize={clusterlabelsize}'
+    if heatmaplabelsize is not None:
+        command += f' --heatmaplabelsize={heatmaplabelsize}'
+    if trackheight is not None:
+        command += f' --trackheight={trackheight}'
+    if highlightindex is not None:
+        command += f' --highlightindex={highlightindex}'
+    if highlightcolor is not None:
+        command += f' --highlightcolor={highlightcolor}'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
     if plotheight is not None:

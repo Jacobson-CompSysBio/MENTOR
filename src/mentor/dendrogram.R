@@ -141,8 +141,8 @@ dendrogram <- function(dis_mat,k = 3,map) {
   
   #################### Return dendogram ##############################
   
-  result <- list(dend_labs,p)
-  names(result) <- c("dendrogram_labels","dendrogram")
+  result <- list(dend_labs,dend2,p)
+  names(result) <- c("dendrogram_labels","dendrogram","plot")
   return(result)
   
 }

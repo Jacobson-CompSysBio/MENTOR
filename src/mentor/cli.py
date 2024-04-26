@@ -126,6 +126,36 @@ def parse_args(test=None):
         help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width'
     )
     parser.add_argument(
+        '--clusterlabelsize',
+        action='store',
+        default=3,
+        help='size of cluster labels associated with circos plot'
+    )
+    parser.add_argument(
+        '--heatmaplabelsize',
+        action='store',
+        default=0.75,
+        help='size of the labels associated with the heatmap rows (typically gene names)'
+    )
+    parser.add_argument(
+        '--trackheight',
+        action='store',
+        default='0.2,0.2,0.2',
+        help='width of the tracks in the circos plot (heatmap1,heatmap2,dendrogram)'
+    )
+    parser.add_argument(
+        '--highlightindex',
+        action='store',
+        default=None,
+        help='sector to highlight on circos plot (0-indexed)'
+    )
+    parser.add_argument(
+        '--highlightcolor',
+        action='store',
+        default='#34EBDC',
+        help='color for highlighted sector on circos plot'
+    )
+    parser.add_argument(
         '--plotwidth',
         action='store',
         default=30,
@@ -240,6 +270,11 @@ def main():
                 legendtitle = args.legendtitle,
                 squish = args.squish,
                 relwidths = args.relwidths,
+                clusterlabelsize = args.clusterlabelsize,
+                heatmaplabelsize = args.heatmaplabelsize,
+                trackheight = args.trackheight,
+                highlightindex = args.highlightindex,
+                highlightcolor = highlightcolor,
                 plotwidth = args.plotwidth,
                 plotheight = args.plotheight
             )
@@ -275,6 +310,11 @@ def main():
             legendtitle = args.legendtitle,
             squish = args.squish,
             relwidths = args.relwidths,
+            clusterlabelsize = args.clusterlabelsize,
+            heatmaplabelsize = args.heatmaplabelsize,
+            trackheight = args.trackheight,
+            highlightindex = args.highlightindex,
+            highlightcolor = highlightcolor,
             plotwidth = args.plotwidth,
             plotheight = args.plotheight
         )
