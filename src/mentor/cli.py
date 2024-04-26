@@ -104,6 +104,12 @@ def parse_args(test=None):
         help='Full path to the heatmap file if you want to include a heatmap'
     )
     parser.add_argument(
+        '--plottype',
+        action='store',
+        default='rectangular',
+        help='Type of dendrogram (either rectangular or polar)'
+    )
+    parser.add_argument(
         '--reordercols',
         action='store_true',
         default=False,
@@ -267,6 +273,7 @@ def main():
                 increment = args.increment,
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
+                plottype = args.plottype,
                 reordercols = args.reordercols,
                 legendtitle = args.legendtitle,
                 squish = args.squish,
@@ -307,6 +314,7 @@ def main():
             increment = args.increment,
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
+            plottype = args.plottype,
             reordercols = args.reordercols,
             legendtitle = args.legendtitle,
             squish = args.squish,

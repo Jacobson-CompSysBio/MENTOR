@@ -23,6 +23,7 @@ def fancy_dendrogram(
         increment,
         maxsize,
         heatmaps,
+        plottype,
         reordercols,
         legendtitle,
         squish,
@@ -57,6 +58,8 @@ def fancy_dendrogram(
         command += f' --maxsize={maxsize}'
     if heatmaps is not None:
         command += f' --heatmaps={heatmaps}'
+    if plottype is not None:
+        command += f' --plottype={plottype}'
     if reordercols is True:
         command += f' --reordercols'
     if legendtitle is not None:

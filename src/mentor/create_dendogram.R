@@ -206,10 +206,6 @@ opt <- parse_args(opt_parser,positional_arguments = FALSE)
 
 #################### Create dendogram ##############################
 
-# track_height = opt$trackheight,
-# highlight_index = opt$highlightindex,
-# highlight_color = opt$highlightcolor,
-
 
 create_dendogram <- function(
     
@@ -222,6 +218,7 @@ create_dendogram <- function(
   k_increment,
   max_size,
   heatmaps,
+  plot_type,
   reordercols,
   legendtitle,
   squish_bounds,
@@ -323,10 +320,8 @@ create_dendogram <- function(
   
   # export the clusters and dendrogram
   if(!is.null(out_file)) {
-    
     cluster_file <- paste0(out_file,"_",cluster_file)
-    plot_file <- paste0(out_file,"_",plot_file)
-    
+    plot_file <- paste0(out_file,"_",plot_file)    
   }
   
   dend_labs$row_order <- 1:nrow(dend_labs)
