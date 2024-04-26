@@ -275,7 +275,7 @@ def main():
                 heatmaplabelsize = args.heatmaplabelsize,
                 trackheight = args.trackheight,
                 highlightindex = args.highlightindex,
-                highlightcolor = highlightcolor,
+                highlightcolor = args.highlightcolor,
                 plotwidth = args.plotwidth,
                 plotheight = args.plotheight
             )
@@ -315,7 +315,7 @@ def main():
             heatmaplabelsize = args.heatmaplabelsize,
             trackheight = args.trackheight,
             highlightindex = args.highlightindex,
-            highlightcolor = highlightcolor,
+            highlightcolor = args.highlightcolor,
             plotwidth = args.plotwidth,
             plotheight = args.plotheight
         )
