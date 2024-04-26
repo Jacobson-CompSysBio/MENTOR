@@ -1,6 +1,6 @@
 
 # function to create polar dendrogram
-circlize <- function(heatmap,heatmap_factors,clusters,cluster_label_size,split,labels_size,group_colors,max_height,track_height,highlight_index,highlight_color) {
+circlize <- function(heatmap,heatmap_factors,clusters,cluster_label_size,split,col_fun1,labels_size,group_colors,max_height,track_height,highlight_index,highlight_color) {
   
     # setting up global parameters for circos plot
     circos.par(
@@ -202,6 +202,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         clusters = clusters,
         cluster_label_size = cluster_label_size, # cluster_label_size = 3
         split = split,
+        col_fun1 = col_fun1,
         labels_size = labels_size, # labels_size = 0.75
         group_colors = group_colors, # rev(brewer.pal(8,"Set1")[c(1:5,8)])
         max_height = max_height,
