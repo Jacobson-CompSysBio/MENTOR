@@ -193,7 +193,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     } else {
         col_fun1 <- colorRamp2(c(-2,0,2),c("blue","white","red"))
     }
-    dend_list <- get_subdendrograms(dend2,k)
+    dend_list <- get_subdendrograms(dend2,nrow(clusters))
     max_height <- max(sapply(dend_list,function(x) attr(x, "height")))
     pdf(plot_file,height = height,width = width)
     circlize(
