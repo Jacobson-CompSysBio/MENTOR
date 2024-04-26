@@ -337,6 +337,8 @@ create_dendogram <- function(
   
   if(plot_type == "polar") {
     
+    subclustered.path <- file.path(script.basename, "/polar_dendrogram.R")
+    source(subclustered.path)
     if(is.null(plot_height)) {
       plot_height = 20
     }
