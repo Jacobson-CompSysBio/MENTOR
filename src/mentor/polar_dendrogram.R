@@ -138,14 +138,14 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     heatmap <- merge(dend_labs,heatmap,all.y = TRUE,by = "label")
     # order by the original row order
     heatmap <- heatmap[order(heatmap$x,heatmap$y,decreasing = FALSE),]
-    clusters <- unique(heatmap$col.x)
-    clusters <- data.frame(
-      "color" = clusters
-    )
-    clusters$cluster <- 0:(nrow(clusters) - 1)
+    # get nuique clusters
+    clusters <- unique(heatmap[,c("col.x","cluster")])
     # change column names
+    names(clusters) <- c("color","cluster")
+    # create split for circos plot
     split <- unique(heatmap[,c("label","cluster")])$cluster
-    heatmap <- heatmap[,c("label","value","source","cluster","row_order.x")]
+    # get heatmap columns used for circos plot
+    heatmap <- heatmap[,c("label","value","source","cluster","row_order")]
     # change label to factor
     heatmap$label <- factor(heatmap$label,levels = unique(heatmap$label))
     # change source to factor
@@ -196,8 +196,14 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     } else {
         col_fun1 <- colorRamp2(c(-2,0,2),c("blue","white","red"))
     }
-    # change clusters to match sub-clustering!
-    dend_list <- get_subdendrograms(dend2,nrow(clusters))
+    # create list of dendrograms based on our sub-/clustering
+    dend_list <- lapply(unique(dend_labs$cluster),function(x) {
+      dend_labs[dend_labs$cluster == x,]$ensembl
+    })
+    dend_list <- lapply(dend_list,function(x) {
+      find_dendrogram(dend2,selected_labels = x)
+    })
+    class(dend_list) <- "dendlist"
     max_height <- max(sapply(dend_list,function(x) attr(x, "height")))
     pdf(plot_file,height = height,width = width)
     circlize(
@@ -220,7 +226,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
             at = c(squish_bounds[1],0,squish_bounds[2]),
             col_fun = col_fun1,
             title_position = "topleft",
-            title = legend_title[1], # callt his somthing else
+            title = legend_title[1], # fix this
             title_gp = gpar(fontface = 1,cex = 1.5),
             labels_gp = gpar(fontface = 1,cex = 1.25),
             title_gap = unit(10,"mm"),

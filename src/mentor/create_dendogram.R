@@ -340,7 +340,7 @@ create_dendogram <- function(
   )
   dend_labs <- merge(dend_labs,groups,by = "col",all.x = TRUE)
   dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
-  dend_labs <- dend_labs[,c("label","cluster","col","row_order")]
+  dend_labs <- dend_labs[,c("ensembl","label","cluster","col")] # ,"x","y","row_order"
   cat("\n\nexporting clusters")
   write.table(
     dend_labs[,c("label","cluster")],
