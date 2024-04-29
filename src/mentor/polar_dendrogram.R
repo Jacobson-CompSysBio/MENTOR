@@ -231,7 +231,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     legend(
         # x = 1.25,y = 0,
         x = 1.15,y = 0.25,
-        legend = c(colnames(heatmap_factor),colnames(heatmap)),
+        legend = c(rev(colnames(heatmap_factor)),rev(colnames(heatmap))),
         fill = c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)]),
         title = legend_title[2], # make dynamic
         xjust = 0,
