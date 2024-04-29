@@ -270,9 +270,9 @@ create_dendogram <- function(
   if(!subcluster) {
    
     # create cluster file
-    cluster_file <- paste0("clusters_k",k,".tsv") 
+    cluster_file <- paste0(plot_type,"_clusters_k",k,".tsv") 
     # create plot filename
-    plot_file <- paste0("dendrogram_k",k,".pdf")
+    plot_file <- paste0(plot_type,"_dendrogram_k",k,".pdf")
     # source the dendrogram.R file
     dendrogram.path <- file.path(script.basename, "/dendrogram.R")
     source(dendrogram.path)
@@ -283,9 +283,9 @@ create_dendogram <- function(
 
     cat("\n\nsubclustering")
     # create cluster file
-    cluster_file <- paste0("clusters_sk",k,"_ki",k_increment,"_ms",max_size,".tsv")
+    cluster_file <- paste0(plot_type,"_clusters_sk",k,"_ki",k_increment,"_ms",max_size,".tsv")
     # create plot filename
-    plot_file <- paste0("subcluster_dendrogram_sk",k,"_ki",k_increment,"_ms",max_size,".pdf")
+    plot_file <- paste0(plot_type,"_subcluster_dendrogram_sk",k,"_ki",k_increment,"_ms",max_size,".pdf")
     # source the subclustered_dendrogram.R file
     subclustered.path <- file.path(script.basename, "/subclustered_dendrogram.R")
     source(subclustered.path)
