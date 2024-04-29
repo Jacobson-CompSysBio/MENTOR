@@ -20,14 +20,16 @@
 suppressWarnings(suppressPackageStartupMessages(require(tidyverse)))
 suppressWarnings(suppressPackageStartupMessages(require(RColorBrewer)))
 suppressWarnings(suppressPackageStartupMessages(require(dendextend)))
-suppressWarnings(suppressPackageStartupMessages(require(ComplexHeatmap)))
 suppressWarnings(suppressPackageStartupMessages(require(cowplot)))
 suppressWarnings(suppressPackageStartupMessages(require(optparse)))
 suppressWarnings(suppressPackageStartupMessages(require(ggnewscale)))
 suppressWarnings(suppressPackageStartupMessages(require(reshape2)))
 suppressWarnings(suppressPackageStartupMessages(require(circlize)))
+suppressWarnings(suppressPackageStartupMessages(require(ComplexHeatmap)))
+suppressWarnings(suppressPackageStartupMessages(require(colorRamps)))
 suppressWarnings(suppressPackageStartupMessages(require(gridBase)))
 suppressWarnings(suppressPackageStartupMessages(require(grid)))
+suppressWarnings(suppressPackageStartupMessages(require(latex2exp)))
 # library(colorRamps)
 
 #################### Argument parser ##############################
@@ -125,8 +127,8 @@ option_list <- list(
     # c("-p","--legendtitle"),
     "--legendtitle",
     type = "character",
-    default = "Value,Group,' '",
-    help = "rectangular plot type: title to give to continuous legend\n polar plot type: titles to give to continuous heatmap legend, factor heatmap legend and factor color block legend ('legend1','legend2','legend3')",
+    default = "Value,Group",
+    help = "rectangular plot type: title to give to continuous legend\n polar plot type: titles to give to continuous heatmap legend, factor heatmap legend and factor color block legend ('legend1','legend2')",
     metavar = "character"
   ),
   make_option(
@@ -309,12 +311,10 @@ create_dendogram <- function(
     heatmaps.path <- file.path(script.basename, "/heatmaps.R")
     source(heatmaps.path)
     # create the heatmap to add to dendrogram
-    heat <- heatmap(plot_type = plot_type,heatmap = heatmaps,dend_labs,reordercols,legendtitle,squish_bounds)
+    heat <- heatmap_(plot_type = plot_type,heatmap = heatmaps,dend_labs,reordercols,legendtitle,squish_bounds)
     if(plot_type == "rectangular") {
       # grab relative widths for final plot
       relative_widths <- do.call("c",strsplit(relative_widths,","))
-      # grab heatmap labels
-      heatmaps <- heat$heat_labs
       # add to dendrogram
       dendrogram <- plot_grid(
         dendrogram,
@@ -333,7 +333,6 @@ create_dendogram <- function(
     cluster_file <- paste0(out_file,"_",cluster_file)
     plot_file <- paste0(out_file,"_",plot_file)    
   }
-  
   dend_labs$row_order <- 1:nrow(dend_labs)
   groups <- data.frame(
     "col" = unique(dend_labs$col),
@@ -343,26 +342,34 @@ create_dendogram <- function(
   dend_labs <- dend_labs[order(dend_labs$row_order,decreasing = FALSE),]
   dend_labs <- dend_labs[,c("label","cluster","col","row_order")]
   cat("\n\nexporting clusters")
-  write.table(dend_labs[,c("label","cluster")],paste0(out_dir,cluster_file),sep = "\t",col.names = TRUE,row.names = FALSE,quote = FALSE)
+  write.table(
+    dend_labs[,c("label","cluster")],
+    paste0(out_dir,cluster_file),
+    sep = "\t",
+    col.names = TRUE,
+    row.names = FALSE,
+    quote = FALSE
+  )
   
   if(plot_type == "polar") {
     
-    subclustered.path <- file.path(script.basename, "/polar_dendrogram.R")
-    source(subclustered.path)
+    polar_dendrogram.path <- file.path(script.basename, "/polar_dendrogram.R")
+    source(polar_dendrogram.path)
     if(is.null(plot_height)) {
       plot_height = 20
     }
+    circos.clear()
     polar_dendrogram(
-      dend_labs = dend_labs,
-      dend2 = dend2,
-      heatmap = heat,
-      squish_bounds = squish_bounds,
-      cluster_label_size = cluster_label_size,
-      labels_size = labels_size,
-      group_colors = group_colors,
-      track_height = track_height,
-      highlight_index = highlight_index,
-      highlight_color = highlight_color,
+      dend_labs,
+      dend2,
+      heatmap = heat$heat_labs,
+      squish_bounds,
+      cluster_label_size,
+      labels_size,
+      group_colors,
+      track_height,
+      highlight_index,
+      highlight_color,
       legend_title = legendtitle,
       plot_file = paste0(out_dir,plot_file),
       height = plot_height,

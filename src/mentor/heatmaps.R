@@ -6,7 +6,7 @@
 
 ################ heatmap function ################
 
-heatmap <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
+heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
@@ -28,45 +28,46 @@ heatmap <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_b
     row_order <- row.names(columnar_data)[clusters$order]
     heat_labs <- heat_labs %>% arrange(factor(source, levels=row_order))
   }
+  # create order column on dend_labs
+  dend_labs$row_order <- 1:nrow(dend_labs)
+  # loop through different sources and create data frame for heatmap sources
+  heatmap_list <- list()
+  for(i in 1:length(unique(heat_labs$source))) {
+    # if dealing with first source set x = 0
+    if(i == 1) {
+      x <- 0
+    }
+    # filter to specific source
+    heat_labs_source <- heat_labs %>% dplyr::filter(source == unique(heat_labs$source)[i])
+    # merge with heat_labs
+    heat_labs_source <- merge(heat_labs_source,dend_labs,by = "label",all.y = TRUE)
+    # extract na rows
+    na_rows <- heat_labs_source[is.na(heat_labs_source$source),]
+    # check for duplicates and take max abs value and
+    heat_labs_source <- heat_labs_source %>% group_by(label) %>% top_n(1,abs(value)) %>% bind_rows(.,na_rows)
+    # reorder heat labels
+    heat_labs_source <- heat_labs_source[order(heat_labs_source$row_order,decreasing = FALSE),]
+    # reset the source column
+    heat_labs_source$source <- unique(heat_labs$source)[i]
+    # adding x coordinates for heatmap
+    heat_labs_source$x <- x
+    # adding y coordinates for heatmap
+    heat_labs_source$y <- 1:(nrow(heat_labs_source))
+    # add new data to list
+    heatmap_list[[i]] <- heat_labs_source
+    # increment x
+    x <- x + 1
+  }
+  # collapse list
+  heat_labs <- do.call("rbind",heatmap_list)
+  # retunr this if plot typeis polar
   if(plot_type == "polar") {
     
-    return(heat_labs)
-    
+    heat_labs <- heat_labs
+    heat <- NULL
+  
   } else {
     
-    polar_heatmap <- heat_labs
-    # create order column on dend_labs
-    dend_labs$row_order <- 1:nrow(dend_labs)
-    # loop through different sources and create data frame for heatmap sources
-    heatmap_list <- list()
-    for(i in 1:length(unique(heat_labs$source))) {
-      # if dealing with first source set x = 0
-      if(i == 1) {
-        x <- 0
-      }
-      # filter to specific source
-      heat_labs_source <- heat_labs %>% dplyr::filter(source == unique(heat_labs$source)[i])
-      # merge with heat_labs
-      heat_labs_source <- merge(heat_labs_source,dend_labs,by = "label",all.y = TRUE)
-      # extract na rows
-      na_rows <- heat_labs_source[is.na(heat_labs_source$source),]
-      # check for duplicates and take max abs value and
-      heat_labs_source <- heat_labs_source %>% group_by(label) %>% top_n(1,abs(value)) %>% bind_rows(.,na_rows)
-      # reorder heat labels
-      heat_labs_source <- heat_labs_source[order(heat_labs_source$row_order,decreasing = FALSE),]
-      # reset the source column
-      heat_labs_source$source <- unique(heat_labs$source)[i]
-      # adding x coordinates for heatmap
-      heat_labs_source$x <- x
-      # adding y coordinates for heatmap
-      heat_labs_source$y <- 1:(nrow(heat_labs_source))
-      # add new data to list
-      heatmap_list[[i]] <- heat_labs_source
-      # increment x
-      x <- x + 1
-    }
-    # collapse list
-    heat_labs <- do.call("rbind",heatmap_list)
     # add a factor column for sources where values are all 1 or NA
     heat_labs$factor <- do.call("c",lapply(unique(heat_labs$x),function(column){
       # filter to current source
@@ -114,7 +115,8 @@ heatmap <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_b
     # if there are any values that contain a decimal
     if(any(grepl("\\.",as.character(heat_labs$value)))) {
       if(!is.null(legendtitle)) {
-        legend_title <- legendtitle
+        # fix below!!!! (IMPORTAAAANT)
+        legend_title <- legendtitle[1]
       } else {
         legend_title <- TeX("$\\log_{2}(FC)$")
       }
@@ -190,10 +192,10 @@ heatmap <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_b
           )
         )
     }
-    
-    return(heat)
-  
   }
   
-  
+  result <- list(heat_labs,heat)
+  names(result) <- c("heat_labs","heat")
+  return(result)
+    
 }
