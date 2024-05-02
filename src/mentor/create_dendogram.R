@@ -48,7 +48,7 @@ option_list <- list(
     "--clusters",
     type = "integer",
     default = 3,
-    help = "the number of clusters desired in the dendrogram", 
+    help = "the number of clusters desired in the dendrogram (initial # if using --subcluster)", 
     metavar = "character"
   ),
   make_option(
@@ -64,7 +64,7 @@ option_list <- list(
     "--outdir",
     type = "character",
     default = NULL, 
-    help = "full path to output the dendrogram", 
+    help = "Path to output the dendrogram", 
     metavar = "character"
   ),
   make_option(
@@ -72,7 +72,7 @@ option_list <- list(
     "--outfile",
     type = "character",
     default = NULL,
-    help = "filename to append",
+    help = "description to append to filenames",
     metavar = "character"
   ),
   make_option(
@@ -112,7 +112,7 @@ option_list <- list(
     "--plottype",
     type = "character",
     default = "rectangular", 
-    help = "either rectangular or polar", 
+    help = "either rectangular or polar dendrogram", 
     metavar = "character"
   ),
   make_option(
@@ -120,7 +120,7 @@ option_list <- list(
     "--reordercols",
     action = "store_true",
     default = FALSE,
-    help = "specify if want to subcluster",
+    help = "reorder the columns of the heatmap based on hierarhical clustering",
     metavar = "character"
   ),
   make_option(
@@ -128,7 +128,7 @@ option_list <- list(
     "--legendtitle",
     type = "character",
     default = "Value,Group",
-    help = "rectangular plot type: title to give to continuous legend\n polar plot type: titles to give to continuous heatmap legend, factor heatmap legend and factor color block legend ('legend1','legend2')",
+    help = "rectangular dendrogram: title to give to continuous legend\n polar dendrogram: titles to give to continuous heatmap legend and factor heatmap legend ('legend1','legend2')",
     metavar = "character"
   ),
   make_option(
@@ -136,7 +136,7 @@ option_list <- list(
     "--squish",
     type = "character",
     default = NULL,
-    help = "if you have FC values squish the upper and lower bounds to two numbers formatted as 'lower_bound,upper_bound'",
+    help = "if you have continuous values in heatmap squish the upper and lower bounds to two numbers formatted as 'lower_bound,upper_bound'",
     metavar = "character"
   ),
   make_option(
@@ -152,7 +152,7 @@ option_list <- list(
     "--clusterlabelsize",
     type = "double",
     default = 3,
-    help = "size of cluster labels associated with circos plot",
+    help = "size of cluster labels associated with polar dendrogram",
     metavar = "character"
   ),
   make_option(
@@ -160,7 +160,7 @@ option_list <- list(
     "--heatmaplabelsize",
     type = "double",
     default = 0.75,
-    help = "size of the labels associated with the circos heatmaps (e.g. gene names)",
+    help = "size of the labels associated with the polar dendrogram heatmap (gene names)",
     metavar = "character"
   ),
   make_option(
@@ -168,7 +168,7 @@ option_list <- list(
     "--groupcolors",
     type = "character",
     default = NULL,
-    help = "colors for group blocks in circos plot",
+    help = "colors for group blocks in polar dendrogram",
     metavar = "character"
   ),
   make_option(
@@ -176,7 +176,7 @@ option_list <- list(
     "--trackheight",
     type = "character",
     default = "0.2,0.2,0.2",
-    help = "width of the tracks in the circos plot (heatmap1,heatmap2,dendrogram)",
+    help = "width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram)",
     metavar = "character"
   ),
   make_option(
@@ -184,7 +184,7 @@ option_list <- list(
     "--highlightindex",
     type = "character",
     default = NULL,
-    help = "sector(s) to highlight on circos plot (sector1,sector2,sector3,...)",
+    help = "sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN)",
     metavar = "character"
   ),
   make_option(
@@ -192,7 +192,7 @@ option_list <- list(
     "--highlightcolor",
     type = "character",
     default = "#34EBDC",
-    help = "color of highlighted sector",
+    help = "color to use for highlighted sectors on polar dendrogram",
     metavar = "character"
   ),
   make_option(
@@ -200,7 +200,7 @@ option_list <- list(
     "--plotwidth",
     type = "integer",
     default = 30,
-    help = "width of the final plot",
+    help = "width of the plot",
     metavar = "character"
   ),
   make_option(
@@ -208,7 +208,7 @@ option_list <- list(
     "--plotheight",
     type = "integer",
     default = NULL,
-    help = "height of the final plot",
+    help = "height of the plot",
     metavar = "character"
   )
 )

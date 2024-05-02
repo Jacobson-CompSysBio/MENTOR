@@ -27,22 +27,22 @@ def parse_args(test=None):
         '--outdir',
         action='store',
         type=pathlib.Path,
-        help='Save dendrogram and clusters to path.'
+        help='Location to save dendrogram and clusters'
     )
     parser.add_argument(
         '--outfile',
         action='store',
-        help='Description to append to filenames.'
+        help='Description to append to filenames'
     )
     parser.add_argument(
         '--multiplex',
         action='store',
-        help=''
+        help='Full path to multiplex network'
     )
     parser.add_argument(
         '--geneset',
         action='store',
-        help=''
+        help='Full path to geneset'
     )
     parser.add_argument(
         '--threads',
@@ -59,7 +59,7 @@ def parse_args(test=None):
         '--version',
         action='store_true',
         default=False,
-        help='Print version and exit.'
+        help='Print version and exit'
     )
     parser.add_argument(
         '--distances',
@@ -71,7 +71,7 @@ def parse_args(test=None):
         action='store',
         default=3,
         type=int,
-        help='Number of initial clusters desired in dendrogram'
+        help='Number of initial clusters desired in dendrogram (inital # if using --subcluster)'
     )
     parser.add_argument(
         '--map',
@@ -119,7 +119,7 @@ def parse_args(test=None):
         '--legendtitle',
         action='store',
         default="Value,Group",
-        help='Title to give to continuous legend (default: log2FC)'
+        help='Titles to give to legends; for rectangular dendrogram title to give to continuous legend; for polar dendrogram titles to give to continuous legend and factor legend'
     )
     parser.add_argument(
         '--squish',
@@ -130,57 +130,57 @@ def parse_args(test=None):
         '--relwidths',
         action='store',
         default='1,1',
-        help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width'
+        help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width; only used for rectangular dendrogram'
     )
     parser.add_argument(
         '--clusterlabelsize',
         action='store',
         default=3,
-        help='size of cluster labels associated with circos plot'
+        help='size of cluster labels associated with polar dendrogram'
     )
     parser.add_argument(
         '--heatmaplabelsize',
         action='store',
         default=0.75,
-        help='size of the labels associated with the heatmap rows (typically gene names)'
+        help='size of the labels associated with the polar dendrogram heatmap rows (typically gene names)'
     )
     parser.add_argument(
         '--groupcolors',
         action='store',
         default=None,
-        help='Colors for the group blocks in circos plot'
+        help='Colors for the group blocks in polar dendrogram'
     )
     parser.add_argument(
         '--trackheight',
         action='store',
         default='0.2,0.2,0.2',
-        help='width of the tracks in the circos plot (heatmap1,heatmap2,dendrogram)'
+        help='width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram)'
     )
     parser.add_argument(
         '--highlightindex',
         action='store',
         default=None,
-        help='sector to highlight on circos plot (0-indexed)'
+        help='sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN)'
     )
     parser.add_argument(
         '--highlightcolor',
         action='store',
         default='#34EBDC',
-        help='color for highlighted sector on circos plot'
+        help='color for highlighted sector on polar dendrogram'
     )
     parser.add_argument(
         '--plotwidth',
         action='store',
         default=30,
         type=int,
-        help='Width of the dendrogram/heatmap visualization'
+        help='Width of the plot'
     )
     parser.add_argument(
         '--plotheight',
         action='store',
         default=None,
         type=int,
-        help='Height of the dendrogram/heatmap visualization'
+        help='Height of the plot'
     )
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
