@@ -130,19 +130,19 @@ def parse_args(test=None):
         '--relwidths',
         action='store',
         default='1,1',
-        help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width; only used for rectangular dendrogram'
+        help='If including a heatmap then adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width; only used for rectangular dendrogram'
     )
     parser.add_argument(
         '--clusterlabelsize',
         action='store',
         default=3,
-        help='size of cluster labels associated with polar dendrogram'
+        help='Size of cluster labels associated with polar dendrogram'
     )
     parser.add_argument(
         '--heatmaplabelsize',
         action='store',
         default=0.75,
-        help='size of the labels associated with the polar dendrogram heatmap rows (typically gene names)'
+        help='Size of the labels associated with the polar dendrogram heatmap (gene names)'
     )
     parser.add_argument(
         '--groupcolors',
@@ -154,19 +154,19 @@ def parse_args(test=None):
         '--trackheight',
         action='store',
         default='0.2,0.2,0.2',
-        help='width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram)'
+        help='Width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram)'
     )
     parser.add_argument(
         '--highlightindex',
         action='store',
         default=None,
-        help='sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN)'
+        help='Sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN)'
     )
     parser.add_argument(
         '--highlightcolor',
         action='store',
         default='#34EBDC',
-        help='color for highlighted sector on polar dendrogram'
+        help='Color to use for highlighted sectors on polar dendrogram'
     )
     parser.add_argument(
         '--plotwidth',
