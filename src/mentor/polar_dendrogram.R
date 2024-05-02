@@ -182,19 +182,26 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         if(any(factor_cols)) {
             if(is.null(group_colors)) {
                 group_colors <- primary.colors(n = ncol(heatmap) + ncol(heatmap_factor) + 1,no.white = TRUE)
+                group_colors <- group_colors[which(group_colors != "#000000")]
+                legend_cols <- c(rev(colnames(heatmap_factor)),rev(colnames(heatmap)))
+                fill_cols <- c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)])
             }
         } else {
             if(is.null(group_colors)) {
                 group_colors <- primary.colors(n = ncol(heatmap) + 1,no.white = TRUE)
+                group_colors <- group_colors[which(group_colors != "#000000")]
+                legend_cols <- rev(colnames(heatmap))
+                fill_cols <- group_colors
             }
         }
     } else {
         if(is.null(group_colors)) {
-            group_colors <- primary.colors(n = ncol(heatmap_factor) + 1,no.white = TRUE)  
+            group_colors <- primary.colors(n = ncol(heatmap_factor) + 1,no.white = TRUE) 
+            group_colors <- group_colors[which(group_colors != "#000000")]
+            legend_cols <- rev(colnames(heatmap_factor))
+            fill_cols <- group_colors
         }
     }
-    # remove black from the default colors
-    group_colors <- group_colors[which(group_colors != "#000000")]
     # color scale for continuous columns
     if(!is.null(squish_bounds)) {
         squish_bounds <- as.numeric(do.call("c",strsplit(squish_bounds,",")))
@@ -245,15 +252,15 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     legend(
         # x = 1.25,y = 0,
         x = 1.15,y = 0.25, #0.25
-        legend = c(rev(colnames(heatmap_factor)),rev(colnames(heatmap))), # 
+        legend = legend_cols, # 
         # fill = group_colors,
-        fill = c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)]),
+        fill = fill_cols,
         title = legend_title[2], # make dynamic
         xjust = 0,
         bty = "n",
         cex = 1.5,
         # border = group_colors,
-        border = c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)]),
+        border = fill_cols,
         text.width = strwidth(colnames(heatmap))[1]*2,
         title.adj = 0.05,
         inset = -0.01,
