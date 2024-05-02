@@ -8,8 +8,10 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
     circos.par(
         "canvas.xlim" = c(-1, 1),
         "canvas.ylim" = c(-1, 1),
-        gap.degree = c(rep(5,nrow(clusters) - 1),8)
+        gap.degree = c(rep(5,nrow(clusters) - 1),8),
+        points.overflow.warning = FALSE # git push this!!!
     )
+    #circos.initialize(sectors = split,xlim = c(-1,1))
     # create track height
     track_height <- as.numeric(do.call("c",strsplit(track_height,",")))
     # check if continuous heatmap is present
@@ -35,7 +37,7 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
         panel.fun = function(x, y) {
             circos.text(
                 CELL_META$xcenter,
-                CELL_META$cell.ylim[2] + 3, # (1.75 - (1/max_label))
+                CELL_META$cell.ylim[2] + (1.5 - (1/max_label)), # (1.75 - (1/max_label)
                 paste0("C",CELL_META$sector.index),
                 facing = "inside",
                 cex = cluster_label_size,
@@ -112,15 +114,19 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
         } else {
             total_tracks <- 3
         }
+        highlight_index <- do.call("c",strsplit(highlight_index,","))
         # draw the highlight for the user input sector
-        draw.sector(
-            get.cell.meta.data("cell.start.degree", sector.index = highlight_index) + 1,
-            get.cell.meta.data("cell.end.degree", sector.index = highlight_index) - 1,
-            rou1 = get.cell.meta.data("cell.top.radius", track.index = 1) + 0.1,
-            rou2 = get.cell.meta.data("cell.bottom.radius", track.index = total_tracks) - 0.05,
-            col = adjustcolor(highlight_color,0.20),
-            border = NA
-        )
+        lapply(unique(highlight_index),function(x){
+            draw.sector(
+                get.cell.meta.data("cell.start.degree", sector.index = x) + 1,
+                get.cell.meta.data("cell.end.degree", sector.index = x) - 1,
+                rou1 = get.cell.meta.data("cell.top.radius", track.index = 1) + 0.05, #  
+                rou2 = get.cell.meta.data("cell.bottom.radius", track.index = total_tracks),  #- 0.05
+                col = adjustcolor(highlight_color,0.20),
+                border = NA
+            )
+        })
+        
     }
     # if(!is.null(zoom)) {
     #     placeholder for adding a zoom option to visualize a single section
@@ -173,7 +179,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     # transform data for polar dendrogram
     if(!is.null(heatmap)) {
         heatmap <- acast(heatmap,label ~ source,var = "value") 
-        if(ncol(heatmap_factor) >= 1) {
+        if(any(factor_cols)) {
             if(is.null(group_colors)) {
                 group_colors <- primary.colors(n = ncol(heatmap) + ncol(heatmap_factor) + 1,no.white = TRUE)
             }
@@ -204,6 +210,8 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
       find_dendrogram(dend2,selected_labels = x)
     })
     class(dend_list) <- "dendlist"
+    if(!any(factor_cols)) heatmap_factor <- NULL
+    if(all(factor_cols)) heatmap <- NULL
     max_height <- max(sapply(dend_list,function(x) attr(x, "height")))
     pdf(plot_file,height = height,width = width)
     circlize(
@@ -236,13 +244,15 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     }
     legend(
         # x = 1.25,y = 0,
-        x = 1.15,y = 0.25,
-        legend = c(rev(colnames(heatmap_factor)),rev(colnames(heatmap))),
+        x = 1.15,y = 0.25, #0.25
+        legend = c(rev(colnames(heatmap_factor)),rev(colnames(heatmap))), # 
+        # fill = group_colors,
         fill = c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)]),
         title = legend_title[2], # make dynamic
         xjust = 0,
         bty = "n",
         cex = 1.5,
+        # border = group_colors,
         border = c(group_colors[(ncol(heatmap)+1):length(group_colors)],group_colors[1:ncol(heatmap)]),
         text.width = strwidth(colnames(heatmap))[1]*2,
         title.adj = 0.05,
@@ -252,7 +262,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     if(!is.null(heatmap_factor)) {
         legend(
             # x = 1.25,y = -0.35,
-            x = 1.15,y = -0.4,
+            x = 1.15,y = -0.45,
             legend = c("absent","present"),
             fill = c("grey","black"),
             title = "",
@@ -267,12 +277,12 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         )  
     }
     if(!is.null(heatmap)) {
-        draw(
-            cont_legend,
-            x = unit(0.865,"npc"), # x = unit(0.9,"npc")
-            y = unit(0.7,"npc") # y = unit(0.6,"npc")
-        )
+       draw(
+           cont_legend,
+           x = unit(0.868,"npc"), # x = unit(0.9,"npc")
+           y = unit(0.68,"npc") # y = unit(0.6,"npc")
+       )
     }
-    dev.off()
+    whatever <- dev.off()
   
 }

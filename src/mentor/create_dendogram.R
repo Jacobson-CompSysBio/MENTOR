@@ -182,9 +182,9 @@ option_list <- list(
   make_option(
     # c("-e","--plotwidth"),
     "--highlightindex",
-    type = "integer",
+    type = "character",
     default = NULL,
-    help = "sector to highlight on circos plot",
+    help = "sector(s) to highlight on circos plot (sector1,sector2,sector3,...)",
     metavar = "character"
   ),
   make_option(
