@@ -1,19 +1,50 @@
 
 # function to create polar dendrogram
-circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_size,split,col_fun1,labels_size,group_colors,max_height,track_height,highlight_index,highlight_color) {
+circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_size,split,col_fun1,labels_size,group_colors,max_height,track_height,highlight_index,highlight_color,height,width) {
   
     # clear circos
     circos.clear()
     # setting up global parameters for circos plot
     circos.par(
-        "canvas.xlim" = c(-1, 1),
-        "canvas.ylim" = c(-1, 1),
+        "canvas.xlim" = c(-1,1),
+        "canvas.ylim" = c(-1,1),
         gap.degree = c(rep(5,nrow(clusters) - 1),8),
-        points.overflow.warning = FALSE # git push this!!!
+        points.overflow.warning = FALSE
     )
-    #circos.initialize(sectors = split,xlim = c(-1,1))
-    # create track height
-    track_height <- as.numeric(do.call("c",strsplit(track_height,",")))
+    # set up track heights & initialize
+    if(is.null(heatmap) & is.null(heatmap_factor)) {
+        circos.initialize(split,xlim = c(0,1))
+        dend_th <- track_height
+    } else if(!is.null(heatmap) & is.null(heatmap_factor)) {
+        circos.heatmap.initialize(heatmap,split = split,cluster = FALSE)
+        heatmap_th <- track_height[1]
+        dend_th <- track_height[2]
+    } else if(is.null(heatmap) & !is.null(heatmap_factor)) {
+        circos.heatmap.initialize(heatmap_factor,split = split,cluster = FALSE)
+        heatmap_factor_th <- track_height[1]
+        dend_th <- track_height[2]
+    } else {
+        circos.heatmap.initialize(heatmap,split = split,cluster = FALSE)
+        heatmap_th <- track_height[1]
+        heatmap_factor_th <- track_height[2]
+        dend_th <- track_height[3]
+    }
+    # adding cluster labels
+    circos.track(
+        ylim = c(0,1),
+        panel.fun = function(x,y) {
+            circos.text(
+                CELL_META$xcenter,
+                CELL_META$cell.ylim[2],
+                paste0("C",CELL_META$sector.index),
+                facing = "inside",
+                cex = cluster_label_size,
+                col = clusters[as.numeric(CELL_META$sector.index) + 1,]$color,
+                adj = c(0.5,0),
+                niceFacing = TRUE
+            )
+        },bg.border = NA,track.height = 0.005
+    )
     # check if continuous heatmap is present
     if(!is.null(heatmap)) {
         # add continuous heatmap track to circos plot
@@ -27,41 +58,23 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
             rownames.cex = labels_size,
             cell_width = rep(1,nrow(heatmap)),
             cell.border = NA,
-            track.height = track_height[1]
+            track.height = heatmap_th
         )
-    }
-    # adding cluster numbers to outside of circos plot
-    max_label <- max(nchar(rownames(heatmap)))
-    circos.track(
-        track.index = get.current.track.index(),
-        panel.fun = function(x, y) {
-            circos.text(
-                CELL_META$xcenter,
-                CELL_META$cell.ylim[2] + (1.5 - (1/max_label)), # (1.75 - (1/max_label)
-                paste0("C",CELL_META$sector.index),
-                facing = "inside",
-                cex = cluster_label_size,
-                col = clusters[as.numeric(CELL_META$sector.index) + 1,]$color,
-                adj = c(0.5, 0), niceFacing = TRUE
-            )    
-        },bg.border = NA
-    )
-    # check again if continuous heatmap is present
-    if(!is.null(heatmap)) {
         # add color blocks for continuous heatmap (group labels)
         circos.track(
             track.index = get.current.track.index(),
-            panel.fun = function(x, y) {
+            panel.fun = function(x,y) {
                 if(CELL_META$sector.numeric.index == nrow(clusters)) {
                     for(i in 1:ncol(heatmap)) {
                         circos.rect(
                             CELL_META$cell.xlim[2] + convert_x(5.5,"mm"),i - 1, # might have to make 5.5 and 15.5 dynamic
                             CELL_META$cell.xlim[2] + convert_x(15.5,"mm"),i,
-                            col = group_colors[i], border = NA
+                            col = group_colors[i],
+                            border = NA
                         )
                     }
                 }
-            },bg.border = NA,track.height = track_height[1]
+            },bg.border = NA,track.height = heatmap_th
         )
         group_colors <- group_colors[(ncol(heatmap) + 1):length(group_colors)]
     }
@@ -76,22 +89,23 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
             cluster = FALSE,
             cell_width = rep(1,nrow(heatmap)),
             cell.border = NA,
-            track.height = track_height[2]
+            track.height = heatmap_factor_th
         )
         # add color blocks for factor heatmap (group labels)
         circos.track(
             track.index = get.current.track.index(),
-            panel.fun = function(x, y) {
+            panel.fun = function(x,y) {
                 if(CELL_META$sector.numeric.index == nrow(clusters)) {
                     for(i in 1:ncol(heatmap_factor)) {
                         circos.rect(
                             CELL_META$cell.xlim[2] + convert_x(4,"mm"),i - 1, # might have to make 4 and 11 dynamic
                             CELL_META$cell.xlim[2] + convert_x(11,"mm"),i,
-                            col = group_colors[i], border = NA
+                            col = group_colors[i],
+                            border = NA
                         )
                     }
                 }
-            },bg.border = NA,track.height = track_height[2]
+            },bg.border = NA,track.height = heatmap_factor_th
         )
     }
     # add dendrogram track to circos plot
@@ -99,34 +113,35 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
         ylim = c(0,max_height),
         panel.fun = function(x,y) {
             sector.index = get.cell.meta.data("sector.index")
-            dend = dend_list[[as.numeric(sector.index) + 1]] #  + 1
+            dend = dend_list[[as.numeric(sector.index) + 1]]
             circos.dendrogram(
                 dend,
                 max_height = max_height,
                 facing = "outside"
             )
-        },bg.border = NA,track.height = track_height[3]
+        },bg.border = NA,track.height = dend_th
     )
     # check if the index for highlighting is not null
     if(!is.null(highlight_index)) {
         if(!is.null(heatmap) & !is.null(heatmap_factor)) {
+            total_tracks <- 6
+        } else if(is.null(heatmap)|is.null(heatmap_factor)) {
             total_tracks <- 4
         } else {
-            total_tracks <- 3
+            total_tracks <- 2
         }
         highlight_index <- do.call("c",strsplit(highlight_index,","))
         # draw the highlight for the user input sector
         lapply(unique(highlight_index),function(x){
             draw.sector(
-                get.cell.meta.data("cell.start.degree", sector.index = x) + 1,
-                get.cell.meta.data("cell.end.degree", sector.index = x) - 1,
-                rou1 = get.cell.meta.data("cell.top.radius", track.index = 1) + 0.05, #  
-                rou2 = get.cell.meta.data("cell.bottom.radius", track.index = total_tracks),  #- 0.05
+                get.cell.meta.data("cell.start.degree",sector.index = x) + 1,
+                get.cell.meta.data("cell.end.degree",sector.index = x) - 1,
+                rou1 = get.cell.meta.data("cell.top.radius",track.index = 1) + 0.05,
+                rou2 = get.cell.meta.data("cell.bottom.radius",track.index = total_tracks),
                 col = adjustcolor(highlight_color,0.20),
                 border = NA
             )
         })
-        
     }
     # if(!is.null(zoom)) {
     #     placeholder for adding a zoom option to visualize a single section
@@ -136,10 +151,8 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
 }
 
 # function to prepare data for polar dendrogram
-polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label_size,labels_size,group_colors,track_height,highlight_index,highlight_color,legend_title,plot_file,height = 20,width = 20) {
+polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label_size,labels_size,group_colors,track_height,highlight_index,highlight_color,legend_title,plot_file,height,width) {
   
-    # # get columns want for heatmap
-    # heatmap <- heatmap[,c("label","value","source")]
     # create data frame with dendrogram labels and heatmap
     heatmap <- merge(dend_labs,heatmap,all.y = TRUE,by = "label")
     # order by the original row order
@@ -219,7 +232,9 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     class(dend_list) <- "dendlist"
     if(!any(factor_cols)) heatmap_factor <- NULL
     if(all(factor_cols)) heatmap <- NULL
-    max_height <- max(sapply(dend_list,function(x) attr(x, "height")))
+    max_height <- max(sapply(dend_list,function(x) attr(x,"height")))
+    track_height <- as.numeric(do.call("c",strsplit(track_height,",")))
+    par(mai=c(0.005,0.005,0.005,0.005))
     pdf(plot_file,height = height,width = width)
     circlize(
         dend_list = dend_list,
@@ -234,14 +249,16 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         max_height = max_height,
         track_height = track_height, # track_height = "0.2,0.2,0.2"
         highlight_index = highlight_index,
-        highlight_color = highlight_color # highlight_color = "#34EBDC"
+        highlight_color = highlight_color, # highlight_color = "#34EBDC"
+        height = height,
+        width = width
     )
     if(!is.null(heatmap)) {
         cont_legend <- Legend(
             at = c(squish_bounds[1],0,squish_bounds[2]),
             col_fun = col_fun1,
             title_position = "topleft",
-            title = legend_title[1], # fix this
+            title = TeX("$\\log_{2}(FC)$"), # fix this legend_title[1]
             title_gp = gpar(fontface = 1,cex = 1.5),
             labels_gp = gpar(fontface = 1,cex = 1.25),
             title_gap = unit(10,"mm"),
@@ -249,21 +266,38 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
             grid_width = unit(0.25,"inches")
         )
     }
+    lgd_ <- rep(NA, 11)
+    lgd_[c(1,6,11)] <- c(2,0,-2)
+    legend(
+        "right",
+        legend = lgd_,
+        fill = colorRampPalette(colors = c('red','white','blue'))(11),
+        title = "",
+        xjust = 0,
+        bty = "n",
+        border = NA,
+        cex = 1.25,
+        inset = c(0.095,0),
+        xpd = TRUE,
+        title.adj = 0.05,
+        y.intersp = 0.5
+        #text.font = 2
+    )
     legend(
         # x = 1.25,y = 0,
-        x = 1.15,y = 0.25, #0.25
+        #x = 1.15,y = 0.25, #0.25
+        "bottomright",
         legend = legend_cols, # 
         # fill = group_colors,
         fill = fill_cols,
         title = legend_title[2], # make dynamic
         xjust = 0,
         bty = "n",
-        cex = 1.5,
+        cex = 1.25,
         # border = group_colors,
         border = fill_cols,
-        text.width = strwidth(colnames(heatmap))[1]*2,
         title.adj = 0.05,
-        inset = -0.01,
+        inset = c(0.01,0.075),
         xpd = TRUE
     )
     if(!is.null(heatmap_factor)) {
@@ -277,19 +311,18 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
             bty = "n",
             cex = 1.5,
             border = c("grey","black"),
-            text.width = strwidth(colnames(heatmap))[1]*2,
             title.adj = 0.05,
             inset = -0.01,
             xpd = TRUE
         )  
     }
-    if(!is.null(heatmap)) {
-       draw(
-           cont_legend,
-           x = unit(0.868,"npc"), # x = unit(0.9,"npc")
-           y = unit(0.68,"npc") # y = unit(0.6,"npc")
-       )
-    }
+    #if(!is.null(heatmap)) {
+       #draw(
+       #    cont_legend,
+       #    x = unit(0.875,"npc"), # x = unit(0.9,"npc") 0.868
+       #    y = unit(0.68,"npc") # y = unit(0.6,"npc")
+       #)
+    #}
     whatever <- dev.off()
   
 }

@@ -135,7 +135,7 @@ def parse_args(test=None):
     parser.add_argument(
         '--clusterlabelsize',
         action='store',
-        default=3,
+        default=2.5,
         help='Size of cluster labels associated with polar dendrogram'
     )
     parser.add_argument(

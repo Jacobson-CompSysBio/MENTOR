@@ -151,7 +151,7 @@ option_list <- list(
     # c("-e","--plotwidth"),
     "--clusterlabelsize",
     type = "double",
-    default = 3,
+    default = 2.5,
     help = "Size of cluster labels associated with polar dendrogram",
     metavar = "character"
   ),
