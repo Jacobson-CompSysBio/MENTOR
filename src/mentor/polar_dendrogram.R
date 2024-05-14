@@ -241,80 +241,101 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         heatmap = heatmap,
         heatmap_factor = heatmap_factor,
         clusters = clusters,
-        cluster_label_size = cluster_label_size, # cluster_label_size = 3
+        cluster_label_size = cluster_label_size,
         split = split,
         col_fun1 = col_fun1,
-        labels_size = labels_size, # labels_size = 0.75
-        group_colors = group_colors, # rev(brewer.pal(8,"Set1")[c(1:5,8)])
+        labels_size = labels_size,
+        group_colors = group_colors,
         max_height = max_height,
-        track_height = track_height, # track_height = "0.2,0.2,0.2"
+        track_height = track_height,
         highlight_index = highlight_index,
-        highlight_color = highlight_color, # highlight_color = "#34EBDC"
+        highlight_color = highlight_color,
         height = height,
         width = width
     )
     if(!is.null(heatmap)) {
-        cont_legend <- Legend(
-            at = c(squish_bounds[1],0,squish_bounds[2]),
-            col_fun = col_fun1,
-            title_position = "topleft",
-            title = TeX("$\\log_{2}(FC)$"), # fix this legend_title[1]
-            title_gp = gpar(fontface = 1,cex = 1.5),
-            labels_gp = gpar(fontface = 1,cex = 1.25),
-            title_gap = unit(10,"mm"),
-            grid_height = unit(2,"inches"),
-            grid_width = unit(0.25,"inches")
-        )
-    }
-    lgd_ <- rep(NA, 11)
-    lgd_[c(1,6,11)] <- c(2,0,-2)
-    legend(
-        "right",
-        legend = lgd_,
-        fill = colorRampPalette(colors = c('red','white','blue'))(11),
-        title = "",
-        xjust = 0,
-        bty = "n",
-        border = NA,
-        cex = 1.25,
-        inset = c(0.095,0),
-        xpd = TRUE,
-        title.adj = 0.05,
-        y.intersp = 0.5
-        #text.font = 2
-    )
-    legend(
-        # x = 1.25,y = 0,
-        #x = 1.15,y = 0.25, #0.25
-        "bottomright",
-        legend = legend_cols, # 
-        # fill = group_colors,
-        fill = fill_cols,
-        title = legend_title[2], # make dynamic
-        xjust = 0,
-        bty = "n",
-        cex = 1.25,
-        # border = group_colors,
-        border = fill_cols,
-        title.adj = 0.05,
-        inset = c(0.01,0.075),
-        xpd = TRUE
-    )
-    if(!is.null(heatmap_factor)) {
-        legend(
-            # x = 1.25,y = -0.35,
-            x = 1.15,y = -0.45,
-            legend = c("absent","present"),
-            fill = c("grey","black"),
+        #cont_legend <- Legend(
+        #    at = c(squish_bounds[1],0,squish_bounds[2]),
+        #    col_fun = col_fun1,
+        #    title_position = "topleft",
+        #    title = TeX("$\\log_{2}(FC)$"), # fix this legend_title[1]
+        #    title_gp = gpar(fontface = 1,cex = 1.5),
+        #    labels_gp = gpar(fontface = 1,cex = 1.25),
+        #    title_gap = unit(10,"mm"),
+        #    grid_height = unit(2,"inches"),
+        #    grid_width = unit(0.25,"inches")
+        #)
+        # get max label size to add to first cont legend number (empty string)
+        max_nchar <- max(nchar(legend_cols))
+        lgd <- rep(NA, 11)
+        lgd[c(1,6,11)] <- c(2,0,-2)
+        lgd[1] <- paste0(lgd[1],paste0(rep(" ",max_nchar + 20),collapse = ""))
+        cont_lgd <- legend(
+            "right",
+            legend = lgd,
+            fill = colorRampPalette(colors = c('red','white','blue'))(11),
             title = "",
             xjust = 0,
             bty = "n",
-            cex = 1.5,
-            border = c("grey","black"),
+            border = NA,
+            cex = 1.25,
+            xpd = TRUE,
+            y.intersp = 0.5,
+            plot = FALSE
+        )
+        legend(
+            "right",
+            legend = lgd,
+            fill = colorRampPalette(colors = c('red','white','blue'))(11),
+            title = "",
+            xjust = 0,
+            bty = "n",
+            border = NA,
+            cex = 1.25,
+            xpd = TRUE,
+            y.intersp = 0.5
+        )
+        legend(
+            x = cont_lgd$rect$left,y = -0.15,
+            legend = legend_cols,
+            fill = fill_cols,
+            title = legend_title[2],
+            xjust = 0,
+            bty = "n",
+            cex = 1.25,
+            border = fill_cols,
             title.adj = 0.05,
-            inset = -0.01,
             xpd = TRUE
-        )  
+        )
+    }
+    if(!is.null(heatmap_factor)) {
+        if(!is.null(heatmap)) {
+            legend(
+                x = cont_lgd$rect$left,y = 0.15,
+                legend = c("absent","present"),
+                fill = c("grey","black"),
+                title = "",
+                xjust = 0,
+                bty = "n",
+                cex = 1.5,
+                border = c("grey","black"),
+                title.adj = 0.05,
+                xpd = TRUE
+            ) 
+        } else {
+            legend(
+                "right",
+                legend = c("absent","present"),
+                fill = c("grey","black"),
+                title = "",
+                xjust = 0,
+                bty = "n",
+                cex = 1.5,
+                border = c("grey","black"),
+                title.adj = 0.05,
+                xpd = TRUE
+            )
+        }
     }
     #if(!is.null(heatmap)) {
        #draw(
