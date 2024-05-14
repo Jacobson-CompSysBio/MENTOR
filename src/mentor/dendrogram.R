@@ -83,6 +83,16 @@ dendrogram <- function(dis_mat,k = 3,map) {
     names(dend_labs)[which(names(dend_labs) == "label")] <- "ensembl"
     map_genes <- suppressMessages(read_tsv(map, col_names = TRUE, show_col_types = FALSE))
     names(map_genes) <- c("ensembl","label")
+    if(nrow(map_genes) > nrow(dend_labs)) {
+      extra_genes <- map_genes$ensembl[!(map_genes$ensembl %in% dend_labs$ensembl)]
+      cat(paste0('\n\nWARNING: ',length(extra_genes),' genes from users map.txt file were not found in multiplex or were not in geneset.txt file; genes removed from map.txt file:\n'))
+      cat(paste0(extra_genes,collapse = "\n"))
+    }
+    if(nrow(map_genes) < nrow(dend_labs)) {
+      missing_genes <- dend_labs$ensembl[!(dend_labs$ensembl %in% map_genes$ensembl)]
+      cat(paste0('\n\nWARNING: ',length(missing_genes),' genes from dendrogram visualization that were missing in users map.txt file:\n'))
+      cat(paste0(missing_genes,collapse = "\n"))
+    }
     dend_labs <- merge(dend_labs,map_genes,by = "ensembl",all.x = TRUE)
     dend_labs <- dend_labs %>% dplyr::select(label,x,y,col,cex)
     dend_labs <- dend_labs[order(dend_labs$x,decreasing = FALSE),]
