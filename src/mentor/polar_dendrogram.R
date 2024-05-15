@@ -6,9 +6,12 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
     circos.clear()
     # setting up global parameters for circos plot
     circos.par(
+        #clock.wise = FALSE, # uncomment to make sectors appear in anti-clockwise direction
+        #start.degree = 219.5, # uncomment to change the start degree of the first cluster
         "canvas.xlim" = c(-1,1),
         "canvas.ylim" = c(-1,1),
         gap.degree = c(rep(5,nrow(clusters) - 1),8),
+        gap.degree = rep(5,nrow(clusters)),
         points.overflow.warning = FALSE
     )
     # set up track heights & initialize
@@ -191,7 +194,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     }
     # transform data for polar dendrogram
     if(!is.null(heatmap)) {
-        heatmap <- acast(heatmap,label ~ source,var = "value") 
+        heatmap <- acast(heatmap,label ~ source,var = "value")
         if(any(factor_cols)) {
             if(is.null(group_colors)) {
                 group_colors <- primary.colors(n = ncol(heatmap) + ncol(heatmap_factor) + 1,no.white = TRUE)
