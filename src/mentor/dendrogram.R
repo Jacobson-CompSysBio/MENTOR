@@ -94,7 +94,7 @@ dendrogram <- function(dis_mat,k = 3,map) {
       cat(paste0(missing_genes,collapse = "\n"))
     }
     dend_labs <- merge(dend_labs,map_genes,by = "ensembl",all.x = TRUE)
-    dend_labs <- dend_labs %>% dplyr::select(label,x,y,col,cex)
+    dend_labs <- dend_labs %>% dplyr::select(ensembl,label,x,y,col,cex)
     dend_labs <- dend_labs[order(dend_labs$x,decreasing = FALSE),]
   }
   # extract segments
@@ -151,8 +151,8 @@ dendrogram <- function(dis_mat,k = 3,map) {
   
   #################### Return dendogram ##############################
   
-  result <- list(dend_labs,p)
-  names(result) <- c("dendrogram_labels","dendrogram")
+  result <- list(dend_labs,dend2,p)
+  names(result) <- c("dendrogram_labels","dendrogram","plot")
   return(result)
   
 }

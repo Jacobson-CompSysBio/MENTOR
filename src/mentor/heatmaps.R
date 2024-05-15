@@ -6,7 +6,7 @@
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
+heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
@@ -66,130 +66,142 @@ heatmap <- function(heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
   }
   # collapse list
   heat_labs <- do.call("rbind",heatmap_list)
-  # add a factor column for sources where values are all 1 or NA
-  heat_labs$factor <- do.call("c",lapply(unique(heat_labs$x),function(column){
-    # filter to current source
-    heats <- heat_labs[heat_labs$x == column,]
-    # check if all values for a given source are all 1 or NA
-    if(all(heats$value == 1|is.na(heats$value))) {
-      # if all values are 1 or NA then set NA values to 0
-      value <- heats$value
-      return(case_when(value == 1 ~ 1,is.na(value) ~ 0))
-    } else {
-      # else set all values to 0
-      return(rep(0,length(heats$value)))
-    }
-  }))
-  # change levels of factor column to "absence" or "presence"
-  heat_labs$factor <- factor(heat_labs$factor,levels = c(0,1),labels = c("absent","present"))
-  # create heatmap
-  heat <- ggplot(data = heat_labs,aes(x,y)) + 
-    # set all tiles to be grey initially
-    geom_tile(aes(fill = !!sym("value")),colour = "grey50",fill = "grey50",show.legend = FALSE) + 
-    # set the labels for the x-axis
-    scale_x_continuous(
-      # labels for x-axis
-      labels = unique(heat_labs$source)[!is.na(unique(heat_labs$source))],
-      # breaks for x-axis labels
-      breaks = unique(heat_labs$x)
-    ) +
-    # adjusting y-scale
-    scale_y_continuous(expand = c(0, 0),limits = c(-1,nrow(dend_labs) + 1)) +
-    # adjusting the theme of the ggplot
-    theme(
-      # removing axis lines
-      axis.line = element_blank(),
-      # removing axis ticks
-      axis.ticks = element_blank(),
-      # removing axis text
-      axis.text.y = element_blank(),
-      # removing axis titles
-      axis.title = element_blank(),
-      # change angle of x-axis title
-      axis.text.x = element_text(angle = 90,vjust = 0.15,hjust = 1,size = 14),
-      # removing background panel
-      panel.background = element_blank()
-    )
-  # if there are any values that contain a decimal
-  if(any(grepl("\\.",as.character(heat_labs$value)))) {
-    if(!is.null(legendtitle)) {
-      legend_title <- legendtitle
-    } else {
-      legend_title <- TeX("$\\log_{2}(FC)$")
-    }
-    # add new scale for log2fc values
-    heat <- heat + 
-      # add new scale
-      new_scale_fill() + 
-      # add geom_tile fills for log2fc values
-      geom_tile(aes(x,y,fill = value), show.legend = TRUE)
-    # check if squish_bounds is null
-    if(!is.null(squish_bounds)) {
-      # get upper and lower bound squish values
-      squish_bounds <- as.numeric(do.call("c",strsplit(squish_bounds,",")))
-      # draw new scale with squish bounds parameters
-      heat <- heat + scale_fill_gradient2(
-        # set the value legend to log2fc (assume these values represent log2fc)
-        name = legend_title,
-        # set low value to blue
-        low = '#0017FF',
-        # set 0 to white
-        mid = "white",
-        # set high value to red
-        high = '#FF2D00',
-        # set midpoint to 0
-        midpoint = 0,
-        # set limits based on squish bounds
-        limits = c(squish_bounds[1],squish_bounds[2]),
-        # squish the scales
-        oob = scales::squish,
-        # set NA values to grey
-        na.value = "grey50"
+  # retunr this if plot typeis polar
+  if(plot_type == "polar") {
+    
+    heat_labs <- heat_labs
+    heat <- NULL
+  
+  } else {
+    
+    # add a factor column for sources where values are all 1 or NA
+    heat_labs$factor <- do.call("c",lapply(unique(heat_labs$x),function(column){
+      # filter to current source
+      heats <- heat_labs[heat_labs$x == column,]
+      # check if all values for a given source are all 1 or NA
+      if(all(heats$value == 1|is.na(heats$value))) {
+        # if all values are 1 or NA then set NA values to 0
+        value <- heats$value
+        return(case_when(value == 1 ~ 1,is.na(value) ~ 0))
+      } else {
+        # else set all values to 0
+        return(rep(0,length(heats$value)))
+      }
+    }))
+    # change levels of factor column to "absence" or "presence"
+    heat_labs$factor <- factor(heat_labs$factor,levels = c(0,1),labels = c("absent","present"))
+    # create heatmap
+    heat <- ggplot(data = heat_labs,aes(x,y)) + 
+      # set all tiles to be grey initially
+      geom_tile(aes(fill = !!sym("value")),colour = "grey50",fill = "grey50",show.legend = FALSE) + 
+      # set the labels for the x-axis
+      scale_x_continuous(
+        # labels for x-axis
+        labels = unique(heat_labs$source)[!is.na(unique(heat_labs$source))],
+        # breaks for x-axis labels
+        breaks = unique(heat_labs$x)
+      ) +
+      # adjusting y-scale
+      scale_y_continuous(expand = c(0, 0),limits = c(-1,nrow(dend_labs) + 1)) +
+      # adjusting the theme of the ggplot
+      theme(
+        # removing axis lines
+        axis.line = element_blank(),
+        # removing axis ticks
+        axis.ticks = element_blank(),
+        # removing axis text
+        axis.text.y = element_blank(),
+        # removing axis titles
+        axis.title = element_blank(),
+        # change angle of x-axis title
+        axis.text.x = element_text(angle = 90,vjust = 0.15,hjust = 1,size = 14),
+        # removing background panel
+        panel.background = element_blank()
       )
-    } else {
-      heat <- heat + scale_fill_gradient2(
-        # set the value legend to log2fc (assume these values represent log2fc?)
-        name = legend_title,
-        # set low value to blue
-        low = '#0017FF',
-        # set 0 to white
-        mid = "white",
-        # set high value to red
-        high = '#FF2D00',
-        # set midpoint to 0
-        midpoint = 0,
-        # set NA values to grey
-        na.value = "grey50"
-      )
-    }
-    heat <- heat + theme(
+    # if there are any values that contain a decimal
+    if(any(grepl("\\.",as.character(heat_labs$value)))) {
+      if(!is.null(legendtitle)) {
+        # fix below!!!! (IMPORTAAAANT)
+        legend_title <- legendtitle[1]
+      } else {
+        legend_title <- TeX("$\\log_{2}(FC)$")
+      }
+      # add new scale for log2fc values
+      heat <- heat + 
+        # add new scale
+        new_scale_fill() + 
+        # add geom_tile fills for log2fc values
+        geom_tile(aes(x,y,fill = value), show.legend = TRUE)
+      # check if squish_bounds is null
+      if(!is.null(squish_bounds)) {
+        # get upper and lower bound squish values
+        squish_bounds <- as.numeric(do.call("c",strsplit(squish_bounds,",")))
+        # draw new scale with squish bounds parameters
+        heat <- heat + scale_fill_gradient2(
+          # set the value legend to log2fc (assume these values represent log2fc)
+          name = legend_title,
+          # set low value to blue
+          low = '#0017FF',
+          # set 0 to white
+          mid = "white",
+          # set high value to red
+          high = '#FF2D00',
+          # set midpoint to 0
+          midpoint = 0,
+          # set limits based on squish bounds
+          limits = c(squish_bounds[1],squish_bounds[2]),
+          # squish the scales
+          oob = scales::squish,
+          # set NA values to grey
+          na.value = "grey50"
+        )
+      } else {
+        heat <- heat + scale_fill_gradient2(
+          # set the value legend to log2fc (assume these values represent log2fc?)
+          name = legend_title,
+          # set low value to blue
+          low = '#0017FF',
+          # set 0 to white
+          mid = "white",
+          # set high value to red
+          high = '#FF2D00',
+          # set midpoint to 0
+          midpoint = 0,
+          # set NA values to grey
+          na.value = "grey50"
+        )
+      }
+      heat <- heat + theme(
         # adjust legend title size and position
         legend.title = element_text(size = 12,vjust = 2)
       )
-  }
-  # if there are any factor values set to "present" (when p-values not present)
-  if(any(heat_labs$factor == "present")) {
-    # add new scale for factor values
-    heat <- heat + 
-      # add new scale
-      new_scale_fill() + 
-      # add geom_tile fills for factor values
-      geom_tile(aes(x,y,fill = factor),show.legend = TRUE) + 
-      scale_fill_manual(
-        # set factor values legend title to ""
-        name = "",
-        # set absent to transparent and present to black
-        values = c("absent" = "transparent","present" = "black"),
-        # override the legend specs
-        guide = guide_legend(
+    }
+    # if there are any factor values set to "present" (when p-values not present)
+    if(any(heat_labs$factor == "present")) {
+      # add new scale for factor values
+      heat <- heat + 
+        # add new scale
+        new_scale_fill() + 
+        # add geom_tile fills for factor values
+        geom_tile(aes(x,y,fill = factor),show.legend = TRUE) + 
+        scale_fill_manual(
+          # set factor values legend title to ""
+          name = "",
+          # set absent to transparent and present to black
+          values = c("absent" = "transparent","present" = "black"),
+          # override the legend specs
+          guide = guide_legend(
             override.aes = list(
               # override the legend fills to grey and black 
               fill = c("grey50","black")
             )
           )
-      )
+        )
+    }
   }
   
-  return(heat)
-  
+  result <- list(heat_labs,heat)
+  names(result) <- c("heat_labs","heat")
+  return(result)
+    
 }

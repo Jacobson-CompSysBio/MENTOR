@@ -23,10 +23,17 @@ def fancy_dendrogram(
         increment,
         maxsize,
         heatmaps,
+        plottype,
         reordercols,
         legendtitle,
         squish,
         relwidths,
+        clusterlabelsize,
+        heatmaplabelsize,
+        groupcolors,
+        trackheight,
+        highlightindex,
+        highlightcolor,
         plotwidth,
         plotheight
     
@@ -34,16 +41,16 @@ def fancy_dendrogram(
 
     command = 'Rscript ' + os.path.dirname(os.path.realpath(__file__)) + '/create_dendogram.R'
     if distances is not None:
-        command += f' --distances={distances}'
+        command += f' --distances="{distances}"'
     if clusters is not None:
-        command += f' --clusters={clusters}'
+        command += f' --clusters="{clusters}"'
     if map is not None:
-        command += f' --map={map}'
+        command += f' --map="{map}"'
     if outdir is not None:
-        command += f' --outdir={outdir}'
+        command += f' --outdir="{outdir}"'
         command = command + '/'
     if outfile is not None:
-        command += f' --outfile={outfile}'
+        command += f' --outfile="{outfile}"'
     if subcluster is True:
         command += f' --subcluster'
     if increment is not None:
@@ -51,15 +58,29 @@ def fancy_dendrogram(
     if maxsize is not None:
         command += f' --maxsize={maxsize}'
     if heatmaps is not None:
-        command += f' --heatmaps={heatmaps}'
+        command += f' --heatmaps="{heatmaps}"'
+    if plottype is not None:
+        command += f' --plottype="{plottype}"'
     if reordercols is True:
         command += f' --reordercols'
     if legendtitle is not None:
         command += f' --legendtitle="{legendtitle}"'
     if squish is not None:
-        command += f' --squish={squish}'
+        command += f' --squish="{squish}"'
     if relwidths is not None:
-        command += f' --relwidths={relwidths}'
+        command += f' --relwidths="{relwidths}"'
+    if clusterlabelsize is not None:
+        command += f' --clusterlabelsize={clusterlabelsize}'
+    if heatmaplabelsize is not None:
+        command += f' --heatmaplabelsize={heatmaplabelsize}'
+    if trackheight is not None:
+        command += f' --trackheight="{trackheight}"'
+    if groupcolors is not None:
+        command += f' --groupcolors="{groupcolors}"'
+    if highlightindex is not None:
+        command += f' --highlightindex={highlightindex}'
+    if highlightcolor is not None:
+        command += f' --highlightcolor="{highlightcolor}"'
     if plotwidth is not None:
         command += f' --plotwidth={plotwidth}'
     if plotheight is not None:

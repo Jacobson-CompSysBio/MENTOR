@@ -27,22 +27,22 @@ def parse_args(test=None):
         '--outdir',
         action='store',
         type=pathlib.Path,
-        help='Save dendrogram and clusters to path.'
+        help='Location to save dendrogram and clusters'
     )
     parser.add_argument(
         '--outfile',
         action='store',
-        help='Description to append to filenames.'
+        help='Description to append to filenames'
     )
     parser.add_argument(
         '--multiplex',
         action='store',
-        help=''
+        help='Full path to multiplex network'
     )
     parser.add_argument(
         '--geneset',
         action='store',
-        help=''
+        help='Full path to geneset'
     )
     parser.add_argument(
         '--threads',
@@ -59,7 +59,7 @@ def parse_args(test=None):
         '--version',
         action='store_true',
         default=False,
-        help='Print version and exit.'
+        help='Print version and exit'
     )
     parser.add_argument(
         '--distances',
@@ -71,7 +71,7 @@ def parse_args(test=None):
         action='store',
         default=3,
         type=int,
-        help='Number of initial clusters desired in dendrogram'
+        help='Number of initial clusters desired in dendrogram (inital # if using --subcluster)'
     )
     parser.add_argument(
         '--map',
@@ -104,6 +104,12 @@ def parse_args(test=None):
         help='Full path to the heatmap file if you want to include a heatmap'
     )
     parser.add_argument(
+        '--plottype',
+        action='store',
+        default='rectangular',
+        help='Type of dendrogram (either rectangular or polar)'
+    )
+    parser.add_argument(
         '--reordercols',
         action='store_true',
         default=False,
@@ -112,7 +118,8 @@ def parse_args(test=None):
     parser.add_argument(
         '--legendtitle',
         action='store',
-        help='Title to give to continuous legend (default: log2FC)'
+        default="Value,Group",
+        help='Titles to give to legends; for rectangular dendrogram title to give to continuous legend; for polar dendrogram titles to give to continuous legend and factor legend'
     )
     parser.add_argument(
         '--squish',
@@ -123,21 +130,57 @@ def parse_args(test=None):
         '--relwidths',
         action='store',
         default='1,1',
-        help='If you are including a heatmap then you can adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width'
+        help='If including a heatmap then adjust the relative widths of the dendrogram to the heatmap with dend_width,heatmap_width; only used for rectangular dendrogram'
+    )
+    parser.add_argument(
+        '--clusterlabelsize',
+        action='store',
+        default=2.5,
+        help='Size of cluster labels associated with polar dendrogram'
+    )
+    parser.add_argument(
+        '--heatmaplabelsize',
+        action='store',
+        default=0.75,
+        help='Size of the labels associated with the polar dendrogram heatmap (gene names)'
+    )
+    parser.add_argument(
+        '--groupcolors',
+        action='store',
+        default=None,
+        help='Colors for the group blocks in polar dendrogram'
+    )
+    parser.add_argument(
+        '--trackheight',
+        action='store',
+        default='0.2,0.2,0.2',
+        help='Width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram)'
+    )
+    parser.add_argument(
+        '--highlightindex',
+        action='store',
+        default=None,
+        help='Sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN)'
+    )
+    parser.add_argument(
+        '--highlightcolor',
+        action='store',
+        default='#34EBDC',
+        help='Color to use for highlighted sectors on polar dendrogram'
     )
     parser.add_argument(
         '--plotwidth',
         action='store',
         default=30,
         type=int,
-        help='Width of the dendrogram/heatmap visualization'
+        help='Width of the plot'
     )
     parser.add_argument(
         '--plotheight',
         action='store',
         default=None,
         type=int,
-        help='Height of the dendrogram/heatmap visualization'
+        help='Height of the plot'
     )
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -207,6 +250,7 @@ def main():
             drop_missing = True,
             max_rank = 'elbow',
         )
+        print("\nrunning clustering")
         mod = cluster.HierarchicalClustering(
             metric = metrics.spearman_d,
             memory = None,
@@ -235,10 +279,17 @@ def main():
                 increment = args.increment,
                 maxsize = args.maxsize,
                 heatmaps = args.heatmaps,
+                plottype = args.plottype,
                 reordercols = args.reordercols,
                 legendtitle = args.legendtitle,
                 squish = args.squish,
                 relwidths = args.relwidths,
+                clusterlabelsize = args.clusterlabelsize,
+                heatmaplabelsize = args.heatmaplabelsize,
+                groupcolors = args.groupcolors,
+                trackheight = args.trackheight,
+                highlightindex = args.highlightindex,
+                highlightcolor = args.highlightcolor,
                 plotwidth = args.plotwidth,
                 plotheight = args.plotheight
             )
@@ -270,10 +321,17 @@ def main():
             increment = args.increment,
             maxsize = args.maxsize,
             heatmaps = args.heatmaps,
+            plottype = args.plottype,
             reordercols = args.reordercols,
             legendtitle = args.legendtitle,
             squish = args.squish,
             relwidths = args.relwidths,
+            clusterlabelsize = args.clusterlabelsize,
+            heatmaplabelsize = args.heatmaplabelsize,
+            groupcolors = args.groupcolors,
+            trackheight = args.trackheight,
+            highlightindex = args.highlightindex,
+            highlightcolor = args.highlightcolor,
             plotwidth = args.plotwidth,
             plotheight = args.plotheight
         )

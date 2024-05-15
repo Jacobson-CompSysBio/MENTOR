@@ -95,12 +95,12 @@ def fullranks_to_matrix(path_or_dataframe,to = 'scores',drop_missing = True):
         fullranks = path_or_dataframe
     else:
         fullranks = pd.read_table(path_or_dataframe)
-    if drop_missing:
-        fullranks = fullranks.query('seed!="missing"')
+        if drop_missing:
+            fullranks = fullranks[fullranks['seed'] != 'missing']
     if to.lower().startswith('score'):
-        mat = fullranks.pivot(index = 'seed',columns = 'NodeNames',values = 'Score')
+        mat = fullranks.set_index(['seed','NodeNames'])['Score'].unstack(level = 'NodeNames')
     elif to.lower().startswith('rank'):
-        mat = fullranks.pivot(index = 'seed',columns = 'NodeNames',values = 'rank')
+        mat = fullranks.set_index(['seed', 'NodeNames'])['rank'].unstack(level='NodeNames')
     else:
         raise ValueError(f'Invalid value for `to`: {to}')
     return mat
@@ -111,10 +111,10 @@ def transform_fullranks(path_or_dataframe,drop_missing = True,max_rank = 'elbow'
     else:
         fullranks = pd.read_table(path_or_dataframe)
     if drop_missing:
-        fullranks = fullranks.query('seed!="missing"')
+        fullranks = fullranks[fullranks['seed'] != 'missing']
     if max_rank == 'elbow':
-        y = fullranks.groupby('rank')['Score'].mean()
-        max_rank = metrics.get_elbow(y)
+        Y = fullranks.groupby('rank')['Score'].mean()
+        max_rank = metrics.get_elbow(Y)
         LOGGER.info(f'Set max_rank to {max_rank}.')
     ranks = fullranks_to_matrix(fullranks,to = 'rank',drop_missing = drop_missing)
     scores = fullranks_to_matrix(fullranks,to = 'scores',drop_missing = drop_missing)
@@ -125,7 +125,8 @@ def transform_fullranks(path_or_dataframe,drop_missing = True,max_rank = 'elbow'
     col_mask = mask.any()
     features = scores.loc[:,col_mask]
     features = features.rank(axis = 1,method = 'first',ascending = False)
+    feat_list = features.columns.to_list()
     for i in labels:
-        if (i in features.columns.to_list()) and np.isnan(features.loc[i,i]):
+        if (i in feat_list) and np.isnan(features.loc[i,i]):
             features.loc[i,i] = 0
     return features,labels
