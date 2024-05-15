@@ -6,7 +6,7 @@
 
 ################ heatmap function ################
 
-heatmap <- function(heatmap,dend_labs,reordercols,legendtitle,squish_bounds,map) {
+heatmap <- function(heatmap,dend_labs,reordercols,legendtitle,squish_bounds) {
   
   # read in logfc table (must be a tsv with columns: label, log2fc)
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
