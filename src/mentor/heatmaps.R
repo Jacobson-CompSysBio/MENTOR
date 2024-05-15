@@ -12,6 +12,12 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
   heat_labs <- suppressMessages(read_tsv(heatmap,col_names = TRUE, show_col_types = FALSE))
   # changing first column name to "label" to match dend_labs
   names(heat_labs) <- c("label","value","source")
+  if(any(!(unique(heat_labs$label) %in% dend_labs$label))) {
+    missing_genes <- unique(heat_labs$label)[which(!(unique(heat_labs$label) %in% dend_labs$label))]
+    heat_labs <- heat_labs[!(heat_labs$label %in% missing_genes),]
+    cat(paste0('\n\nWARNING: ',length(missing_genes),' genes from users heatmap.txt file were not found in the multiplex or did not match dendrogram labels; genes removed from heatmap.txt file:\n'))
+    cat(paste0(missing_genes,collapse = "\n"))
+  }
   if(any(duplicated(heat_labs))) {
     cat("\nWARNING: duplicated rows in heatmap table; make sure all rows are unique!")
   }
