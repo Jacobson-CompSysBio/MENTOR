@@ -1,6 +1,7 @@
 
 from mentor._version import __version__
 import argparse
+from datetime import datetime
 import os
 import sys
 import pandas as pd
@@ -193,7 +194,7 @@ def parse_args(test=None):
 
 
 def main():
-    print("\nMENTOR STARTED: " + date)
+    print("\nMENTOR STARTED: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     args = parse_args()
     logger_config = dict(
         format = '[%(asctime)s|%(levelname)s] %(message)s',
@@ -338,5 +339,5 @@ def main():
         )
     else:
         pass
-    print("\nMENTOR FINISHED: " + date)
+    print("\nMENTOR FINISHED: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     return 0
