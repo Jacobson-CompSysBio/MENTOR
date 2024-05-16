@@ -106,70 +106,70 @@ RWR <- function(geneset,adjnorm,mpo,method,num_folds,chunks,restart,tau,threads,
   
 }
 
-calc_metrics_cv <- function(res_combined,res_avg) {
+#calc_metrics_cv <- function(res_combined,res_avg) {
   
   ### calculate ROC/PRC per-fold
-  res_combined <- res_combined %>%
-    dplyr::mutate(fold = as.factor(fold)) %>%
-    dplyr::group_by(fold) %>%
-    dplyr::group_modify(~ calc_ROCPRC(df = .x,scorescol = "rank",labelscol = "InValset"))
+#  res_combined <- res_combined %>%
+#    dplyr::mutate(fold = as.factor(fold)) %>%
+#    dplyr::group_by(fold) %>%
+#    dplyr::group_modify(~ calc_ROCPRC(df = .x,scorescol = "rank",labelscol = "InValset"))
   # 1. precision @ numleftout (aka R-PREC)
-  output <- res_combined %>%
-    dplyr::group_by(fold) %>%
-    dplyr::filter(rank == num_leftout) %>%
-    dplyr::summarise(value = PREC,measure = "P@NumLeftOut")
+#  output <- res_combined %>%
+#    dplyr::group_by(fold) %>%
+#    dplyr::filter(rank == num_leftout) %>%
+#    dplyr::summarise(value = PREC,measure = "P@NumLeftOut")
   # 2. Avg PRC (uses Average Precision, not interpolated precision)
-  output <- rbind(output,res_combined %>%
-    dplyr::group_by(fold) %>%
-    dplyr::filter(TP == 1) %>%
-    dplyr::summarise(value = sum(PREC)/sum(InValset),measure = "AvgPrec"))
+#  output <- rbind(output,res_combined %>%
+#    dplyr::group_by(fold) %>%
+#    dplyr::filter(TP == 1) %>%
+#    dplyr::summarise(value = sum(PREC)/sum(InValset),measure = "AvgPrec"))
   # 3. AUPRC (provide both the AUPRC per fold, and the AUPRC expected by an unskilled model)
-  output <- rbind(output, res_combined %>%
-    dplyr::group_by(fold) %>%
-    dplyr::summarise(value = area_under_curve(REC,PREC,method = "trapezoid",ties = "max"),measure = "AUPRC"))
-  output <- rbind(output,res_combined %>%
-    dplyr::group_by(fold) %>% 
-    dplyr::summarise(value = dplyr::first(num_leftout)/dplyr::n(),measure = "ExpectedAUPRC"))
+#  output <- rbind(output, res_combined %>%
+#    dplyr::group_by(fold) %>%
+#    dplyr::summarise(value = area_under_curve(REC,PREC,method = "trapezoid",ties = "max"),measure = "AUPRC"))
+#  output <- rbind(output,res_combined %>%
+#    dplyr::group_by(fold) %>% 
+#    dplyr::summarise(value = dplyr::first(num_leftout)/dplyr::n(),measure = "ExpectedAUPRC"))
   # 4. AUROC
-  output <- rbind(output,res_combined %>%
-    dplyr::group_by(fold) %>%
-    dplyr::summarise(value = sum(REC)/dplyr::n(),measure = "AUROC"))
+#  output <- rbind(output,res_combined %>%
+#    dplyr::group_by(fold) %>%
+#    dplyr::summarise(value = sum(REC)/dplyr::n(),measure = "AUROC"))
   ### get metrics based on reranking of mean ranks
-  res_avg <- calc_ROCPRC(res_avg,scorescol = "rerank",labelscol = "InValset")
+#  res_avg <- calc_ROCPRC(res_avg,scorescol = "rerank",labelscol = "InValset")
   # 5. AvgPrec of mean ranks (uses Average Precision, not interpolated avg precision)
-  output <- rbind(output,res_avg %>%
-    dplyr::filter(TP == 1) %>%
-    dplyr::summarise(fold = "meanrank",value = sum(PREC)/sum(InValset),measure = "AvgPrec"))
+#  output <- rbind(output,res_avg %>%
+#    dplyr::filter(TP == 1) %>%
+#    dplyr::summarise(fold = "meanrank",value = sum(PREC)/sum(InValset),measure = "AvgPrec"))
   # 6. AUPRC of mean ranks
-  output <- rbind(output,res_avg %>%
-    dplyr::summarise(fold = "meanrank",value = area_under_curve(REC,PREC,method = "trapezoid",ties = "max"),measure = "AUPRC"))
+#  output <- rbind(output,res_avg %>%
+#    dplyr::summarise(fold = "meanrank",value = area_under_curve(REC,PREC,method = "trapezoid",ties = "max"),measure = "AUPRC"))
   # 7. AUROC of mean ranks
-  output <- rbind(output,res_avg %>%
-    dplyr::summarise(fold = "meanrank",value = sum(REC)/dplyr::n(),measure = "AUROC"))
-  output$geneset <- res_combined$geneset[1]
-  return(list(summary = output,res_combined = res_combined,res_avg = res_avg))
+#  output <- rbind(output,res_avg %>%
+#    dplyr::summarise(fold = "meanrank",value = sum(REC)/dplyr::n(),measure = "AUROC"))
+#  output$geneset <- res_combined$geneset[1]
+#  return(list(summary = output,res_combined = res_combined,res_avg = res_avg))
 
-}
+#}
 
-calculate_max_precision <- function(pr,metrics) {
+#calculate_max_precision <- function(pr,metrics) {
   
-  maxprec <- foreach::foreach(
-    f = pr$fold@.Data,
-    r = pr$recall,
-    .combine = c
-  ) %do% {
-    prec <- metrics$res_combined %>%
-      dplyr::filter(fold == f,REC >= r) %>%
-      dplyr::pull(PREC)
-    if (length(prec) > 0) {
-      max(prec)
-    } else {
-      return(0)
-    }
-  }
-  maxprec
+#  maxprec <- foreach::foreach(
+#    f = pr$fold@.Data,
+#    r = pr$recall,
+#    .combine = c
+#  ) %do% {
+#    prec <- metrics$res_combined %>%
+#      dplyr::filter(fold == f,REC >= r) %>%
+#      dplyr::pull(PREC)
+#    if (length(prec) > 0) {
+#      max(prec)
+#    } else {
+#      return(0)
+#    }
+#  }
+#  maxprec
   
-}
+#}
 
 post_process_rwr_output_cv <- function(res,extras,folds,nw.mpo) {
   
@@ -249,8 +249,8 @@ RWR_CV <- function(data = NULL,
   method <- updated_data_list$method
   res <- RWR(geneset,nw_adjnorm,nw_mpo,method,folds,chunks,restart,tau,threads,verbose)
   res_combined <- post_process_rwr_output_cv(res,extras,folds,nw_mpo)
-  res_avg <- calculate_average_rank_across_folds_cv(res_combined)
-  metrics <- calc_metrics_cv(res_combined,res_avg)
+  #res_avg <- calculate_average_rank_across_folds_cv(res_combined)
+  #metrics <- calc_metrics_cv(res_combined,res_avg) # remove
   out_path <- get_file_path("RWR-CV_",
     res_combined$geneset[1],
     get_base_name(data),
@@ -266,43 +266,43 @@ RWR_CV <- function(data = NULL,
       dplyr::slice_head(prop = numranked)
     write_table(combined,out_path)
   }
-  out_path <- get_file_path("RWR-CV_",
-    res_avg$geneset[1],
-    get_base_name(data),
-    outdir = outdir,
-    ext = ".meanranks.tsv"
-  )
-  if (write_to_file) {
-    write_table(
-      res_avg %>%
-        dplyr::slice_head(prop = numranked),
-      out_path
-    )
-  }
-  out_path <- get_file_path("RWR-CV_",
-    metrics$res_combined$geneset[1],
-    get_base_name(data),
-    outdir = outdir,
-    ext = ".metrics.tsv"
-  )
-  if (write_to_file) {
-    write_table(metrics$res_avg,out_path)
-  }
-  out_path <- get_file_path("RWR-CV_",
-    metrics$res_combined$geneset[1],
-    get_base_name(data),
-    outdir = outdir,
-    ext = ".summary.tsv"
-  )
-  if (write_to_file) {
-    write_table(metrics$summary,out_path)
-  }
+  #out_path <- get_file_path("RWR-CV_",
+  #  res_avg$geneset[1],
+  #  get_base_name(data),
+  #  outdir = outdir,
+  #  ext = ".meanranks.tsv"
+  #)
+  #if (write_to_file) {
+  #  write_table(
+  #    res_avg %>%
+  #      dplyr::slice_head(prop = numranked),
+  #    out_path
+  #  )
+  #}
+  #out_path <- get_file_path("RWR-CV_",
+  #  metrics$res_combined$geneset[1],
+  #  get_base_name(data),
+  #  outdir = outdir,
+  #  ext = ".metrics.tsv"
+  #)
+  #if (write_to_file) {
+  #  write_table(metrics$res_avg,out_path)
+  #}
+  #out_path <- get_file_path("RWR-CV_",
+  #  metrics$res_combined$geneset[1],
+  #  get_base_name(data),
+  #  outdir = outdir,
+  #  ext = ".summary.tsv"
+  #)
+  #if (write_to_file) {
+  #  write_table(metrics$summary,out_path)
+  #}
   return(
     list(
-      "fullranks" = res_combined,
-      "meanranks" = res_avg,
-      "metrics" = metrics$res_avg,
-      "summary" = metrics$summary
+      "fullranks" = res_combined #,
+      #"meanranks" = res_avg, # remove
+      #"metrics" = metrics$res_avg, # remove
+      #"summary" = metrics$summary # remove
     )
   )
   

@@ -210,20 +210,20 @@ def main():
     LOGGER.debug(args)
     if args.outfile is not None:
         diss_mat = args.outfile + '-dissimilarity-matrix.tsv'
-        diss_stats = args.outfile + '-dissimilarity-stats.tsv'
-        diss_dist = args.outfile + '-distribution-of-pairwise-dissimilarities.png'
+        #diss_stats = args.outfile + '-dissimilarity-stats.tsv'
+        #diss_dist = args.outfile + '-distribution-of-pairwise-dissimilarities.png'
     else:
         diss_mat = 'dissimilarity-matrix.tsv'
-        diss_stats = 'dissimilarity-stats.tsv'
-        diss_dist = 'distribution-of-pairwise-dissimilarities.png'
+        #diss_stats = 'dissimilarity-stats.tsv'
+        #diss_dist = 'distribution-of-pairwise-dissimilarities.png'
     if args.outdir is not None:
         out_dissimilarity_matrix = args.outdir / diss_mat
-        out_dissimilarity_stats = args.outdir / diss_stats
-        out_dissimilarity_distribution = args.outdir / diss_dist
+        #out_dissimilarity_stats = args.outdir / diss_stats
+        #out_dissimilarity_distribution = args.outdir / diss_dist
     else:
         out_dissimilarity_matrix = None
-        out_dissimilarity_stats = None
-        out_dissimilarity_distribution = None
+        #out_dissimilarity_stats = None
+        #out_dissimilarity_distribution = None
     if args.multiplex and args.geneset:
         command = rwrtoolkit.rwr_singletons(
             data = args.multiplex,
@@ -295,21 +295,21 @@ def main():
             )
         else:
             dmat = None
-        if out_dissimilarity_stats is not None:
-            print("\nsaving dissimilarity matrix statistics")
-            out_dissimilarity_stats.parent.mkdir(parents = False,exist_ok = True)
-            with open(out_dissimilarity_stats,'w') as f:
-                try:
-                    dist_summary = metrics.summarize_pairwise_dissimilarities(mod.pairwise_distances,mod.labels_)
-                    for key,value in dist_summary.items():
-                        print(key,value,sep = '\t',file = f)
-                except:
-                    pass
-                try:
-                    chi = metrics.calinski_harabasz_score_(X,mod.labels_)
-                    print('calinski_harabasz_score',chi,sep = '\t',file = f)
-                except:
-                    pass
+        #if out_dissimilarity_stats is not None:
+        #    print("\nsaving dissimilarity matrix statistics")
+        #    out_dissimilarity_stats.parent.mkdir(parents = False,exist_ok = True)
+        #    with open(out_dissimilarity_stats,'w') as f:
+        #        try:
+        #            dist_summary = metrics.summarize_pairwise_dissimilarities(mod.pairwise_distances,mod.labels_)
+        #            for key,value in dist_summary.items():
+        #                print(key,value,sep = '\t',file = f)
+        #        except:
+        #            pass
+        #        try:
+        #            chi = metrics.calinski_harabasz_score_(X,mod.labels_)
+        #            print('calinski_harabasz_score',chi,sep = '\t',file = f)
+        #        except:
+        #            pass
     elif args.distances is not None:
         fd.fancy_dendrogram(
             distances = args.distances,
