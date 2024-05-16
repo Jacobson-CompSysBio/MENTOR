@@ -137,8 +137,8 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
         # draw the highlight for the user input sector
         lapply(unique(highlight_index),function(x){
             draw.sector(
-                get.cell.meta.data("cell.start.degree",sector.index = x) + 1,
-                get.cell.meta.data("cell.end.degree",sector.index = x) - 1,
+                get.cell.meta.data("cell.start.degree",sector.index = x) + 2.5,
+                get.cell.meta.data("cell.end.degree",sector.index = x) - 2.5,
                 rou1 = get.cell.meta.data("cell.top.radius",track.index = 1) + 0.05,
                 rou2 = get.cell.meta.data("cell.bottom.radius",track.index = total_tracks),
                 col = adjustcolor(highlight_color,0.20),
