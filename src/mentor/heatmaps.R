@@ -93,7 +93,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
     # create heatmap
     heat <- ggplot(data = heat_labs,aes(x,y)) + 
       # set all tiles to be grey initially
-      geom_tile(aes(fill = !!sym("value")),colour = "grey50",fill = "grey50",show.legend = FALSE) + 
+      geom_tile(aes(fill = !!sym("value")),colour = "grey",fill = "grey",show.legend = FALSE) + # change grey back to grey50? or #BEBEBE (lighter grey) 
       # set the labels for the x-axis
       scale_x_continuous(
         # labels for x-axis
@@ -153,7 +153,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
           # squish the scales
           oob = scales::squish,
           # set NA values to grey
-          na.value = "grey50"
+          na.value = "grey" # grey50
         )
       } else {
         heat <- heat + scale_fill_gradient2(
@@ -168,7 +168,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
           # set midpoint to 0
           midpoint = 0,
           # set NA values to grey
-          na.value = "grey50"
+          na.value = "grey" # grey50
         )
       }
       heat <- heat + theme(
@@ -193,7 +193,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
           guide = guide_legend(
             override.aes = list(
               # override the legend fills to grey and black 
-              fill = c("grey50","black")
+              fill = c("grey","black")
             )
           )
         )
