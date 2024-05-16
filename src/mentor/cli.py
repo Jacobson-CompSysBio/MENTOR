@@ -193,6 +193,7 @@ def parse_args(test=None):
 
 
 def main():
+    print("\nMENTOR STARTED: " + date)
     args = parse_args()
     logger_config = dict(
         format = '[%(asctime)s|%(levelname)s] %(message)s',
@@ -337,4 +338,5 @@ def main():
         )
     else:
         pass
+    print("\nMENTOR FINISHED: " + date)
     return 0
