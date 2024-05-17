@@ -343,7 +343,7 @@ create_dendogram <- function(
   dend_labs <- dend_labs[,c("ensembl","label","cluster","col")] # ,"x","y","row_order"
   cat("\n\nexporting clusters")
   write.table(
-    dend_labs[,c("label","cluster")],
+    dend_labs,
     paste0(out_dir,cluster_file),
     sep = "\t",
     col.names = TRUE,

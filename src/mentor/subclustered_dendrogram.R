@@ -213,6 +213,10 @@ subclustered_dendrogram <- function(
     dend_labs <- merge(dend_labs,map_genes,by = "ensembl",all.x = TRUE)
     dend_labs <- dend_labs %>% dplyr::select(ensembl,label,x,y,col,cex)
     dend_labs <- dend_labs[order(dend_labs$x,decreasing = FALSE),]
+  } else {
+    dend_labs$ensembl <- dend_labs$label
+    dend_labs <- dend_labs %>% dplyr::select(ensembl,label,x,y,col,cex)
+    dend_labs <- dend_labs[order(dend_labs$x,decreasing = FALSE),]
   }
   # extract segments
   dend_seg <- ggd1$segments %>%
