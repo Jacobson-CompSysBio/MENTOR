@@ -227,8 +227,8 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     }
     # create list of dendrograms based on our sub-/clustering
     dend_list <- lapply(unique(dend_labs$cluster),function(x) {
-      #dend_labs[dend_labs$cluster == x,]$ensembl
-      dend_labs[dend_labs$cluster == x,]$label
+      dend_labs[dend_labs$cluster == x,]$ensembl
+      #dend_labs[dend_labs$cluster == x,]$label
     })
     dend_list <- lapply(dend_list,function(x) {
       find_dendrogram(dend2,selected_labels = x)
