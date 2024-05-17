@@ -315,7 +315,7 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
     if(!is.null(heatmap_factor)) {
         if(!is.null(heatmap)) {
             legend(
-                x = cont_lgd$rect$left,y = 0.15,
+                x = cont_lgd$rect$left,y = 0.25,
                 legend = c("absent","present"),
                 fill = c("grey","black"),
                 title = "",
