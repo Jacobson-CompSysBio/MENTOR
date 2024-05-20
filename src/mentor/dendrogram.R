@@ -6,7 +6,7 @@
 
 ################ original dendrogram ################
 
-dendrogram <- function(dis_mat,k = 3,map) {
+dendrogram <- function(dis_mat,k = 3,map,plot_type) {
   
   #################### perform hierarchical clustering ####################
   
@@ -26,8 +26,13 @@ dendrogram <- function(dis_mat,k = 3,map) {
   #################### create color pallete ####################
   
   # select palette from RColorBrewer package
-  seg_pal_name <- "Dark2"
-  label_pal_name <- "Set2"
+  if(plot_type == "polar") {
+    seg_pal_name <- "Dark2"
+    label_pal_name <- "Dark2"  
+  } else {
+    seg_pal_name <- "Dark2"
+    label_pal_name <- "Set2"
+  }
   # add more colors to segments palette :
   if (k > 8) {
     # get segment color palette
