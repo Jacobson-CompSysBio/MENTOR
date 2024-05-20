@@ -13,7 +13,8 @@ subclustered_dendrogram <- function(
       k = 3,
       k_increment = 5,
       max_size = 40,
-      map
+      map,
+      plot_type
   ) {
   
   # Perform hierarchical clustering
@@ -139,8 +140,13 @@ subclustered_dendrogram <- function(
   #################### create color pallete ####################
   
   # select palette from RColorBrewer package
-  seg_pal_name <- "Dark2"
-  label_pal_name <- "Set2"
+  if(plot_type == "polar") {
+    seg_pal_name <- "Dark2"
+    label_pal_name <- "Dark2"  
+  } else {
+    seg_pal_name <- "Dark2"
+    label_pal_name <- "Set2"  
+  }
   
   # get final k
   k <- n_clusters
@@ -257,7 +263,7 @@ subclustered_dendrogram <- function(
     # add labels for dendrogram
     geom_label(
       data = dend_labs2,
-      aes(x, y, label = label, fill = col), 
+      aes(x, y, label = label, fill = col),
       color = 'black',
       hjust = 0,
       family = 'mono',

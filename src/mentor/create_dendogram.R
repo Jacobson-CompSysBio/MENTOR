@@ -277,7 +277,7 @@ create_dendogram <- function(
     dendrogram.path <- file.path(script.basename, "/dendrogram.R")
     source(dendrogram.path)
     # create dendrogram
-    dendo <- dendrogram(dis_mat = dm_dist,k,map)
+    dendo <- dendrogram(dis_mat = dm_dist,k,map,plot_type)
     
   } else {
 
@@ -290,7 +290,7 @@ create_dendogram <- function(
     subclustered.path <- file.path(script.basename, "/subclustered_dendrogram.R")
     source(subclustered.path)
     # create sub-clustered dendrogram
-    dendo <- subclustered_dendrogram(dis_mat = dm_dist,k,k_increment,max_size,map)
+    dendo <- subclustered_dendrogram(dis_mat = dm_dist,k,k_increment,max_size,map,plot_type)
     
   }
   
