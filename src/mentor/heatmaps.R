@@ -93,7 +93,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
     # create heatmap
     heat <- ggplot(data = heat_labs,aes(x,y)) + 
       # set all tiles to be grey initially
-      geom_tile(aes(fill = !!sym("value")),colour = "grey",fill = "grey",show.legend = FALSE) + # change grey back to grey50? or #BEBEBE (lighter grey) 
+      geom_tile(aes(fill = !!sym("value")),colour = "grey",fill = "grey",lwd = 0,show.legend = FALSE) + # change grey back to grey50? or #BEBEBE (lighter grey) ,colour = "grey",fill = "grey" # ,color = !!sym("value"))
       # set the labels for the x-axis
       scale_x_continuous(
         # labels for x-axis
@@ -131,7 +131,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
         # add new scale
         new_scale_fill() + 
         # add geom_tile fills for log2fc values
-        geom_tile(aes(x,y,fill = value), show.legend = TRUE)
+        geom_tile(aes(x,y,fill = value), lwd = 0,show.legend = TRUE)
       # check if squish_bounds is null
       if(!is.null(squish_bounds)) {
         # get upper and lower bound squish values
@@ -188,7 +188,7 @@ heatmap_ <- function(plot_type,heatmap,dend_labs,reordercols,legendtitle,squish_
           # set factor values legend title to ""
           name = "",
           # set absent to transparent and present to black
-          values = c("absent" = "transparent","present" = "black"),
+          values = c("absent" = "transparent","present" = "black"), #28282B matte black
           # override the legend specs
           guide = guide_legend(
             override.aes = list(
