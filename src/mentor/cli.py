@@ -227,6 +227,7 @@ def main():
         #out_dissimilarity_stats = None
         #out_dissimilarity_distribution = None
     if args.multiplex and args.geneset:
+        print("\nbuilding RWRtoolkit singletons command")
         command = rwrtoolkit.rwr_singletons(
             data = args.multiplex,
             geneset = args.geneset,
