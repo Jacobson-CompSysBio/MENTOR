@@ -72,9 +72,11 @@ create_rankings_cv <- function(rwr,networks,r,geneset,method,seed_genes,leftout,
 RWR <- function(geneset,adjnorm,mpo,method,num_folds,chunks,restart,tau,threads,verbose = FALSE) {
   
   networks <- paste(names(mpo)[1:mpo$Number_of_Layers],collapse = "_")
-  cluster <- makeCluster(threads)
-  doParallel::registerDoParallel(cluster) # cores = threads
-  res <- foreach::foreach(r = 1:num_folds,.export = c("extract_lo_and_seed_genes_cv","Random.Walk.Restart.Multiplex","create_rankings_cv"),.packages = c("dplyr","RandomWalkRestartMH")) %dopar% {
+  #cluster <- makeCluster(threads)
+  #doParallel::registerDoParallel(cluster) # cores = threads
+  cat("\nsetting up doparallel")
+  doParallel::registerDoParallel(cores = threads)
+  res <- foreach::foreach(r = 1:num_folds) %dopar% { # ,.export = c("extract_lo_and_seed_genes_cv","Random.Walk.Restart.Multiplex","create_rankings_cv"),.packages = c("dplyr","RandomWalkRestartMH")
     lo_seed_genelist <- extract_lo_and_seed_genes_cv(
       geneset,
       method,
@@ -102,8 +104,9 @@ RWR <- function(geneset,adjnorm,mpo,method,num_folds,chunks,restart,tau,threads,
     )
     ranking_results
   }
-  doParallel::stopCluster(cluster)
-  # doParallel::stopImplicitCluster()
+  # doParallel::stopCluster(cluster)
+  doParallel::stopImplicitCluster()
+  cat("finished doparallel")
   res
   
 }
@@ -249,12 +252,13 @@ RWR_CV <- function(data = NULL,
   geneset <- updated_data_list$geneset
   chunks <- updated_data_list$chunks
   method <- updated_data_list$method
-  print("\nrunning RWR with the following parameters:")
-  print(paste0("\nfolds = ",folds))
-  print(paste0("\nrestart = ",restart))
-  print(paste0("\ntau = ",tau))
-  print(paste0("\nthreads = ",threads))
+  cat("\nrunning RWR with the following parameters:")
+  cat(paste0("\nfolds = ",folds))
+  cat(paste0("\nrestart = ",restart))
+  cat(paste0("\ntau = ",tau))
+  cat(paste0("\nthreads = ",threads))
   res <- RWR(geneset,nw_adjnorm,nw_mpo,method,folds,chunks,restart,tau,threads,verbose)
+  cat("\nrwr completed")
   res_combined <- post_process_rwr_output_cv(res,extras,folds,nw_mpo)
   #res_avg <- calculate_average_rank_across_folds_cv(res_combined)
   #metrics <- calc_metrics_cv(res_combined,res_avg) # remove

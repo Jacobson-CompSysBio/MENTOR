@@ -30,6 +30,7 @@ suppressWarnings(suppressPackageStartupMessages(require(colorRamps)))
 suppressWarnings(suppressPackageStartupMessages(require(gridBase)))
 suppressWarnings(suppressPackageStartupMessages(require(grid)))
 suppressWarnings(suppressPackageStartupMessages(require(latex2exp)))
+suppressWarnings(suppressPackageStartupMessages(require(readr))
 # library(colorRamps)
 
 #################### Argument parser ##############################
