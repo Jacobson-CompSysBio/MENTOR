@@ -11,7 +11,6 @@ circlize <- function(dend_list,heatmap,heatmap_factor,clusters,cluster_label_siz
         "canvas.xlim" = c(-1,1),
         "canvas.ylim" = c(-1,1),
         gap.degree = c(rep(5,nrow(clusters) - 1),8),
-        gap.degree = rep(5,nrow(clusters)),
         points.overflow.warning = FALSE
     )
     # set up track heights & initialize
@@ -272,7 +271,16 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         # get max label size to add to first cont legend number (empty string)
         max_nchar <- max(nchar(legend_cols))
         lgd <- rep(NA, 11)
-        lgd[c(1,6,11)] <- c(2,0,-2)
+	# need to put in a check here for squish bounds
+	if(!is.null(squish_bounds)) {
+	    if(squish_bounds[1] < 1) {
+	        lgd[c(1,6,11)] <- c(squish_bounds[2],0,squish_bounds[1])
+	    } else {
+	        lgd[c(1,6,11)] <- c(squish_bounds[1],0,squish_bounds[2])
+	    }
+	} else {
+	    lgd[c(1,6,11)] <- c(2,0,-2)
+	}
         lgd[1] <- paste0(lgd[1],paste0(rep(" ",max_nchar + 20),collapse = ""))
         cont_lgd <- legend(
             "right",
