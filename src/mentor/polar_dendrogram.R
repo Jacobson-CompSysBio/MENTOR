@@ -186,6 +186,9 @@ polar_dendrogram <- function(dend_labs,dend2,heatmap,squish_bounds,cluster_label
         heatmap_factor$value <- as.character(heatmap_factor$value)
         heatmap_factor <- acast(heatmap_factor,label ~ source,var = "value")
         heatmap <- data.frame(do.call("rbind",heatmap_list[!factor_cols]))
+	if(nrow(heatmap) == 0) {
+	    heatmap <- NULL
+	}
     }
     # grab user defined group colors
     if(!is.null(group_colors)) {
