@@ -28,6 +28,12 @@ dependencies:
   - r-stringr
   - r-matrix
   - r-irkernel
+  - r-circlize
+  - r-colorramps
+  - r-reshape2
+  - r-gridbase
+  - r-readr
+  - bioconductor-complexheatmap
   - bioconductor-randomwalkrestartmh
   - scikit-learn>=1.4
   - scipy
