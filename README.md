@@ -31,27 +31,35 @@ usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multip
 arguments:
 
   -h, --help                                          Show this help message and exit
-  --geneset /path/to/geneset.txt                      Path to gene set file
-  --multiplex /path/to/multiplex.RData                Path to multiplex network
   --outdir /path/to/outdir                            Save output to path (default: None)
-  --outfile outfile                                   Description to append to filenames.
-  --threads threads                                    
-  --verbose, -v                                       Default: WARNING; once: INFO; twice: DEBUG (default: 0)
+  --outfile outfile                                   Description to append to filenames (default: None)
+  --multiplex /path/to/multiplex.RData                Path to multiplex network (default: None)
+  --geneset /path/to/geneset.txt                      Path to gene set file (default: None)
+  --threads threads                                   Number of threads to use in calculation (default: based on system) 
+  --verbose, -v                                       Gives output from runs. Default: WARNING; once: INFO; twice: DEBUG (default: 0)
   --version                                           Print version and exit (default: False)
   --distances /path/to/dissimilarity-matrix.tsv       Path to dissimilarity-matrix.tsv (default: None)
   --clusters clusters                                 Number of clusters for dendrogram (default: 3)
-  --map /path/to/map.txt                              Path to ensembl ID mapping file (default: None)
+  --map /path/to/map.txt                              Path to gene symbol to gene ID mapping file (default: None)
   --subcluster                                        Subcluster the dendrogram (default: False)   
-  --increment increment                               If subclustering increment cluster size by (default: 5)
+  --increment increment                               Increment subclustering cluster size by this value (default: 5)
   --maxsize maxsize                                   Maximum size of clusters for subclustering (default: 40)
-  --heatmaps /path/to/heatmap.txt                     Path to heatmap file (default: None)
-  --legendtitle legendtitle                           Title to give to continuous legend (default: log2FC)
+  --heatmaps /path/to/heatmap.txt                     Path to heatmap file if including heatmaps for log2FC or effect size (default: None)
+  --plottype shape                                    Type of dendrogram (either rectangular or polar; default: rectangular)
   --reordercols                                       Reorder columns of heatmap with clustering (default: False)
+  --legendtitle legendtitle                           Titles to give to legends; for rectangular dendrogram title to give to continuous legend;
+                                                      for polar dendrogram titles to give to continuous legend and factor legend (default: log2FC)
+  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
   --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
                                                       the heatmap
-  --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
   --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
                                                       (default: 1,1)
+  --clusterlabelsize labelsize                        Size of cluster labels associated with polar dendrogram (default: 2.5)
+  --heatmaplabelsize heatmaplabelsize                 Size of the labels associated with the polar dendrogram heatmap (gene names; default: 0.75)
+  --groupcolors #00000F,#FFFFFF,#000FFF               Colors for the group blocks in polar dendrogram (default: None)
+  --trackheight  height,height,height                 Width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram; default: 0.2, 0.2, 0.2)
+  --highlightindex 0,1,2                              Sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN; default: None)
+  --highlightcolor #34EBDC                            Color to use for highlighted sectors on polar dendrogram (default: #34EBDC)
   --plotwidth plotwidth                               Width of the dendrogram visualization (default: 30)
   --plotheight plotheight                             Height of the dendrogram/heatmap visualization (default: None)
 ```
