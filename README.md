@@ -23,10 +23,12 @@ Usage
 =====
 
 ```
-usage: mentor [-h] [--geneset /path/to/geneset.txt] [--multiplex /path/to/multiplex.RData] [--outdir /path/to/outdir]
+usage: mentor [-h] [--outdir /path/to/outdir] [--outfile outfile] [--multiplex /path/to/multiplex.RData] [--geneset /path/to/geneset.txt]
                    [--threads threads] [--verbose] [--version] [--distances /path/to/dissimilarity-matrix.tsv] [--clusters clusters]
                    [--map /path/to/map.txt] [--subcluster] [--increment increment] [--maxsize maxsize] [--heatmaps /path/to/heatmap.txt]
-                   [--reordercols] [--pcutoff pcutoff] [--squish=lower,upper] [--relwidths=dend,heat] [--plotwidth plotwidth]
+                   [--reordercols] [--legendtitle legendtitle] [--squish=lower,upper] [--relwidths=dend,heat] [--clusterlabelsize clusterlabelsize]
+                   [--heatmaplabelsize heatmaplabelsize] [--groupcolors "#00000F,#FFFFFF,#000FFF"] [--trackheight height,height,height]
+                   [--highlightindex 0,1,2] [--highlightcolor #34EBDC] [--plotwidth plotwidth] [--plotheight plotheight]
 
 arguments:
 
@@ -50,13 +52,11 @@ arguments:
   --legendtitle legendtitle                           Titles to give to legends; for rectangular dendrogram title to give to continuous legend;
                                                       for polar dendrogram titles to give to continuous legend and factor legend (default: log2FC)
   --squish lower,upper                                Squish the color scale to LOWER,UPPER bounds (default: None)
-  --pcutoff pcutoff                                   Cutoff value for p-value if there is a p-value column in
-                                                      the heatmap
   --relwidths dend,heat                               Set relative widths of dendrogram and heatmap to dend,heat
                                                       (default: 1,1)
   --clusterlabelsize labelsize                        Size of cluster labels associated with polar dendrogram (default: 2.5)
   --heatmaplabelsize heatmaplabelsize                 Size of the labels associated with the polar dendrogram heatmap (gene names; default: 0.75)
-  --groupcolors #00000F,#FFFFFF,#000FFF               Colors for the group blocks in polar dendrogram (default: None)
+  --groupcolors "#00000F,#FFFFFF,#000FFF"               Colors for the group blocks in polar dendrogram (default: None)
   --trackheight  height,height,height                 Width of the tracks in the polar dendrogram (heatmap1,heatmap2,dendrogram; default: 0.2, 0.2, 0.2)
   --highlightindex 0,1,2                              Sector(s) to highlight on polar dendrogram (sector1,sector2,...,sectorN; default: None)
   --highlightcolor #34EBDC                            Color to use for highlighted sectors on polar dendrogram (default: #34EBDC)
